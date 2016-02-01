@@ -1,0 +1,605 @@
+/*
+
+* {
+        font-family: verdana, arial, sans-serif;
+}
+body {
+        border-left: 1px solid #B9D3EE;
+        padding:0;
+        padding-left:30px !important;
+        margin:0;
+}
+body.menu {
+        background-color: #EFEFEF;
+        padding-top: 30px;
+}
+h3 {
+        padding:0;
+        margin:0;
+}
+*/
+html, body {
+    height: 100%;
+    width: 98%;
+}
+
+table#cam {
+    border-collapse: collapse;
+    border-color: #999;
+}
+#cam td{
+    border: 1px solid #999;
+}
+#cam th{
+    background-color: #999;
+    color: #FFF;
+    border-color: #999;
+}
+hr {
+    border: 1px solid #B9D3EE;
+}
+img {
+    border: 0;
+    margin:0;
+    padding:0;
+}
+
+#cam tr.line-separator td{
+    border-top: 5px solid #999;
+}
+#cam tr:hover {
+    color: #000;
+    background-color: #DDDDFF;
+}
+#cam tr:hover a{
+    color: #000;
+}
+#cam tr:hover .vlan a{
+    color: inherit;
+}
+td.port, td.vlan {
+    text-align: center;
+}
+a.connection, a.connection:visited {
+    display: block;
+    text-decoration:none;
+    color: black;
+    font-weight: bold;
+    padding: 2px 0;
+}
+/*
+td.port a:hover {
+    color:white !important;
+    background-color: blue;
+}
+*/
+td.mac {
+    text-transform: uppercase;
+}
+td.acoes {
+    text-align: right;
+    white-space: nowrap;
+}
+td.acoes img {
+    height: 16px;
+}
+
+.menu {
+    font-size:10px;
+}
+.menu a:link, .menu a:visited {
+    color: black;
+}
+/*
+.sidetitle {
+        background-color: #B9D3EE;
+        color: white;
+        width: 670px;
+        position: fixed;
+        left:-326px;
+        top:0%;
+        padding: 0 0 3px 5px;
+        writing-mode: bt-rl;
+        transform: rotate(-90deg);
+        -webkit-transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+}
+*/
+#search-form {
+    float:left;
+}
+
+
+/** D3 graphs **/
+
+marker#local {
+    fill: green;
+}
+
+.link {
+    fill: none;
+    stroke: #777;
+    stroke-width: 1.5px;
+}
+
+.link.local {
+    stroke: blue;
+}
+
+.link.local-hub {
+    stroke-dasharray: 0,2 1;
+    stroke: blue;
+    stroke-width: 1px !important;
+}
+
+.link.backbone {
+    stroke: #555;
+    stroke-width: 2px !important;
+}
+
+.host {
+    cursor: pointer;
+}
+
+circle {
+    fill: #ccc;
+    stroke: #333;
+    stroke-width: 1px;
+}
+/*
+circle.port{
+        fill:  #AAF;
+}
+*/
+circle.host {
+    stroke: blue !important;
+    /*fill:  #99F;*/
+}
+
+circle.switch {
+    stroke: black !important;
+}
+circle.selected-host {
+    fill: #55C !important;
+}
+.selected-host {
+    color: #FFF;
+    background-color: #55C;
+}
+.selected-host .vlan a {
+    color: inherit;
+}
+
+.selected-host a,
+.selected-host a:visited {
+    color: #FFF;
+}
+
+text.host-label {
+    font: 10px sans-serif;
+    fill: #333;
+}
+
+text.host-label:hover,
+text.host-label.selected {
+    /*    font-weight:bold;*/
+    text-decoration: underline;
+    fill: #000;
+    /*    stroke: #FFF;
+        stroke-width: 0.5px;*/
+    /*    stroke-opacity: .8;*/
+}
+
+
+/*text {
+  font: 10px sans-serif;
+  pointer-events: none;
+}
+
+text.shadow {
+  color: #000;
+  stroke: #fff;
+  stroke-width: 2px;
+  stroke-opacity: .8;
+}*/
+
+#netmap {
+    float:left;
+    width: 80%;
+    /*	position: fixed;*/
+    /*	margin: -12px 0 0 -4px;*/
+}
+
+#netmap svg {
+    float:right;
+}
+#bg-map {
+    /*cursor: hand;*/
+}
+
+.legenda {
+    /*	position: fixed;*/
+    float: right;
+    border: 1px dotted gray;
+    padding: 5px;
+    margin:3px;
+    background-color: #fff;
+    position: relative;
+    z-index: 999;
+}
+
+.legenda .icon {
+    height: 20px;
+    vertical-align: middle;
+}
+
+.legenda ul{
+    list-style: none;
+    margin-left: 2px;
+}
+
+.legenda table {
+    margin: 0;
+}
+/*
+ disable firefox drag'n drop  
+html, body, div, span, object,
+form, input, h1, h2, button, label, a, img, image, svg {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+     this will work for QtWebKit in future 
+    -webkit-user-drag: none;
+}*/
+
+#listhosts {
+    float:left;
+    width: 200px;
+}
+
+
+
+/* custom */
+/* on main.css: @import url("custom.css");*/
+
+/* host */
+.view.host-type{
+    padding-left: 55px;
+    background-position: 2px 10px;
+    background-repeat: no-repeat;
+}
+.view.host-type.switch {
+    background-image: url('../images/host/switch.png');
+}
+.view.host-type.router {
+    background-image: url('../images/host/router.png');
+}
+.view.host-type.server {
+    background-image: url('../images/host/server.png');
+}
+.view.host-type.supposed_hub {
+    background-image: url('../images/host/supposed_hub.png');
+}
+.view.host-type.security_camera {
+    background-image: url('../images/host/security_camera.png');
+}
+.view.host-type.wifi_router {
+    background-image: url('../images/host/wifi_router.png');
+}
+.view.host-type.unknown {
+    background-image: url('../images/host/unknown.png');
+}
+.view .actions{
+    float:right;
+}
+
+.host-connection-list {
+    width: auto;
+    border-collapse: collapse;
+}
+.host-connection-list,
+.host-connection-list td {
+    border: 1px solid rgb(201, 224, 237);
+}
+
+.view-connections .host-connection-list{
+    width: 100%;
+}
+
+.vlanlabel,
+.portlabel {
+    display:block;
+    width:100%;
+    text-align:center;
+    text-decoration:none;
+    padding: 2px 0;
+}
+
+.port {
+    padding: 0px;
+    border-spacing: 5px 10px;
+    /*    margin: 3px;*/
+    border: 2px solid #000;
+    /* SVG */
+    stroke-width: 2px;
+    fill-opacity:0.5;
+}
+
+a.port {
+    display: block;
+    text-align: center;
+    padding: 3px;
+    color: #fff;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.hover,
+.port:hover,
+g.host rect:hover {
+    border-color: orange !important;
+    stroke: orange !important;
+    stroke-opacity: 1 !important;
+}
+
+/* Host port menu */
+.menu {
+    display: none;
+    position: absolute;
+    margin-left: -1px;
+    padding: 2px;
+    text-align: left;
+    background-color: #fff;
+    border: 1px solid gray;
+    list-style: none;
+}
+
+
+a.ifOperStatus1:hover,
+a.ifOperStatus1:focus{
+    background-color: #4A4;
+    border: 3px solid #FF000 !important;
+}
+
+a.ifOperStatus2:hover,
+a.ifOperStatus2:focus{
+    background-color: #222;
+    border: 3px solid #FF000 !important;
+}
+
+.portbox {
+    border: 1px solid #808080;
+    padding: 5px 10px;
+    margin-bottom: 0px;
+    background-color: #888;
+    word-wrap: break-word;
+    line-height: 2.2em;
+    text-align: justify;
+    overflow: auto;
+    border-spacing: 3px;
+}
+
+.portbox span.port {
+    padding: 1px 2px;
+    margin: 2px;
+    width: 32px;
+    height: 31px;
+    float: left;
+    text-align: center;
+}
+
+table.items th:first-child
+{
+    width:10px;
+}
+
+#cam-grid {
+    width:70%;
+}
+
+/* map */
+#netmap {
+    display: block;
+    border: 1px solid #efefef;
+}
+
+#yw1 {
+    float: left;
+}
+
+.infobox {
+    padding: 3px;
+}
+
+.link.wireless {
+    stroke: #0000AA !important;
+    stroke-dasharray: 1,2;
+    stroke-opacity: 0.7;
+    stroke-width: 5px;
+}
+
+.link.fiber {
+    stroke: black !important;
+    stroke-width: 2px;
+}
+
+.link.supposed_link {
+    stroke: #0000AA !important;
+    stroke-width: 1px;
+    stroke-opacity: 0.5;
+}
+.link.utp_cat5 {
+    stroke: #0000AA !important;
+    stroke-width: 1px;
+}
+
+.link.utp_cat5e {
+    stroke: #0000AA !important;
+    stroke-width: 2px;
+}
+
+.link.utp_cat6 {
+    stroke: orange !important;
+    stroke-width: 2px;
+}
+
+/* host face */
+.ifAdminStatus1 {
+    color: #fff;
+    background-color: #080;
+    /* svg */
+    fill:#008000;
+}
+.ifAdminStatus2 {
+    color: #fff;
+    background-color: #800 !important;
+    /* svg */
+    fill:#800000 !important;
+}
+.ifOperStatus1 {
+    color: #fff;
+    background-color: #080;
+    /* svg */
+    fill:#008000;
+}
+.ifOperStatus2 {
+    background-color: #000;
+    /* svg */
+    fill: #000000;
+}
+
+/* destacar porta UP bloqueada */
+.ifOperStatus1.dot1dStpPortState2 {
+    background-color: #FF0;
+    fill: #FF0;
+}
+
+/* porta com host conectado */
+.hasConnection {
+    stroke: blue;
+    stroke-fill: blue;
+    border-color: #0000cf !important;
+    font-weight: bolder;
+}
+
+#connections div {
+    height: 32px;
+    margin-bottom: 2px;
+}
+
+#connections a {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 15px;
+    white-space: nowrap;
+    background-position: center left;
+}
+#connections a.host {
+    background-position: center left;
+}
+#connections a.vlan {
+    margin-right: 2px;
+    text-align: center;
+    width: 40px;
+    float: left;
+}
+
+#portInfoBox {
+    display: none;
+    width: 100%;
+    margin-top: 3px;
+}
+
+#portInfoBox h3 {
+    margin: 0;
+}
+
+#portInfoBox ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#portInfoBox select {
+    display: inline; 
+    color: #000;
+    height: 1.5em;
+    font-size: 10px;
+    background-color: transparent;
+}
+
+#portInfoBox select.readonly {
+    color: #888;
+    border: 1px solid gray;
+}
+
+#portInfoBox form {
+    display: inline;
+}
+
+#portInfoBox th {
+    text-align: right;
+}
+
+#portInfoBox .title{
+    font-weight: bolder;
+    font-size: 15px;
+    line-height: 20px;
+    vertical-align: middle;
+    padding:3px 5px;
+    height: 22px;
+}
+#portInfoBox input{
+    font-size: 15px;
+    padding: 3px;
+}
+
+#portInfoBox .nav {
+    margin-bottom: 0px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.action,
+.actions input {
+    padding: 2px 4px;
+    margin: auto 2px;
+    background-color: #fff;
+}
+.actions input{
+    width:100%;
+}
+#btnClosePortBox {
+    float: right;
+}
+
+
+
+#menuhosts {
+    display: block;
+    float: left;
+    width: 160px;
+    height: 100%;
+    padding: 0;
+}
+#menuhosts #hostfilter {
+    width: 80%;
+    background: url('../images/search.png') no-repeat 7px center;
+    padding: 5px 0 5px 27px;
+    margin: 1px;
+    border: 1px solid #eee;
+}
+#listhosts {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    float: right;
+}
+#listhosts a {
+    display: block;
+    height: 30px;
+    line-height: 14px;
+    vertical-align: middle;
+    background-color: #F4F4F4;
+    margin-bottom: 1px;
+    background-position: left center;
+}

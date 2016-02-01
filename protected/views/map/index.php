@@ -1,0 +1,1 @@
+<?php $this->renderPartial('_view');

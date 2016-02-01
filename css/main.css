@@ -1,0 +1,85 @@
+body
+{
+    margin: 0;
+    padding: 50px 10px 10px 10px;
+    color: #555;
+    font: normal 10pt Arial,Helvetica,sans-serif;
+    background: #EFEFEF;
+}
+
+#header
+{
+    margin: 0;
+    padding: 0;
+}
+
+#content
+{
+    padding:0;
+}
+
+#sidebar
+{
+    padding: 20px 20px 20px 0;
+}
+
+#footer
+{
+    padding: 10px;
+    margin: 10px 20px;
+    font-size: 0.8em;
+    text-align: center;
+    border-top: 1px solid #CCC;
+}
+
+#logo
+{
+    float: left;
+    padding: 7px;
+    font-size: 200%;
+}
+
+.operations a {
+    font-size: 13px;
+}
+
+.button-column {
+    white-space: nowrap;
+}
+
+/* bootstrap */
+
+.breadcrumb {
+    padding: 2px 5px !important;
+    margin-bottom: 10px !important;
+}
+
+.breadcrumb > .active {
+    font-weight: bolder;
+    color: #000 !important;
+}
+
+.inline {
+    display: inline !important;
+}
+
+select {
+    padding:0 !important;
+    width: auto !important;
+}
+
+.table th, .table td {
+    padding: 5px !important;
+}
+
+/* colorpicker bootstrap conflict */
+.colorpicker input {
+	background-color: transparent !important;
+	border: 1px solid transparent !important;
+	font-size: 10px !important;
+	font-family: Arial,Helvetica,sans-serif !important;
+	color: #898989 !important;
+	padding: 0px !important;
+	height: 11px !important;
+        width: auto;
+}
