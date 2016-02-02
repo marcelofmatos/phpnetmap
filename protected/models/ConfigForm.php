@@ -37,7 +37,7 @@ class ConfigForm extends CFormModel {
      */
     public function attributeLabels() {
         return array(
-            'translateCamTable' => 'Translate CAM Table with Gateway ARP table (SLOW)',
+            'translateCamTable' => 'Translate CAM Table with Gateway ARP table (Be careful! Consults can be slow)',
             'hostGatewayId' => 'Gateway',
             'cacheTtlCam' => 'TTL for CAM table Cache (seconds)',
             'cacheTtlArp' => 'TTL for ARP table Cache (seconds)',
