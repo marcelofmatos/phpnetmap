@@ -30,6 +30,12 @@ Altere o docker-compose.yml conforme necessário
 ## Instalação do Docker
 * curl -sSL https://get.docker.com/ | sh
 
+## Instalação do docker-compose
+
+ apt-get install python-pip
+ pip install docker-compose
+
+
 
 
 # Referências
