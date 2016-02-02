@@ -1,3 +1,5 @@
-assets/*
+.git
+/assets/*
+/protected/extensions/*/assets/*
 /protected/runtime/*
 /protected/config/params.ini
