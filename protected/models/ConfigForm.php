@@ -39,10 +39,10 @@ class ConfigForm extends CFormModel {
         return array(
             'translateCamTable' => 'Translate CAM Table with Gateway ARP table (SLOW)',
             'hostGatewayId' => 'Gateway',
-            'cacheTtlCam' => 'Cache TTL for Cache CAM table',
-            'cacheTtlArp' => 'Cache TTL for Cache ARP table',
-            'cacheTtlGetSnmp' => 'Cache TTL for SNMP Get consults',
-            'cacheTtlDefault' => 'Cache TTL Default',
+            'cacheTtlCam' => 'TTL for CAM table Cache (seconds)',
+            'cacheTtlArp' => 'TTL for ARP table Cache (seconds)',
+            'cacheTtlGetSnmp' => 'TTL for SNMP Get Cache (seconds)',
+            'cacheTtlDefault' => 'TTL Default Cache (seconds)',
         );
     }
 
