@@ -3,7 +3,7 @@
 /* @var $model SnmpFieldSnmpTemplate */
 
 $this->breadcrumbs=array(
-	'Snmp Field Snmp Templates'=>array('index'),
+	'Snmp Field Snmp Templates'=>array('admin'),
 	$model->id,
 );
 

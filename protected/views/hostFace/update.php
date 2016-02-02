@@ -3,7 +3,7 @@
 /* @var $model HostFace */
 
 $this->breadcrumbs=array(
-	'Host Faces'=>array('index'),
+	'Host Faces'=>array('admin'),
 	$model->name=>array('view','id'=>$model->id),
 	'Update',
 );

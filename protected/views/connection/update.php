@@ -3,7 +3,7 @@
 /* @var $model Connection */
 
 $this->breadcrumbs=array(
-	'Connections'=>array('index'),
+	'Connections'=>array('admin'),
 	$model->id=>array('view','id'=>$model->id),
 	'Update',
 );

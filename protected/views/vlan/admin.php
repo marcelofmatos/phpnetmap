@@ -3,7 +3,7 @@
 /* @var $model Vlan */
 
 $this->breadcrumbs=array(
-	'Vlans'=>array('index'),
+	'Vlans'=>array('admin'),
 	'Manage',
 );
 
