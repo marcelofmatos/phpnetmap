@@ -34,3 +34,4 @@ Altere o docker-compose.yml conforme necessário
 
 # Referências
 * https://docs.docker.com/engine/installation/
+* https://docs.docker.com/compose/compose-file/
