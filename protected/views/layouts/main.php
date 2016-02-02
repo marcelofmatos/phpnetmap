@@ -27,21 +27,20 @@
 
 
         <div id="mainmenu" class="navbar navbar-fixed-top navbar-inner">
-                <div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
-		<?php $this->widget('bootstrap.widgets.TbNav',array(
-			'items'=>array(
-				array('label' => 'Home', 'url'=>array('/')),
-                                array('label' => 'SNMP Templates', 'url' => array('/snmpTemplate/admin')),
-                                array('label' => 'Hosts', 'url' => array('/host/admin')),
-                                array('label' => 'Vlans', 'url' => array('/vlan/admin')),
-                                array('label' => 'Connections', 'url' => array('/connection/admin')),
-                                array('label' => 'Search', 'url' => array('/search')),
-                                array('label' => 'Configuration', 'url' => array('/config')),
-                                array('label' => 'About', 'url' => array('/site/page', 'view' => 'about')),
+            <div id="logo"><a href="<?php echo Yii::app()->baseUrl; ?>"><?php echo CHtml::encode(Yii::app()->name); ?></a></div>
+            <?php $this->widget('bootstrap.widgets.TbNav',array(
+                    'items'=>array(
+                            array('label' => 'SNMP Templates', 'url' => array('/snmpTemplate/admin')),
+                            array('label' => 'Hosts', 'url' => array('/host/admin')),
+                            array('label' => 'Vlans', 'url' => array('/vlan/admin')),
+                            array('label' => 'Connections', 'url' => array('/connection/admin')),
+                            array('label' => 'Search', 'url' => array('/search')),
+                            array('label' => 'Configuration', 'url' => array('/config')),
+                            array('label' => 'About', 'url' => array('/site/page', 'view' => 'about')),
 //				array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
 //				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
-			),
-		)); ?>
+                    ),
+            )); ?>
 	</div><!-- mainmenu -->
 	<?php if(isset($this->breadcrumbs)):?>
 		<?php $this->widget('bootstrap.widgets.TbBreadcrumb', array(
