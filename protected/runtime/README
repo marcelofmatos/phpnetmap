@@ -1,0 +1,6 @@
+This directory holds private temporary files generated during runtime of the 
+application. This directory must be writable by Web server process. 
+It can be customized via CApplication::runtimePath.
+
+# Reference
+* http://www.yiiframework.com/doc/guide/1.1/en/basics.convention

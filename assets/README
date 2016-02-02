@@ -1,0 +1,7 @@
+This directory holds published asset files. An asset file is a private file that 
+may be published to become accessible to Web users. This directory must be 
+writable by Web server process. It can be customized via CAssetManager::basePath
+
+# Reference
+* http://www.yiiframework.com/doc/guide/1.1/en/basics.convention
+* http://www.yiiframework.com/wiki/148/understanding-assets/
