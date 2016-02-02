@@ -23,18 +23,20 @@ O login está configurado em .htaccess e .htpasswd portanto o apache deve estar 
 
 # PHPNetMap e Docker
 
-Com o docker-compose.yml na raiz do projeto é possível rodar o sistema, bastando rodar o comando 'docker-compose up' no diretório do projeto. 
+Com o docker-compose.yml na raiz do projeto é possível rodar o sistema, bastando rodar o comando `docker-compose up` no diretório do projeto. 
 Observe as configurações do servidor para rodar em modo de produção (senha em .htpasswd, allowoverride=true, etc)
 Altere o docker-compose.yml conforme necessário
 
 ## Instalação do Docker
-* curl -sSL https://get.docker.com/ | sh
-
+```
+curl -sSL https://get.docker.com/ | sh
+```
 ## Instalação do docker-compose
 
- apt-get install python-pip
- pip install docker-compose
-
+```
+apt-get install python-pip
+pip install docker-compose
+```
 
 
 
