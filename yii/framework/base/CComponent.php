@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2011 Yii Software LLC
+ * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -248,6 +248,7 @@ class CComponent
 	 * to implement the behavior feature.
 	 * @param string $name the method name
 	 * @param array $parameters method parameters
+	 * @throws CException if current class and its behaviors do not have a method or closure with the given name
 	 * @return mixed the method return value
 	 */
 	public function __call($name,$parameters)
@@ -260,7 +261,7 @@ class CComponent
 					return call_user_func_array(array($object,$name),$parameters);
 			}
 		}
-		if(class_exists('Closure', false) && $this->canGetProperty($name) && $this->$name instanceof Closure)
+		if(class_exists('Closure', false) && ($this->canGetProperty($name) || property_exists($this, $name)) && $this->$name instanceof Closure)
 			return call_user_func_array($this->$name, $parameters);
 		throw new CException(Yii::t('yii','{class} and its behaviors do not have a method or closure named "{name}".',
 			array('{class}'=>get_class($this), '{name}'=>$name)));
@@ -318,6 +319,8 @@ class CComponent
 	 * @param string $name the behavior's name. It should uniquely identify this behavior.
 	 * @param mixed $behavior the behavior configuration. This is passed as the first
 	 * parameter to {@link YiiBase::createComponent} to create the behavior object.
+	 * You can also pass an already created behavior instance (the new behavior will replace an already created
+	 * behavior with the same name, if it exists).
 	 * @return IBehavior the behavior object
 	 */
 	public function attachBehavior($name,$behavior)
@@ -496,7 +499,7 @@ class CComponent
 	 * $component->getEventHandlers($eventName)->add($eventHandler);
 	 * </pre>
 	 *
-	 * Using {@link getEventHandlers}, one can also specify the excution order
+	 * Using {@link getEventHandlers}, one can also specify the execution order
 	 * of multiple handlers attaching to the same event. For example:
 	 * <pre>
 	 * $component->getEventHandlers($eventName)->insertAt(0,$eventHandler);
@@ -592,6 +595,9 @@ class CComponent
 	 * If a PHP expression is used, the second parameter will be "extracted" into PHP variables
 	 * that can be directly accessed in the expression. See {@link http://us.php.net/manual/en/function.extract.php PHP extract}
 	 * for more details. In the expression, the component object can be accessed using $this.
+	 *
+	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
+	 * please refer to the {@link http://www.php.net/manual/en/language.expressions.php php manual}.
 	 *
 	 * @param mixed $_expression_ a PHP expression or PHP callback to be evaluated.
 	 * @param array $_data_ additional parameters to be passed to the above expression/callback.

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2011 Yii Software LLC
+ * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -265,7 +265,10 @@ class CUrlManager extends CApplicationComponent
 		if(is_array($route) && isset($route['class']))
 			return $route;
 		else
-			return new $this->urlRuleClass($route,$pattern);
+		{
+			$urlRuleClass=Yii::import($this->urlRuleClass,true);
+			return new $urlRuleClass($route,$pattern);
+		}
 	}
 
 	/**
@@ -655,6 +658,7 @@ class CUrlRule extends CBaseUrlRule
 		$this->route=trim($route,'/');
 
 		$tr2['/']=$tr['/']='\\/';
+		$tr['.']='\\.';
 
 		if(strpos($route,'<')!==false && preg_match_all('/<(\w+)>/',$route,$matches2))
 		{

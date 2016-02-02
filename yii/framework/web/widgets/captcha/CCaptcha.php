@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2011 Yii Software LLC
+ * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -26,6 +26,9 @@
  *
  * A {@link CCaptchaValidator} may be used to validate that the user enters
  * a verification code matching the code displayed in the CAPTCHA image.
+ *
+ * When combining CCaptcha with CActiveForm or CForm, make sure ajaxValidation is disabled. Performing ajax validation causes
+ * your Captcha to be refreshed, rendering the code invalid on the next validation attempt.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @package system.web.widgets.captcha
@@ -154,7 +157,7 @@ jQuery(document).on('click', '$selector', function(){
 
 	/**
 	 * Checks if specified graphic extension support is loaded.
-	 * @param string extension name to be checked. Possible values are 'gd', 'imagick' and null.
+	 * @param string $extension name to be checked. Possible values are 'gd', 'imagick' and null.
 	 * Default value is null meaning that both extensions will be checked. This parameter
 	 * is available since 1.1.13.
 	 * @return boolean true if ImageMagick extension with PNG support or GD with FreeType support is loaded,

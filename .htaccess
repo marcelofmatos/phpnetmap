@@ -3,3 +3,24 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
+
+
+# Auth
+#
+AuthType Basic
+AuthName "Authentication Required"
+AuthUserFile "/app/.htpasswd"
+Require valid-user
+
+
+# LDAP Auth
+#
+#AuthName "Authentication Required - example.com LDAP"
+#AuthType "basic"
+#AuthBasicProvider ldap
+#AuthzLDAPAuthoritative on
+#AuthLDAPURL "ldap://ldap.example.com:389/ou=Users,dc=example,dc=com?uid?sub"
+#AuthLDAPGroupAttribute memberUid
+#AuthLDAPGroupAttributeIsDN off
+#Require ldap-group cn=Group1,ou=Groups,dc=example,dc=com
+#Require ldap-group cn=Group2,ou=Groups,dc=example,dc=com

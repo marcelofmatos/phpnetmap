@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2011 Yii Software LLC
+ * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -81,7 +81,7 @@ class CViewAction extends CAction
 	{
 		if($this->_viewPath===null)
 		{
-			if(!empty($_GET[$this->viewParam]))
+			if(!empty($_GET[$this->viewParam]) && is_string($_GET[$this->viewParam]))
 				$this->_viewPath=$_GET[$this->viewParam];
 			else
 				$this->_viewPath=$this->defaultView;
@@ -93,7 +93,7 @@ class CViewAction extends CAction
 	 * Resolves the user-specified view into a valid view name.
 	 * @param string $viewPath user-specified view in the format of 'path.to.view'.
 	 * @return string fully resolved view in the format of 'path/to/view'.
-	 * @throw CHttpException if the user-specified view is invalid
+	 * @throws CHttpException if the user-specified view is invalid
 	 */
 	protected function resolveView($viewPath)
 	{
