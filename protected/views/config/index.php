@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs=array(
-	'Configuration'=>array('index')
+	'Configuration'
 );
 
 ?>
