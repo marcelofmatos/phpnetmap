@@ -27,7 +27,7 @@
 
 
         <div id="mainmenu" class="navbar navbar-fixed-top navbar-inner">
-            <div id="logo"><a href="<?php echo Yii::app()->baseUrl; ?>"><?php echo CHtml::encode(Yii::app()->name); ?></a></div>
+            <div id="logo"><a href="<?php echo Yii::app()->getBaseUrl(true); ?>"><?php echo CHtml::encode(Yii::app()->name); ?></a></div>
             <?php $this->widget('bootstrap.widgets.TbNav',array(
                     'items'=>array(
                             array('label' => 'SNMP Templates', 'url' => array('/snmpTemplate/admin')),
