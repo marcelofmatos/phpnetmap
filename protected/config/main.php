@@ -40,7 +40,7 @@ return array(
             'urlFormat' => 'path',
             'rules' => array(
                 'site/page/<view:\w+>' => 'site/page',
-                'host/view/<name:[a-z].+>' => 'host/viewByName',
+                'host/view/<name:[a-zA-Z].+>' => 'host/viewByName',
                 'host/<action:\w+>/<name:[a-z].+>' => 'host/<action>',
                 'map/<action:\w+>/<hostId:[0-9]+>' => 'map/<action>',
                 'vlan/tag/<tag:[0-9]+>' => 'vlan/viewByTag',
