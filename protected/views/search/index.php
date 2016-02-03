@@ -56,6 +56,19 @@ $this->breadcrumbs = array(
                             'visible' => '$data[hostDst] instanceof Host',
                         ),
                         'mac',
+                        array(
+                            'class' => 'CButtonColumn',
+                            //                    'template'=> '{create_host}{show_host}',
+                            'template' => '{create_host}',
+                            'buttons' => array(
+                                'create_host' => array(
+                                    'label' => 'Create Host',
+                                    'imageUrl' => Yii::app()->request->baseUrl . '/images/host/add.png',
+                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
+                                    'visible' => ' ! $data[hostDst] instanceof Host',
+                                ),
+                            ),
+                        ),
                     ),
                 ));
                 break;
