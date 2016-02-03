@@ -77,7 +77,7 @@ class SearchForm extends CFormModel {
                             }
 
                             $row['host'] = $host;
-                            $row['hostDst'] = $hostDst;
+                            $row['hostDst'] = $hostDst instanceof Host ? $hostDst : Host::model()->findByAttributes(array('mac' => $row['mac']));
                             $row['vlan'] = Vlan::model()->findByAttributes(array('tag' => $row['vlan_tag']));
                             $result[] = $row;
                         }

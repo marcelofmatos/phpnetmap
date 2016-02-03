@@ -52,9 +52,9 @@ if (is_array($cam_table)) {
                     ),
                     'create_host'=>array(
                         'label' => 'Create Host',
-                        'imageUrl'=>Yii::app()->request->baseUrl.'/images/host/add.png',
-                        'url'=>'$this->grid->controller->createUrl("host/create", array("ip" => $data[host]->ip, "mac" => $data[mac]))',
-                        'visible'=>'! $data[host]->id',
+                        'imageUrl' => Yii::app()->request->baseUrl.'/images/host/add.png',
+                        'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[host]->ip, "mac" => $data[mac]))',
+                        'visible' => '! $data[host]->id',
                     ),
                 ),
             ),

@@ -49,23 +49,29 @@ $this->breadcrumbs = array(
                             'value' => 'CHtml::link($data[vlan]->tag, Yii::app()->createUrl("vlan/tag",array("id"=>$data[vlan]->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[vlan]->font_color}; background-color:#{$data[vlan]->background_color}","class"=>"vlanlabel"))',
                             'type' => 'raw',
                         ),
+                        'mac',
                         array(
                             'name' => 'hostDst',
                             'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
                             'type' => 'raw',
                             'visible' => '$data[hostDst] instanceof Host',
                         ),
-                        'mac',
                         array(
                             'class' => 'CButtonColumn',
                             //                    'template'=> '{create_host}{show_host}',
-                            'template' => '{create_host}',
+                            'template' => '{create_conn}{create_host}',
                             'buttons' => array(
+                                'create_conn'=>array(
+                                    'label' => 'Create Connection',
+                                    'imageUrl' => Yii::app()->request->baseUrl.'/images/connection/add.png',
+                                    'url' => '$this->grid->controller->createUrl("connection/create", array("host_src_id" => $data[host]->id, "host_src_port" => $data[port], "host_dst_id" => $data[hostDst]->id))',
+                                    'visible' => '! $data[host]->getHostOnPort($data[port]) && $data[hostDst] instanceof Host',
+                                ),
                                 'create_host' => array(
                                     'label' => 'Create Host',
                                     'imageUrl' => Yii::app()->request->baseUrl . '/images/host/add.png',
                                     'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
-                                    'visible' => ' ! $data[hostDst] instanceof Host',
+                                    'visible' => '! $data[hostDst] instanceof Host',
                                 ),
                             ),
                         ),
