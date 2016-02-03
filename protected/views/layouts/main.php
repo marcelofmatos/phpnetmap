@@ -34,8 +34,8 @@
                             array('label' => 'Hosts', 'url' => array('/host/admin')),
                             array('label' => 'Vlans', 'url' => array('/vlan/admin')),
                             array('label' => 'Connections', 'url' => array('/connection/admin')),
-                            array('label' => 'Search', 'url' => array('/search')),
-                            array('label' => 'Configuration', 'url' => array('/config')),
+                            array('label' => 'Search', 'url' => array('/search/index')),
+                            array('label' => 'Configuration', 'url' => array('/config/index')),
                             array('label' => 'About', 'url' => array('/site/page', 'view' => 'about')),
 //				array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
 //				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
