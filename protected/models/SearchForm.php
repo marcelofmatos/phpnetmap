@@ -44,8 +44,8 @@ class SearchForm extends CFormModel {
     }
 
     /**
-     * Logs in the user using the given username and password in the model.
-     * @return boolean whether login is successful
+     * Consults ARP or CAM table for search query
+     * @return array result for list
      */
     public function searchResult() {
         $result = array();
