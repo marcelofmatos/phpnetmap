@@ -13,93 +13,104 @@ $this->breadcrumbs = array(
 
 <?php if ($result) : ?>
     <div class="result">
-    <?php
-    
-    switch ($searchModel->type) {
+        <?php
+        switch ($searchModel->type) {
 
-        case "camtable:mac" :
-        case "camtable:vlan_tag" :
+            case "camtable:mac" :
+            case "camtable:vlan_tag" :
 
-            $dataProvider = new CArrayDataProvider($result, array(
-                        'sort' => array(
-                            'attributes' => array(
-                                'host', 'port', 'port_dst_host', 'vlan', 'mac',
+                $dataProvider = new CArrayDataProvider($result, array(
+                    'sort' => array(
+                        'attributes' => array(
+                            'host', 'port', 'port_dst_host', 'vlan', 'mac',
+                        ),
+                    ),
+                    'pagination' => array(
+                        'pageSize' => 100000,
+                    ),
+                ));
+
+                $this->widget('bootstrap.widgets.TbGridView', array(
+                    'id' => 'cam-grid',
+                    'dataProvider' => $dataProvider,
+                    'columns' => array(
+                        array(
+                            'name' => 'host',
+                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
+                            'type' => 'raw',
+                        ),
+                        array(
+                            'name' => 'port',
+                            'value' => 'CHtml::link($data[port], Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("name"=>"port_{$data[port]}", "class"=>"portlabel"))',
+                            'type' => 'raw',
+                        ),
+                        array(
+                            'name' => 'vlan',
+                            'value' => 'CHtml::link($data[vlan]->tag, Yii::app()->createUrl("vlan/tag",array("id"=>$data[vlan]->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[vlan]->font_color}; background-color:#{$data[vlan]->background_color}","class"=>"vlanlabel"))',
+                            'type' => 'raw',
+                        ),
+                        array(
+                            'name' => 'hostDst',
+                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
+                            'type' => 'raw',
+                            'visible' => '$data[hostDst] instanceof Host',
+                        ),
+                        'mac',
+                    ),
+                ));
+                break;
+
+
+            case 'arptable:mac':
+            case 'arptable:ip':
+
+                $dataProvider = new CArrayDataProvider($result, array(
+                    'sort' => array(
+                        'attributes' => array(
+                            'mac', 'ip', 'host',
+                        ),
+                    ),
+                    'pagination' => array(
+                        'pageSize' => 100000,
+                    ),
+                ));
+
+                $this->widget('bootstrap.widgets.TbGridView', array(
+                    'id' => 'cam-grid',
+                    'dataProvider' => $dataProvider,
+                    'columns' => array(
+                        array(
+                            'name' => 'host',
+                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
+                            'type' => 'raw',
+                        ),
+                        'mac',
+                        'ip',
+                        array(
+                            'name' => 'hostDst',
+                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
+                            'type' => 'raw',
+                        ),
+                        array(
+                            'class' => 'CButtonColumn',
+                            //                    'template'=> '{create_host}{show_host}',
+                            'template' => '{create_host}',
+                            'buttons' => array(
+                                'create_host' => array(
+                                    'label' => 'Create Host',
+                                    'imageUrl' => Yii::app()->request->baseUrl . '/images/host/add.png',
+                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
+                                    'visible' => ' ! $data[hostDst] instanceof Host',
+                                ),
                             ),
                         ),
-                        'pagination' => array(
-                            'pageSize' => 100000,
-                        ),
-                    ));
-
-            $this->widget('bootstrap.widgets.TbGridView', array(
-                'id' => 'cam-grid',
-                'dataProvider' => $dataProvider,
-                'columns' => array(
-                    array(
-                        'name' => 'host',
-                        'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
-                        'type' => 'raw',
                     ),
-                    array(
-                        'name' => 'port',
-                        'value' => 'CHtml::link($data[port], Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("name"=>"port_{$data[port]}", "class"=>"portlabel"))',
-                        'type' => 'raw',
-                    ),
-                    array(
-                        'name' => 'vlan',
-                        'value' => 'CHtml::link($data[vlan]->tag, Yii::app()->createUrl("vlan/tag",array("id"=>$data[vlan]->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[vlan]->font_color}; background-color:#{$data[vlan]->background_color}","class"=>"vlanlabel"))',
-                        'type' => 'raw',
-                    ),
-                    array(
-                        'name' => 'hostDst',
-                        'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
-                        'type' => 'raw',
-                        'visible' => '$data[hostDst] instanceof Host',
-                    ),
-
-                    'mac',
-                ),
-            ));
-            break;
-        
-        
-        case 'arptable:mac':
-        case 'arptable:ip':
-
-            $dataProvider = new CArrayDataProvider($result, array(
-                        'sort' => array(
-                            'attributes' => array(
-                                'mac', 'ip', 'host',
-                            ),
-                        ),
-                        'pagination' => array(
-                            'pageSize' => 100000,
-                        ),
-                    ));
-
-            $this->widget('bootstrap.widgets.TbGridView', array(
-                'id' => 'cam-grid',
-                'dataProvider' => $dataProvider,
-                'columns' => array(
-                    array(
-                        'name' => 'host',
-                        'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
-                        'type' => 'raw',
-                    ),
-                    'mac',
-                    'ip',
-                    array(
-                        'name' => 'hostDst',
-                        'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
-                        'type' => 'raw',
-                    ),
-                ),
-            ));
-            break;
-        default:
-            echo 'unknown search type';
-    }
-    ?>
+                ));
+                break;
+            default:
+                echo 'unknown search type';
+        }
+        ?>
     </div>
-<?php endif; ?>
+    <?php endif; ?>
 

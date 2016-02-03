@@ -90,7 +90,7 @@ class SearchForm extends CFormModel {
                     $host->loadArpTable();
 
                     foreach ($host->arp_table as $mac => $ip) {
-var_dump($$search_field);
+
                         if ($this->exact_match) {
                                 $found = $$search_field == $this->query;
                         } else {
