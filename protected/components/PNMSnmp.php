@@ -56,7 +56,7 @@ class PNMSnmp {
 
     static function walk($host, $object_id, $cache_ttl = null) {
         
-        if($cache_ttl) {
+        if(Yii::app()->params['cache']) {
             $cache_var = str_replace('.','_',$host->ip.$object_id);
             $cache = new CacheAPC();
             $resultCache = $cache->load($cache_var);
@@ -86,7 +86,7 @@ class PNMSnmp {
         }
 
         if (is_array($result)) {
-            if($cache_var && $cache_ttl) {
+            if($cache instanceof CacheAPC) {
                 $cache->save($cache_var, $result, $cache_ttl);
             }
             return $result;
@@ -98,7 +98,7 @@ class PNMSnmp {
 
     static function get($host, $object_id, $cache_ttl = null) {
         
-        if($cache_ttl) {
+        if(Yii::app()->params['cache']) {
             $cache_var = str_replace('.','_',$host->ip.$object_id);
             $cache = new CacheAPC();
             $resultCache = $cache->load($cache_var);
@@ -130,7 +130,7 @@ class PNMSnmp {
         if ($result) {
             // retira 'STRING: ' do inicio do texto
             $result = trim(preg_replace('/^[^:]+: ?/','',$result));
-            if($cache_var && $cache_ttl) {
+            if($cache instanceof CacheAPC) {
                 $cache->save($cache_var, $result, $cache_ttl);
             }
             return $result;
