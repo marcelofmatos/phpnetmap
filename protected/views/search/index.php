@@ -17,8 +17,8 @@ $this->breadcrumbs = array(
     
     switch ($searchModel->type) {
 
-        case "camtable_mac" :
-        case "camtable_vlan" :
+        case "camtable:mac" :
+        case "camtable:vlan_tag" :
 
             $dataProvider = new CArrayDataProvider($result, array(
                         'sort' => array(
@@ -58,6 +58,41 @@ $this->breadcrumbs = array(
                     ),
 
                     'mac',
+                ),
+            ));
+            break;
+        
+        
+        case 'arptable:mac':
+        case 'arptable:ip':
+
+            $dataProvider = new CArrayDataProvider($result, array(
+                        'sort' => array(
+                            'attributes' => array(
+                                'mac', 'ip', 'host',
+                            ),
+                        ),
+                        'pagination' => array(
+                            'pageSize' => 100000,
+                        ),
+                    ));
+
+            $this->widget('bootstrap.widgets.TbGridView', array(
+                'id' => 'cam-grid',
+                'dataProvider' => $dataProvider,
+                'columns' => array(
+                    array(
+                        'name' => 'host',
+                        'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
+                        'type' => 'raw',
+                    ),
+                    'mac',
+                    'ip',
+                    array(
+                        'name' => 'hostDst',
+                        'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
+                        'type' => 'raw',
+                    ),
                 ),
             ));
             break;

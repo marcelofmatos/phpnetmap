@@ -15,8 +15,10 @@ class SearchForm extends CFormModel {
 
     public static function getSearchTypes() {
         return array(
-            'camtable_mac' => 'MAC on switches CAM tables',
-            'camtable_vlan' => 'VLAN tag on switches CAM tables',
+            'camtable:mac' => 'MAC on switches CAM tables',
+            'camtable:vlan_tag' => 'VLAN tag on switches CAM tables',
+            'arptable:mac' => 'MAC on hosts ARP tables',
+            'arptable:ip' => 'IP on hosts ARP tables',
         );
     }
 
@@ -48,45 +50,64 @@ class SearchForm extends CFormModel {
     public function searchResult() {
         $result = array();
         $hosts = Host::model()->findAllByAttributes(array('id' => $this->hosts));
+        
+        list($search_table,$search_field) = explode(':', $this->type);
 
-        switch ($this->type) {
-            case "camtable_mac":
-                $search_table = 'camtable';
-                $search_field = 'mac';
-                break;
-            case "camtable_vlan":
-                $search_table = 'camtable';
-                $search_field = 'vlan_tag';
-                break;
-        }
+        if (count($hosts)) {
+            if($search_table == 'camtable') {
+                
+                foreach ($hosts as $host) {
 
-        if (count($hosts) && $search_table == 'camtable') {
-            foreach ($hosts as $host) {
+                    $host->loadCamTable();
 
-                $host->loadCamTable();
+                    foreach ($host->cam_table as $row) {
 
-                foreach ($host->cam_table as $row) {
+                        if ($this->exact_match) {
+                                $found = $row[$search_field] == $this->query;
+                        } else {
+                                $found = strpos($row[$search_field], $this->query) !== FALSE;
+                        }
 
-                    if ($this->exact_match) {
-                            $found = $row[$search_field] == $this->query;
-                    } else {
-                            $found = strpos($row[$search_field], $this->query) !== FALSE;
+                        if ($found) {
+
+                            $hostDst = $host->getHostOnPort($row['port']);
+
+                            if ($this->exclude_link_ports && !empty($hostDst)) {
+                                continue;
+                            }
+
+                            $row['host'] = $host;
+                            $row['hostDst'] = $hostDst;
+                            $row['vlan'] = Vlan::model()->findByAttributes(array('tag' => $row['vlan_tag']));
+                            $result[] = $row;
+                        }
                     }
+                }
+            
+            } else if ($search_table == 'arptable') {
+                foreach ($hosts as $host) {
 
-                    if ($found) {
+                    $host->loadArpTable();
 
-                        $hostDst = $host->getHostOnPort($row['port']);
+                    foreach ($host->arp_table as $mac => $ip) {
+var_dump($$search_field);
+                        if ($this->exact_match) {
+                                $found = $$search_field == $this->query;
+                        } else {
+                                $found = strpos($$search_field, $this->query) !== FALSE;
+                        }
 
-                        if ($this->exclude_link_ports && !empty($hostDst))
-                            continue;
-
-                        $row['host'] = $host;
-                        $row['hostDst'] = $hostDst;
-                        $row['vlan'] = Vlan::model()->findByAttributes(array('tag' => $row['vlan_tag']));
-                        $result[] = $row;
+                        if ($found) {
+                            $row['host'] = $host;
+                            $row['mac'] = $mac;
+                            $row['ip'] = $ip;
+                            $row['hostDst'] = Host::model()->findByAttributes(array('mac' => $mac));
+                            $result[] = $row;
+                        }
                     }
                 }
             }
+            
         }
         
         return $result;
