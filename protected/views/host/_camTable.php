@@ -30,15 +30,15 @@ if (is_array($cam_table)) {
                 'type' => 'raw',
             ),
             array(
-                    'name'  => 'vlan',
-                    'value' => 'CHtml::link($data[vlan]->tag, Yii::app()->createUrl("vlan/viewByTag",array("tag"=>$data[vlan]->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[vlan]->font_color}; background-color:#{$data[vlan]->background_color}","class"=>"vlanlabel"))',
-                    'type'  => 'raw',
+                'name'  => 'vlan',
+                'value' => 'CHtml::link($data[vlan]->tag, Yii::app()->createUrl("vlan/viewByTag",array("tag"=>$data[vlan]->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[vlan]->font_color}; background-color:#{$data[vlan]->background_color}","class"=>"vlanlabel"))',
+                'type'  => 'raw',
             ),
             'mac',
             array(
-                    'name'  => 'host',
-                    'value' => '( isset($data[host]->id) ) ? CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)),array("title"=>"$data[host]")) : $data[host]->ip',
-                    'type'  => 'raw',
+                'name'  => 'host',
+                'value' => '( isset($data[host]->id) ) ? CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)),array("title"=>"$data[host]")) : $data[host]->ip',
+                'type'  => 'raw',
             ),
             array(
                 'class'=>'CButtonColumn',
@@ -48,7 +48,7 @@ if (is_array($cam_table)) {
                         'label' => 'Create Connection',
                         'imageUrl'=>Yii::app()->request->baseUrl.'/images/connection/add.png',
                         'url'=>'$this->grid->controller->createUrl("connection/create", array("host_src_id"=>'.$model->id.', "host_src_port" => $data[port], "host_dst_id" => $data[host]->id))',
-                        'visible'=>' ! $data[host_dst] instanceof Host && $data[host] instanceof Host',
+                        'visible'=>' ! $data[host_dst] instanceof Host && $data[host]->id',
                     ),
                     'create_host'=>array(
                         'label' => 'Create Host',

@@ -264,8 +264,13 @@ form, input, h1, h2, button, label, a, img, image, svg {
 /* host */
 .view.host-type{
     padding-left: 55px;
-    background-position: 2px 10px;
+    background-position: 2px center;
     background-repeat: no-repeat;
+    display: block;
+    height: 30px;
+    vertical-align: middle;
+    line-height: 31px;
+    white-space: nowrap;
 }
 .view.host-type.switch {
     background-image: url('../images/host/switch.png');
@@ -597,7 +602,6 @@ table.items th:first-child
 #listhosts a {
     display: block;
     height: 30px;
-    line-height: 14px;
     vertical-align: middle;
     background-color: #F4F4F4;
     margin-bottom: 1px;
