@@ -497,6 +497,7 @@ table.items th:first-child
     font-size: 15px;
     white-space: nowrap;
     background-position: center left;
+    display: inline;
 }
 #connections a.host {
     background-position: center left;
