@@ -36,7 +36,7 @@ $this->breadcrumbs = array(
                     'columns' => array(
                         array(
                             'name' => 'host',
-                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
+                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("class"=>"view host-type ". $data[host]->type))',
                             'type' => 'raw',
                         ),
                         array(
@@ -52,7 +52,7 @@ $this->breadcrumbs = array(
                         'mac',
                         array(
                             'name' => 'hostDst',
-                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
+                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
                             'type' => 'raw',
                             'visible' => '$data[hostDst] instanceof Host',
                         ),
@@ -100,14 +100,14 @@ $this->breadcrumbs = array(
                     'columns' => array(
                         array(
                             'name' => 'host',
-                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)))',
+                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("class"=>"view host-type ". $data[host]->type))',
                             'type' => 'raw',
                         ),
                         'mac',
                         'ip',
                         array(
                             'name' => 'hostDst',
-                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)))',
+                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
                             'type' => 'raw',
                         ),
                         array(
@@ -126,6 +126,40 @@ $this->breadcrumbs = array(
                     ),
                 ));
                 break;
+            
+            case 'portsinfo:ifAlias':
+
+                $dataProvider = new CArrayDataProvider($result, array(
+                    'sort' => array(
+                        'attributes' => array(
+                            'host', 'port', 'info',
+                        ),
+                    ),
+                    'pagination' => array(
+                        'pageSize' => 100000,
+                    ),
+                ));
+
+                $this->widget('bootstrap.widgets.TbGridView', array(
+                    'id' => 'cam-grid',
+                    'dataProvider' => $dataProvider,
+                    'columns' => array(
+                        array(
+                            'name' => 'host',
+                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("class"=>"view host-type ". $data[host]->type))',
+                            'type' => 'raw',
+                        ),
+                        'port',
+                        array(
+                            'name' => 'hostDst',
+                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
+                            'type' => 'raw',
+                        ),
+                        'info',
+                    ),
+                ));
+                break;
+            
             default:
                 echo 'unknown search type';
         }

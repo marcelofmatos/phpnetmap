@@ -14,11 +14,19 @@ class SearchForm extends CFormModel {
     public $showErrorSummary = true;
 
     public static function getSearchTypes() {
+        /**
+         * Search types for form
+         *  <search_table>:<search_field>
+         * where:
+         * search_table: list type to search
+         * search_field: reference for field to search with $this->query
+         */
         return array(
             'camtable:mac' => 'MAC on switches CAM tables',
             'camtable:vlan_tag' => 'VLAN tag on switches CAM tables',
             'arptable:mac' => 'MAC on hosts ARP tables',
             'arptable:ip' => 'IP on hosts ARP tables',
+            'portsinfo:ifAlias' => 'Description Alias on hosts interfaces',
         );
     }
 
@@ -49,13 +57,14 @@ class SearchForm extends CFormModel {
      */
     public function searchResult() {
         $result = array();
+       
         $hosts = Host::model()->findAllByAttributes(array('id' => $this->hosts));
         
         list($search_table,$search_field) = explode(':', $this->type);
 
         if (count($hosts)) {
             if($search_table == 'camtable') {
-                
+                /* @var $host Host */                
                 foreach ($hosts as $host) {
 
                     $host->loadCamTable();
@@ -102,6 +111,31 @@ class SearchForm extends CFormModel {
                             $row['mac'] = $mac;
                             $row['ip'] = $ip;
                             $row['hostDst'] = Host::model()->findByAttributes(array('mac' => $mac));
+                            $result[] = $row;
+                        }
+                    }
+                }
+                
+            } else if ($search_table == 'portsinfo') {
+                foreach ($hosts as $host) {
+
+                    $host->loadPortsInfo(array($search_field));
+
+                    foreach ($host->ports as $index => $port) {
+                        
+                        $hostDst = $host->getHostOnPort($index);
+
+                        if ($this->exact_match) {
+                                $found = $port[$search_field] == $this->query;
+                        } else {
+                                $found = strpos($port[$search_field], $this->query) !== FALSE;
+                        }
+
+                        if ($found) {
+                            $row['host'] = $host;
+                            $row['hostDst'] = $hostDst;
+                            $row['port'] = $index;
+                            $row['info'] = $port[$search_field];
                             $result[] = $row;
                         }
                     }
