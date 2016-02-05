@@ -3,8 +3,11 @@
 Software para monitoramento de equipamentos de Camada 2 e Camada 3 com protocolo 
 SNMP v(1 / 2c / 3). Testado com 3Com / HP, ProCurve, Dell e Extreme. 
 Alguns outros modelos com suporte SNMP funcionam corretamente.
-Framework yii com bootstrap, colorpicker e CAdvancedArBehavior.
-Usando biblioteca JavaScript D3 para o mapa.
+Framework [yii](http://www.yiiframework.com/) com 
+[bootstrap](http://www.yiiframework.com/extension/bootstrap), 
+[colorpicker](http://www.yiiframework.com/extension/colorpicker) e 
+[CAdvancedArBehavior](http://www.yiiframework.com/extension/cadvancedarbehavior).
+Usando biblioteca JavaScript [D3](http://d3js.org/) para o mapa.
 
 
 # Requisitos
