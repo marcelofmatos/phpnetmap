@@ -8,7 +8,7 @@
                     'type' => 'dropdownlist',
                     'items' => CHtml::listData(Host::model()->findAll(), 'id', 'name', 'type'),
                     'multiple' => 'multiple',
-                    'size' => '20',
+                    'size' => '12',
                 ),
                 'query' => array(
                         'type' =>'text'

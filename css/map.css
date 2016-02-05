@@ -262,7 +262,9 @@ form, input, h1, h2, button, label, a, img, image, svg {
 /* on main.css: @import url("custom.css");*/
 
 /* host */
-.view.host-type{
+.view.host-type,
+optgroup option
+{
     padding-left: 55px;
     background-position: 2px center;
     background-repeat: no-repeat;
@@ -272,25 +274,42 @@ form, input, h1, h2, button, label, a, img, image, svg {
     line-height: 31px;
     white-space: nowrap;
 }
-.view.host-type.switch {
+.view.host-type.switch,
+optgroup[label=switch] option
+{
     background-image: url('../images/host/switch.png');
 }
-.view.host-type.router {
+.view.host-type.router,
+optgroup[label=router] option
+{
     background-image: url('../images/host/router.png');
 }
-.view.host-type.server {
+.view.host-type.server,
+optgroup[label=server] option
+{
     background-image: url('../images/host/server.png');
 }
 .view.host-type.supposed_hub {
     background-image: url('../images/host/supposed_hub.png');
 }
-.view.host-type.security_camera {
+.view.host-type.security_camera,
+optgroup[label=security_camera] option
+{
     background-image: url('../images/host/security_camera.png');
 }
-.view.host-type.wifi_router {
+.view.host-type.wifi_router,
+optgroup[label=wifi_router] option
+{
     background-image: url('../images/host/wifi_router.png');
 }
-.view.host-type.unknown {
+.view.host-type.desktop,
+optgroup[label=desktop] option
+{
+    background-image: url('../images/host/unknown.png');
+}
+.view.host-type.unknown,
+optgroup[label=unknown] option
+{
     background-image: url('../images/host/unknown.png');
 }
 .view .actions{
