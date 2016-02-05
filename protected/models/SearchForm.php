@@ -37,7 +37,6 @@ class SearchForm extends CFormModel {
      */
     public function rules() {
         return array(
-            // type and query are required
             array('type, hosts, query, exact_match, exclude_link_ports', 'required'),
         );
     }

@@ -35,7 +35,7 @@ class SearchController extends Controller {
     public function actionIndex() {
         $model = new SearchForm;
         $form = new CForm('application.views.search.form', $model);
-        if ($form->submitted('submit')) {
+        if ($form->submitted('submit') && $model->validate()) {
             $result = $model->searchResult();
             $this->render('index', array('form' => $form, 'searchModel'=> $model, 'result' => $result));
         } else {

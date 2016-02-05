@@ -15,7 +15,7 @@ class ConfigController extends Controller {
         $form = new CForm('application.views.config.form', $model);
         $model->load();
 
-        if ($form->submitted('submit')) {
+        if ($form->submitted('submit') && $model->validate()) {
             $model->attributes = $_POST['ConfigForm'];
             if ($model->save()) {
                 Yii::app()->user->setFlash('config', Yii::t('app', 'Your new options have been saved.'));
