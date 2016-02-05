@@ -36,7 +36,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
 
 
         function drawPorts(portsData){
-            
+            // TODO: desenhar hostFace com svg
             hostFace = d3.select('#hostFace')
                     .append('div')
                     .attr('class','portbox')
@@ -62,7 +62,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                     return console.warn(error);
                 }
                 
-                hostFace = d3.selectAll('#hostFace svg');
+                hostFace = d3.selectAll('#hostFace svg, #hostFace div');
                 
                 if(hostFace.empty()) {
                     drawPorts(json); 
