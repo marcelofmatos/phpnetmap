@@ -26,13 +26,13 @@ $this->menu=array(
 		'id',
                 array(
                     'name' => 'hostSrc',
-                    'value' => CHtml::link($model['hostSrc']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$model['hostSrc']->name))),
+                    'value' => CHtml::link($model['hostSrc']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$model['hostSrc']->name)), array("class"=>"view host-type ". $model['hostSrc']->type)),
                     'type' => 'raw',
                 ),
 		'host_src_port',
                 array(
                     'name' => 'hostDst',
-                    'value' => CHtml::link($model['hostDst']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$model['hostDst']->name))),
+                    'value' => CHtml::link($model['hostDst']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$model['hostDst']->name)), array("class"=>"view host-type ". $model['hostDst']->type)),
                     'type' => 'raw',
                 ),
 		'host_dst_port',
