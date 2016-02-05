@@ -43,9 +43,19 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 	'filter'=>$model,
 	'columns'=>array(
 		'id',
-		'hostSrc',
+                array(
+                    'name' => 'hostSrc',
+                    'value' => 'CHtml::link($data[hostSrc]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostSrc]->name)), array("class"=>"view host-type ". $data[hostSrc]->type))',
+                    'type' => 'raw',
+                    'visible' => '$data[hostSrc] instanceof Host',
+                ),
 		'host_src_port',
-		'hostDst',
+                array(
+                    'name' => 'hostDst',
+                    'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
+                    'type' => 'raw',
+                    'visible' => '$data[hostDst] instanceof Host',
+                ),
 		'host_dst_port',
 		'type',
 		array(

@@ -43,7 +43,12 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 	'filter'=>$model,
 	'columns'=>array(
 		'id',
-		'name',
+                array(
+                    'name' => 'name',
+                    'value' => 'CHtml::link($data[name], Yii::app()->createUrl("host/viewByName",array("name"=>$data[name])), array("class"=>"view host-type ". $data[type]))',
+                    'type' => 'raw',
+                    'visible' => '$data[id]',
+                ),
 		'type',
 		'mac',
 		'ip',
