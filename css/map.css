@@ -263,7 +263,8 @@ form, input, h1, h2, button, label, a, img, image, svg {
 
 /* host */
 .view.host-type,
-optgroup option
+optgroup option,
+#Host_type option
 {
     padding-left: 55px;
     background-position: 2px center;
@@ -274,44 +275,67 @@ optgroup option
     line-height: 31px;
     white-space: nowrap;
 }
+
 .view.host-type.switch,
-optgroup[label=switch] option
+optgroup[label=switch] option,
+#Host_type option[value=switch]
 {
     background-image: url('../images/host/switch.png');
 }
+
 .view.host-type.router,
-optgroup[label=router] option
+optgroup[label=router] option,
+#Host_type option[value=router]
 {
     background-image: url('../images/host/router.png');
 }
+
 .view.host-type.server,
-optgroup[label=server] option
+optgroup[label=server] option,
+#Host_type option[value=server]
 {
     background-image: url('../images/host/server.png');
 }
-.view.host-type.supposed_hub {
-    background-image: url('../images/host/supposed_hub.png');
+
+.view.host-type.hub,
+optgroup[label=hub] option,
+#Host_type option[value=hub]
+{
+    background-image: url('../images/host/hub.png');
 }
+
 .view.host-type.security_camera,
-optgroup[label=security_camera] option
+optgroup[label=security_camera] option,
+#Host_type option[value=security_camera]
 {
     background-image: url('../images/host/security_camera.png');
 }
+
 .view.host-type.wifi_router,
-optgroup[label=wifi_router] option
+optgroup[label=wifi_router] option,
+#Host_type option[value=wifi_router]
 {
     background-image: url('../images/host/wifi_router.png');
 }
+
 .view.host-type.desktop,
-optgroup[label=desktop] option
+optgroup[label=desktop] option,
+#Host_type option[value=desktop]
 {
     background-image: url('../images/host/unknown.png');
 }
+
 .view.host-type.unknown,
-optgroup[label=unknown] option
+optgroup[label=unknown] option,
+#Host_type option[value=unknown]
 {
     background-image: url('../images/host/unknown.png');
 }
+
+.view.host-type.supposed_hub {
+    background-image: url('../images/host/supposed_hub.png');
+}
+
 .view .actions{
     float:right;
 }
