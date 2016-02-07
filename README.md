@@ -10,23 +10,6 @@ Framework [yii](http://www.yiiframework.com/) com
 Usando biblioteca JavaScript [D3](http://d3js.org/) para o mapa.
 
 
-# Requisitos
-
-O software foi testado em servidor Debian e Ubuntu com os seguintes pacotes 
-instalados:
-
-* apache2
-* libapache2-mod-php5
-* php5-snmp
-* php5-sqlite
-* php-apc
-* snmpd
-* sqlite3
-
-O login está configurado em .htaccess e .htpasswd portanto o apache deve estar 
-configurado para ler as instruções
-
-
 # PHPNetMap e Docker
 
 Criei uma imagem Docker com toda a configuração pronta para uso do PHPNetMap, 
@@ -41,6 +24,7 @@ conforme necessário.
 ```
 curl -sSL https://get.docker.com/ | sh
 ```
+
 ## Instalação do docker-compose
 
 ```
@@ -48,6 +32,22 @@ apt-get install python-pip
 pip install docker-compose
 ```
 
+
+# Servidor
+
+O software foi testado em servidor Debian e Ubuntu com os seguintes pacotes 
+instalados:
+
+* apache2
+* libapache2-mod-php5
+* php5-snmp
+* php5-sqlite
+* php-apc
+* snmpd
+* sqlite3
+
+O login está configurado em .htaccess e .htpasswd portanto o apache deve estar 
+configurado para ler as instruções
 
 
 # Referências
