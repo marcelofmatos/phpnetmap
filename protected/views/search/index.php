@@ -52,9 +52,8 @@ $this->breadcrumbs = array(
                         'mac',
                         array(
                             'name' => 'hostDst',
-                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
+                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type)) : ""',
                             'type' => 'raw',
-                            'visible' => '$data[hostDst] instanceof Host',
                         ),
                         array(
                             'class' => 'CButtonColumn',
@@ -107,7 +106,7 @@ $this->breadcrumbs = array(
                         'ip',
                         array(
                             'name' => 'hostDst',
-                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
+                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type)) : ""',
                             'type' => 'raw',
                         ),
                         array(
@@ -152,7 +151,7 @@ $this->breadcrumbs = array(
                         'port',
                         array(
                             'name' => 'hostDst',
-                            'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
+                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type)) : ""',
                             'type' => 'raw',
                         ),
                         'info',
