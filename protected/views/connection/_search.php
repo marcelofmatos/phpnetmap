@@ -17,8 +17,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'host_src_id'); ?>
-		<?php echo $form->textField($model,'host_src_id'); ?>
+		<?php echo $form->label($model,'hostSrc'); ?>
+		<?php echo $form->textField($model,'hostSrc'); ?>
 	</div>
 
 	<div class="row">
@@ -27,8 +27,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'host_dst_id'); ?>
-		<?php echo $form->textField($model,'host_dst_id'); ?>
+		<?php echo $form->label($model,'hostDst'); ?>
+		<?php echo $form->textField($model,'hostDst'); ?>
 	</div>
 
 	<div class="row">
@@ -37,8 +37,9 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'type'); ?>
-		<?php echo $form->textField($model,'type',array('size'=>50,'maxlength'=>50)); ?>
+                <?php echo $form->labelEx($model, 'type'); ?>
+                <?php echo $form->dropDownList($model, 'type', array_merge( array(''=>''), $model->getTypes()) ); ?>
+                <?php echo $form->error($model, 'type'); ?>
 	</div>
 
 	<div class="row buttons">

@@ -83,3 +83,11 @@ select {
 	height: 11px !important;
         width: auto;
 }
+
+.filter-container select {
+    width: 200px !important;
+}
+
+.filter-container #Connection_type {
+    width: 100px !important;
+}

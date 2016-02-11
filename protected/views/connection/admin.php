@@ -45,19 +45,27 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		'id',
                 array(
                     'name' => 'hostSrc',
-                    'value' => 'CHtml::link($data[hostSrc]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostSrc]->name)), array("class"=>"view host-type ". $data[hostSrc]->type))',
                     'type' => 'raw',
-                    'visible' => '$data[hostSrc] instanceof Host',
+                    'value' => 'CHtml::link($data[hostSrc]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostSrc]->name)), array("class"=>"view host-type ". $data[hostSrc]->type))',
                 ),
 		'host_src_port',
                 array(
                     'name' => 'hostDst',
-                    'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
                     'type' => 'raw',
-                    'visible' => '$data[hostDst] instanceof Host',
+                    'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
                 ),
 		'host_dst_port',
-		'type',
+                array(
+                    'name' => 'type',
+                    'type' => 'raw',
+                    'filter' => $model->getTypes(),
+                    'value' => '$data[type]',
+                ),
+            
+            
+                
+                
+                
 		array(
 			'class'=>'CButtonColumn',
 		),
