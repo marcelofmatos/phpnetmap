@@ -38,8 +38,7 @@
 
 	<div class="row">
                 <?php echo $form->labelEx($model, 'type'); ?>
-                <?php echo $form->dropDownList($model, 'type', array_merge( array(''=>''), $model->getTypes()) ); ?>
-                <?php echo $form->error($model, 'type'); ?>
+                <?php echo $form->textField($model,'type'); ?>
 	</div>
 
 	<div class="row buttons">

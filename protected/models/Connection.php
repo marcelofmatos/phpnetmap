@@ -109,7 +109,7 @@ class Connection extends CActiveRecord
 		$criteria->compare('host_src_port',$this->host_src_port);
 		$criteria->compare('host_dst_id',$this->host_dst_id);
 		$criteria->compare('host_dst_port',$this->host_dst_port);
-		$criteria->compare('type',$this->type,true);
+		$criteria->compare('t.type',$this->type,true);
                 
                 $criteria->with = array('hostSrc','hostDst');
                 $criteria->addSearchCondition('hostSrc.name',$this->hostSrc);
