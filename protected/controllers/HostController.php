@@ -191,13 +191,16 @@ class HostController extends Controller {
     public function loadModelByName($name, $ip = null, $mac = null) {
 
         $model = Host::model()->findByAttributes(array('name' => $name));
-        if ($model === null)
+        
+        if ($model == null && !empty($ip)) {
             $model = Host::model()->findByAttributes(array('ip' => $ip));
-        if ($model === null)
+        } else if ($model == null && !empty($mac)) {
             $model = Host::model()->findByAttributes(array('mac' => $mac));
-
-        if ($model === null)
+        }
+        
+        if ($model == null) {
             throw new CHttpException(404, 'Model name ' . $name . ' does not exist.');
+        }
 
         return $model;
     }
@@ -349,6 +352,7 @@ class HostController extends Controller {
      */
     public function actionArpTable() {
         try {
+            
             if (isset($_GET['id'])) {
                 $model = $this->loadModel((int) $_GET['id']);
             } else if (isset($_GET['name'])) {

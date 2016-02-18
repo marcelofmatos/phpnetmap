@@ -41,7 +41,7 @@ return array(
             'rules' => array(
                 'site/page/<view:\w+>' => 'site/page',
                 'host/view/<name:[a-zA-Z].+>' => 'host/viewByName',
-                'host/<action:\w+>/<name:[a-z].+>' => 'host/<action>',
+                'host/<action:\w+>/<name:[a-zA-Z].+>' => 'host/<action>',
                 'map/<action:\w+>/<hostId:[0-9]+>' => 'map/<action>',
                 'vlan/tag/<tag:[0-9]+>' => 'vlan/viewByTag',
                 '<controller:\w+>/<id:\d+>' => '<controller>/view',
