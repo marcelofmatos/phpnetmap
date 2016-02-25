@@ -52,7 +52,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		'type',
 		'mac',
 		'ip',
-                array('name' => 'snmpTemplate', 'value' => '$data->snmpTemplate'),
+                'snmpTemplate',
 		array(
                     'class' => 'CButtonColumn',
                     'template' => '{view} {update} {delete}',

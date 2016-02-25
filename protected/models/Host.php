@@ -71,7 +71,7 @@ class Host extends CActiveRecord {
             array('ip', 'length', 'max' => 15),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
-            array('id, name, type, mac, ip, snmp_template_id, host_face_id', 'safe', 'on' => 'search'),
+            array('id, name, type, mac, ip, snmp_template_id, host_face_id, snmpTemplate', 'safe', 'on' => 'search'),
         );
     }
 
@@ -113,16 +113,17 @@ class Host extends CActiveRecord {
         // should not be searched.
 
         $criteria = new CDbCriteria();
-        $criteria->with = array('snmpTemplate');
         $criteria->compare('t.id', $this->id);
         $criteria->compare('t.name', $this->name, true);
         $criteria->compare('t.type', $this->type, true);
         $criteria->compare('t.mac', $this->mac, true);
         $criteria->compare('t.ip', $this->ip, true);
         $criteria->compare('t.snmp_template_id', $this->snmp_template_id);
-        $criteria->compare('snmp_template.name', $this->snmpTemplate, true);
         $criteria->compare('host_face_id', $this->host_face_id);
-
+        
+        $criteria->with = array('snmpTemplate');
+        $criteria->addSearchCondition('snmpTemplate.name',$this->snmpTemplate);
+        
         return new CActiveDataProvider('Host', array(
             'criteria' => $criteria,
             'sort' => array(
