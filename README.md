@@ -9,9 +9,6 @@ Framework [yii](http://www.yiiframework.com/) com
 [CAdvancedArBehavior](http://www.yiiframework.com/extension/cadvancedarbehavior).
 Usando biblioteca JavaScript [D3](http://d3js.org/) para o mapa.
 
-![Home Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_home.png =170x)
-![Host Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png =170x)
-
 
 # PHPNetMap e Docker
 
@@ -51,6 +48,13 @@ instalados:
 
 O login está configurado em .htaccess e .htpasswd portanto o apache deve estar 
 configurado para ler as instruções
+
+
+# Screenshots
+
+![Home Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_home.png)
+![Host Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png)
+
 
 
 # Referências
