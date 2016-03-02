@@ -1,6 +1,5 @@
 # PHPNetMap
 
-
 Software para monitoramento de equipamentos de rede com protocolo 
 SNMP v(1 / 2c / 3). Testado com 3Com / HP, ProCurve, Dell e Extreme. 
 Alguns outros modelos com suporte SNMP funcionam corretamente.
@@ -10,8 +9,8 @@ Framework [yii](http://www.yiiframework.com/) com
 [CAdvancedArBehavior](http://www.yiiframework.com/extension/cadvancedarbehavior).
 Usando biblioteca JavaScript [D3](http://d3js.org/) para o mapa.
 
-![Home Screenshot](images/screenshot_home.png =150x)
-![Host Screenshot](images/screenshot_host.png =150x)
+![Home Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_home.png =x250)
+![Host Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png =x250)
 
 
 # PHPNetMap e Docker
