@@ -59,10 +59,10 @@ Using JavaScript <a href="http://d3js.org/">D3</a> library  to the map.</p>
 <p>The PHPNetMap shows the host connected to the equipment from <a href="https://en.wikipedia.org/wiki/Forwarding_information_base">FIB</a>
 or table CAM switches, and <a href="https://en.wikipedia.org/wiki/Address_Resolution_Protocol">ARP</a> table 
 equipment. You can perform searches within these tables in various
-devices at the same time. With the map view you can check
-the connections between hosts and each host there is a screen indicating the 
-port status with their respective connected host. You can see the operating 
-status port and status of the <a href="https://en.wikipedia.org/wiki/Spanning_Tree_Protocol">Spanning Tree Protocol</a> 
+devices at the same time. With the map view you can check the connections 
+between hosts and each host there is a screen indicating the  port status with 
+their respective connected host. You can see the operating status port and 
+status of the <a href="https://en.wikipedia.org/wiki/Spanning_Tree_Protocol">Spanning Tree Protocol</a> 
 on switches with dot1dStpPortState OID. Using an SNMP community with read/write 
 permission you can change the ifAdminStatus or set ifAlias</p>
 
@@ -92,20 +92,21 @@ pip install docker-compose
 <h1>
 <a id="server" class="anchor" href="#server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Server</h1>
 
-<p>The software was tested on Debian and Ubuntu Server with the following installed packages:</p>
+<p>The software was tested on Debian and Ubuntu Server with the following 
+installed packages:</p>
 
 <ul>
 <li>apache2</li>
-<li>Libapache2-mod-php5</li>
-<li>Php5-snmp</li>
-<li>Php5-sqlite</li>
-<li>Php-apc</li>
+<li>libapache2-mod-php5</li>
+<li>php5-snmp</li>
+<li>php5-sqlite</li>
+<li>php-apc</li>
 <li>snmpd</li>
 <li>sqlite3</li>
 </ul>
 
-<p>The login is set in .htaccess and .htpasswd so apache must be
-configured to read the instructions</p>
+<p>The login is set in .htaccess and .htpasswd so apache must be configured to 
+read the instructions</p>
 
 <h1>
 <a id="screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Screenshots</h1>
