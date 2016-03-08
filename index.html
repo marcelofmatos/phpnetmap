@@ -42,57 +42,68 @@
         <h1>
 <a id="phpnetmap" class="anchor" href="#phpnetmap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PHPNetMap</h1>
 
-<p>Software para monitoramento de equipamentos de rede com protocolo 
-SNMP v(1 / 2c / 3). Testado com 3Com / HP, ProCurve, Dell e Extreme. 
-Alguns outros modelos com suporte SNMP funcionam corretamente.
-Framework <a href="http://www.yiiframework.com/">yii</a> com 
-<a href="http://www.yiiframework.com/extension/bootstrap">bootstrap</a>, 
-<a href="http://www.yiiframework.com/extension/colorpicker">colorpicker</a> e 
+<p>Software for network equipment monitoring with protocol
+SNMP v(1/2c/3). Tested with 3Com/HP, ProCurve, Dell and Extreme.
+Some other models with SNMP support work properly.
+Framework <a href="http://www.yiiframework.com/">yii</a> with
+<a href="http://www.yiiframework.com/extension/bootstrap">Bootstrap</a>
+<a href="http://www.yiiframework.com/extension/colorpicker">Colorpicker</a> and
 <a href="http://www.yiiframework.com/extension/cadvancedarbehavior">CAdvancedArBehavior</a>.
-Usando biblioteca JavaScript <a href="http://d3js.org/">D3</a> para o mapa.</p>
-
-<h1>
-<a id="phpnetmap-e-docker" class="anchor" href="#phpnetmap-e-docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PHPNetMap e Docker</h1>
-
-<p>Criei uma imagem Docker com toda a configuração pronta para uso do PHPNetMap, 
-disponível no <a href="https://hub.docker.com/r/marcelofmatos/phpnetmap/">Docker Hub</a>. 
-Com o docker-compose.yml na raiz do projeto é possível baixar a imagem e rodar o 
-sistema somente com o comando <code>docker-compose up</code> dentro do diretório do 
-projeto. Observe as configurações do servidor para rodar em modo de produção 
-(senha em .htpasswd, allowoverride=true, etc). Altere o docker-compose.yml 
-conforme necessário.</p>
+Using JavaScript <a href="http://d3js.org/">D3</a> library  to the map.</p>
 
 <h2>
-<a id="instalação-do-docker" class="anchor" href="#instala%C3%A7%C3%A3o-do-docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instalação do Docker</h2>
+<a id="how-it-works" class="anchor" href="#how-it-works" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How It works</h2>
 
-<pre><code>curl -sSL https://get.docker.com/ | sh
+<p>The PHPNetMap shows the host connected to the equipment from <a href="https://en.wikipedia.org/wiki/Forwarding_information_base">FIB</a>
+or table CAM switches, and <a href="https://en.wikipedia.org/wiki/Address_Resolution_Protocol">ARP</a> table 
+equipment. You can perform searches within these tables in various
+devices at the same time. With the map view you can check
+the connections between hosts and each host there is a screen indicating the 
+port status with their respective connected host. You can see the operating 
+status port and status of the <a href="https://en.wikipedia.org/wiki/Spanning_Tree_Protocol">Spanning Tree Protocol</a> 
+on switches with dot1dStpPortState OID. Using an SNMP community with read/write 
+permission you can change the ifAdminStatus or set ifAlias</p>
+
+<h1>
+<a id="phpnetmap-and-docker" class="anchor" href="#phpnetmap-and-docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>PHPNetMap and Docker</h1>
+
+<p>I created a Docker image with all the configuration ready for use PHPNetMap,
+available in <a href="https://hub.docker.com/r/marcelofmatos/phpnetmap/">Docker Hub</a>.
+With the docker-compose.yml in the project root you can download the image and run
+system only with the command <code>docker-compose up</code> within the directory
+project. Note server settings to run in production mode (Password in .htpasswd, 
+AllowOverride=true, and so on). Change the docker-compose.yml as necessary.</p>
+
+<h2>
+<a id="installing-docker" class="anchor" href="#installing-docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing Docker</h2>
+
+<pre><code>curl -ssl https://get.docker.com/ | sh
 </code></pre>
 
 <h2>
-<a id="instalação-do-docker-compose" class="anchor" href="#instala%C3%A7%C3%A3o-do-docker-compose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instalação do docker-compose</h2>
+<a id="installing-the-docker-compose" class="anchor" href="#installing-the-docker-compose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing the docker-compose</h2>
 
 <pre><code>apt-get install python-pip
 pip install docker-compose
 </code></pre>
 
 <h1>
-<a id="servidor" class="anchor" href="#servidor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Servidor</h1>
+<a id="server" class="anchor" href="#server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Server</h1>
 
-<p>O software foi testado em servidor Debian e Ubuntu com os seguintes pacotes 
-instalados:</p>
+<p>The software was tested on Debian and Ubuntu Server with the following installed packages:</p>
 
 <ul>
 <li>apache2</li>
-<li>libapache2-mod-php5</li>
-<li>php5-snmp</li>
-<li>php5-sqlite</li>
-<li>php-apc</li>
+<li>Libapache2-mod-php5</li>
+<li>Php5-snmp</li>
+<li>Php5-sqlite</li>
+<li>Php-apc</li>
 <li>snmpd</li>
 <li>sqlite3</li>
 </ul>
 
-<p>O login está configurado em .htaccess e .htpasswd portanto o apache deve estar 
-configurado para ler as instruções</p>
+<p>The login is set in .htaccess and .htpasswd so apache must be
+configured to read the instructions</p>
 
 <h1>
 <a id="screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Screenshots</h1>
@@ -101,7 +112,7 @@ configurado para ler as instruções</p>
 <img src="https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png" alt="Host Screenshot"></p>
 
 <h1>
-<a id="referências" class="anchor" href="#refer%C3%AAncias" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Referências</h1>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h1>
 
 <ul>
 <li><a href="http://www.yiiframework.com/">http://www.yiiframework.com/</a></li>
