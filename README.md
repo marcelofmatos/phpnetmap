@@ -17,10 +17,10 @@ Using JavaScript [D3](http://d3js.org/) library  to the map.
 The PHPNetMap shows the host connected to the equipment from [FIB](https://en.wikipedia.org/wiki/Forwarding_information_base)
 or table CAM switches, and [ARP](https://en.wikipedia.org/wiki/Address_Resolution_Protocol) table 
 equipment. You can perform searches within these tables in various
-devices at the same time. With the map view you can check
-the connections between hosts and each host there is a screen indicating the 
-port status with their respective connected host. You can see the operating 
-status port and status of the [Spanning Tree Protocol](https://en.wikipedia.org/wiki/Spanning_Tree_Protocol) 
+devices at the same time. With the map view you can check the connections 
+between hosts and each host there is a screen indicating the  port status with 
+their respective connected host. You can see the operating status port and 
+status of the [Spanning Tree Protocol](https://en.wikipedia.org/wiki/Spanning_Tree_Protocol) 
 on switches with dot1dStpPortState OID. Using an SNMP community with read/write 
 permission you can change the ifAdminStatus or set ifAlias
 
@@ -49,18 +49,19 @@ pip install docker-compose
 
 # Server
 
-The software was tested on Debian and Ubuntu Server with the following installed packages:
+The software was tested on Debian and Ubuntu Server with the following 
+installed packages:
 
 * apache2
-* Libapache2-mod-php5
-* Php5-snmp
-* Php5-sqlite
-* Php-apc
+* libapache2-mod-php5
+* php5-snmp
+* php5-sqlite
+* php-apc
 * snmpd
 * sqlite3
 
-The login is set in .htaccess and .htpasswd so apache must be
-configured to read the instructions
+The login is set in .htaccess and .htpasswd so apache must be configured to 
+read the instructions
 
 
 # Screenshots
