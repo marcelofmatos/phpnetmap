@@ -1,31 +1,43 @@
 # PHPNetMap
 
-Software para monitoramento de equipamentos de rede com protocolo 
-SNMP v(1 / 2c / 3). Testado com 3Com / HP, ProCurve, Dell e Extreme. 
-Alguns outros modelos com suporte SNMP funcionam corretamente.
-Framework [yii](http://www.yiiframework.com/) com 
-[bootstrap](http://www.yiiframework.com/extension/bootstrap), 
-[colorpicker](http://www.yiiframework.com/extension/colorpicker) e 
+Software for network equipment monitoring with protocol
+SNMP v(1/2c/3). Tested with 3Com/HP, ProCurve, Dell and Extreme.
+Some other models with SNMP support work properly.
+Framework [yii](http://www.yiiframework.com/) with
+[Bootstrap](http://www.yiiframework.com/extension/bootstrap)
+[Colorpicker](http://www.yiiframework.com/extension/colorpicker) and
 [CAdvancedArBehavior](http://www.yiiframework.com/extension/cadvancedarbehavior).
-Usando biblioteca JavaScript [D3](http://d3js.org/) para o mapa.
+Using JavaScript [D3](http://d3js.org/) library  to the map.
 
 
-# PHPNetMap e Docker
+## How It works
 
-Criei uma imagem Docker com toda a configuração pronta para uso do PHPNetMap, 
-disponível no [Docker Hub](https://hub.docker.com/r/marcelofmatos/phpnetmap/). 
-Com o docker-compose.yml na raiz do projeto é possível baixar a imagem e rodar o 
-sistema somente com o comando `docker-compose up` dentro do diretório do 
-projeto. Observe as configurações do servidor para rodar em modo de produção 
-(senha em .htpasswd, allowoverride=true, etc). Altere o docker-compose.yml 
-conforme necessário.
+The PHPNetMap shows the host connected to the equipment from [FIB](https://en.wikipedia.org/wiki/Forwarding_information_base)
+or table CAM switches, and [ARP](https://en.wikipedia.org/wiki/Address_Resolution_Protocol) table 
+equipment. You can perform searches within these tables in various
+devices at the same time. With the map view you can check
+the connections between hosts and each host there is a screen indicating the 
+port status with their respective connected host. You can see the operating 
+status port and status of the [Spanning Tree Protocol](https://en.wikipedia.org/wiki/Spanning_Tree_Protocol) 
+on switches with dot1dStpPortState OID. Using an SNMP community with read/write 
+permission you can change the ifAdminStatus or set ifAlias
 
-## Instalação do Docker
+
+# PHPNetMap and Docker
+
+I created a Docker image with all the configuration ready for use PHPNetMap,
+available in [Docker Hub](https://hub.docker.com/r/marcelofmatos/phpnetmap/).
+With the docker-compose.yml in the project root you can download the image and run
+system only with the command `docker-compose up` within the directory
+project. Note server settings to run in production mode (Password in .htpasswd, 
+AllowOverride=true, and so on). Change the docker-compose.yml as necessary.
+
+## Installing Docker
 ```
-curl -sSL https://get.docker.com/ | sh
+curl -ssl https://get.docker.com/ | sh
 ```
 
-## Instalação do docker-compose
+## Installing the docker-compose
 
 ```
 apt-get install python-pip
@@ -33,21 +45,20 @@ pip install docker-compose
 ```
 
 
-# Servidor
+# Server
 
-O software foi testado em servidor Debian e Ubuntu com os seguintes pacotes 
-instalados:
+The software was tested on Debian and Ubuntu Server with the following installed packages:
 
 * apache2
-* libapache2-mod-php5
-* php5-snmp
-* php5-sqlite
-* php-apc
+* Libapache2-mod-php5
+* Php5-snmp
+* Php5-sqlite
+* Php-apc
 * snmpd
 * sqlite3
 
-O login está configurado em .htaccess e .htpasswd portanto o apache deve estar 
-configurado para ler as instruções
+The login is set in .htaccess and .htpasswd so apache must be
+configured to read the instructions
 
 
 # Screenshots
@@ -56,8 +67,7 @@ configurado para ler as instruções
 ![Host Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png)
 
 
-
-# Referências
+# References
 * http://www.yiiframework.com/
 * http://d3js.org/
 * https://docs.docker.com/engine/installation/
