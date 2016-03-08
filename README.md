@@ -1,5 +1,7 @@
 # PHPNetMap
 
+[README.pt-BR](https://github.com/marcelofmatos/phpnetmap/blob/master/README.pt-BR.md)
+
 Software for network equipment monitoring with protocol
 SNMP v(1/2c/3). Tested with 3Com/HP, ProCurve, Dell and Extreme.
 Some other models with SNMP support work properly.
