@@ -2,7 +2,7 @@
 
 [README.pt-BR](https://github.com/marcelofmatos/phpnetmap/blob/master/README.pt-BR.md)
 
-PHP Software for network equipment monitoring with
+PHP Software for network device monitoring with
 SNMP v(1/2c/3) protocol. Tested with 3Com/HP, ProCurve, Dell and Extreme devices.
 Some other models with SNMP support work properly.
 Framework [yii](http://www.yiiframework.com/) with
