@@ -2,7 +2,7 @@
 
 [README.pt-BR](https://github.com/marcelofmatos/phpnetmap/blob/master/README.pt-BR.md)
 
-Software for network equipment monitoring with protocol
+PHP Software for network equipment monitoring with protocol
 SNMP v(1/2c/3). Tested with 3Com/HP, ProCurve, Dell and Extreme.
 Some other models with SNMP support work properly.
 Framework [yii](http://www.yiiframework.com/) with
@@ -14,10 +14,10 @@ Using JavaScript [D3](http://d3js.org/) library  to the map.
 
 ## How It works
 
-The PHPNetMap shows the host connected to the equipment from [FIB](https://en.wikipedia.org/wiki/Forwarding_information_base)
+The PHPNetMap shows connected hosts based on the [FIB](https://en.wikipedia.org/wiki/Forwarding_information_base)
 or table CAM switches, and [ARP](https://en.wikipedia.org/wiki/Address_Resolution_Protocol) table 
-equipment. You can perform searches within these tables in various
-devices at the same time. With the map view you can check the connections 
+devices. You can perform searches within these tables in various
+devices with the Search form. With the map view you can check the connections 
 between hosts and each host there is a screen indicating the  port status with 
 their respective connected host. You can see the operating status port and 
 status of the [Spanning Tree Protocol](https://en.wikipedia.org/wiki/Spanning_Tree_Protocol) 

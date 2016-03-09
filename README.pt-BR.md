@@ -1,6 +1,6 @@
 # PHPNetMap
 
-Software para monitoramento de equipamentos de rede com protocolo 
+Software em PHP para monitoramento de equipamentos de rede com protocolo 
 SNMP v(1 / 2c / 3). Testado com 3Com / HP, ProCurve, Dell e Extreme. 
 Alguns outros modelos com suporte SNMP funcionam corretamente.
 Framework [yii](http://www.yiiframework.com/) com 
@@ -12,11 +12,10 @@ Usando biblioteca JavaScript [D3](http://d3js.org/) para o mapa.
 
 ## Como funciona
 
-O PHPNetMap mostra o mapeamento dos host conectados nos equipamentos a partir das 
-informações do [FIB](https://en.wikipedia.org/wiki/Forwarding_information_base) 
+O PHPNetMap mostra os hosts conectados baseando-se no [FIB](https://en.wikipedia.org/wiki/Forwarding_information_base) 
 ou tabela CAM dos switches, e da tabela [ARP](https://en.wikipedia.org/wiki/Address_Resolution_Protocol) 
 dos equipamentos. É possível executar buscas dentro dessas tabelas em vários 
-equipamentos ao mesmo tempo. Com a visualização do mapa é possível verificar 
+equipamentos com o formulário em Search. Com a visualização do mapa é possível verificar 
 as conexões entre os hosts e para cada host há uma tela indicando o status das
 portas com seu respectivo host conectado. É possível ver o status de operação 
 da porta e status do [Protocolo Spanning Tree](https://en.wikipedia.org/wiki/Spanning_Tree_Protocol) 
