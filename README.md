@@ -66,8 +66,14 @@ read the instructions
 
 # Screenshots
 
+## Main page
 ![Home Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_home.png)
+
+## Host and network map
 ![Host Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png)
+
+## Traffic ports
+![Traffic Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_traffic.png)
 
 
 # References

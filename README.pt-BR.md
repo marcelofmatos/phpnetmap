@@ -66,9 +66,14 @@ configurado para ler as instruções
 
 # Screenshots
 
+## Página principal
 ![Home Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_home.png)
+
+## Host e mapa de conexões
 ![Host Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_host.png)
 
+## Tráfego das portas
+![Traffic Screenshot](https://raw.githubusercontent.com/marcelofmatos/phpnetmap/master/images/screenshot_traffic.png)
 
 
 # Referências
