@@ -82,11 +82,34 @@ AllowOverride=true, and so on). Change the docker-compose.yml as necessary.</p>
 <pre><code>curl -ssl https://get.docker.com/ | sh
 </code></pre>
 
+<p>Create and run a single container</p>
+
+<pre><code>docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
+</code></pre>
+
+<p>To manage container:</p>
+
+<pre><code>docker start server1
+docker stop server1
+</code></pre>
+
 <h2>
-<a id="installing-the-docker-compose" class="anchor" href="#installing-the-docker-compose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing the docker-compose</h2>
+<a id="using-with-docker-compose" class="anchor" href="#using-with-docker-compose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using with docker-compose</h2>
+
+<p>Use these comands to install docker-compose</p>
 
 <pre><code>apt-get install python-pip
 pip install docker-compose
+</code></pre>
+
+<p>To run configuration in docker-compose.yml:</p>
+
+<pre><code>docker-compose up
+</code></pre>
+
+<p>To run especific YML file:</p>
+
+<pre><code>docker-compose -f docker-compose-multiple-servers.yml up
 </code></pre>
 
 <h1>
