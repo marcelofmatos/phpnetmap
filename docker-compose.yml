@@ -1,8 +1,7 @@
+# Example to use single server
 server:
   image: marcelofmatos/phpnetmap
   ports:
    - "80:80"
   volumes: 
    - .:/app
-  environment:
-    ALLOW_OVERRIDE: 'true'

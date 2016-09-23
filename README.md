@@ -39,13 +39,35 @@ AllowOverride=true, and so on). Change the docker-compose.yml as necessary.
 curl -ssl https://get.docker.com/ | sh
 ```
 
-## Installing the docker-compose
+Create and run a single container
+```
+docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
+```
 
+To manage container:
+```
+docker start server1
+docker stop server1
+```
+
+
+## Using with docker-compose
+
+Use these comands to install docker-compose
 ```
 apt-get install python-pip
 pip install docker-compose
 ```
 
+To run configuration in docker-compose.yml:
+```
+docker-compose up
+```
+
+To run especific YML file:
+```
+docker-compose -f docker-compose-multiple-servers.yml up
+```
 
 # Server
 
