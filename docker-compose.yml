@@ -1,6 +1,9 @@
 # Example to use single server
 server:
   image: marcelofmatos/phpnetmap
+  environment:
+   - ADMIN_USER=admin
+   - ADMIN_PASSWORD=pnm
   ports:
    - "80:80"
   volumes: 

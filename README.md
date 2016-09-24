@@ -31,8 +31,8 @@ I created a Docker image with all the configuration ready for use PHPNetMap,
 available in [Docker Hub](https://hub.docker.com/r/marcelofmatos/phpnetmap/).
 With the docker-compose.yml in the project root you can download the image and run
 system only with the command `docker-compose up` within the directory
-project. Note server settings to run in production mode (Password in .htpasswd, 
-AllowOverride=true, and so on). Change the docker-compose.yml as necessary.
+project. Note server settings to run in production mode (Password in ADMIN_PASSWORD 
+environment variable, for example). Change the docker-compose.yml as necessary.
 
 ## Installing Docker
 ```
@@ -45,6 +45,7 @@ docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
 ```
 
 Open a web browser and access http://<server_ip> or http://localhost if 'docker run' executed in your local machine
+The HTTP user is 'admin' and password is string set in ADMIN_PASSWORD environment variable.
 
 If you wish run container in other port:
 ```
@@ -52,11 +53,22 @@ docker run -p 8081:80 --name=server1 marcelofmatos/phpnetmap
 ```
 And open http://localhost:8081
 
-
 To manage container:
 ```
 docker start server1
 docker stop server1
+```
+
+Set HTTP user and password:
+```
+docker run -p 80:80 --name=server1 -e ADMIN_USER=admin -e ADMIN_PASSWORD=pnm marcelofmatos/phpnetmap
+```
+If ADMIN_USER is not set, 'admin' is default value
+If ADMIN_PASSWORD is not set, a random value is set and printed on log container.
+
+To show log container
+```
+docker logs server1
 ```
 
 See more in https://docs.docker.com/engine/getstarted/
