@@ -63,7 +63,7 @@ Set HTTP user and password:
 ```
 docker run -p 80:80 --name=server1 -e ADMIN_USER=admin -e ADMIN_PASSWORD=pnm marcelofmatos/phpnetmap
 ```
-If ADMIN_USER is not set, 'admin' is default value
+If ADMIN_USER is not set, 'admin' is default value.
 If ADMIN_PASSWORD is not set, a random value is set and printed on log container.
 
 To show log container
