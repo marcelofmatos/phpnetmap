@@ -70,17 +70,15 @@ apt-get install python-pip
 pip install docker-compose
 ```
 
-To run configuration in docker-compose.yml:
+To run configuration in [docker-compose.yml](https://github.com/marcelofmatos/phpnetmap/blob/master/docker-compose.yml):
 ```
 docker-compose up
 ```
 
-To run especific YML file:
+To run especific YML file, like [docker-compose-multiple-servers.yml](https://github.com/marcelofmatos/phpnetmap/blob/master/docker-compose-multiple-servers.yml):
 ```
 docker-compose -f docker-compose-multiple-servers.yml up
 ```
-
-See these files in [GitHub Project] (https://github.com/marcelofmatos/phpnetmap)
 
 
 # Server
