@@ -73,8 +73,8 @@ permission you can change the ifAdminStatus or set ifAlias</p>
 available in <a href="https://hub.docker.com/r/marcelofmatos/phpnetmap/">Docker Hub</a>.
 With the docker-compose.yml in the project root you can download the image and run
 system only with the command <code>docker-compose up</code> within the directory
-project. Note server settings to run in production mode (Password in .htpasswd, 
-AllowOverride=true, and so on). Change the docker-compose.yml as necessary.</p>
+project. Note server settings to run in production mode (Password in ADMIN_PASSWORD 
+environment variable, for example). Change the docker-compose.yml as necessary.</p>
 
 <h2>
 <a id="installing-docker" class="anchor" href="#installing-docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing Docker</h2>
@@ -87,7 +87,8 @@ AllowOverride=true, and so on). Change the docker-compose.yml as necessary.</p>
 <pre><code>docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
 </code></pre>
 
-<p>Open a web browser and access http:// or http://localhost if 'docker run' executed in your local machine</p>
+<p>Open a web browser and access http:// or http://localhost if 'docker run' executed in your local machine
+The HTTP user is 'admin' and password is string set in ADMIN_PASSWORD environment variable.</p>
 
 <p>If you wish run container in other port:</p>
 
@@ -100,6 +101,19 @@ AllowOverride=true, and so on). Change the docker-compose.yml as necessary.</p>
 
 <pre><code>docker start server1
 docker stop server1
+</code></pre>
+
+<p>Set HTTP user and password:</p>
+
+<pre><code>docker run -p 80:80 --name=server1 -e ADMIN_USER=admin -e ADMIN_PASSWORD=pnm marcelofmatos/phpnetmap
+</code></pre>
+
+<p>If ADMIN_USER is not set, 'admin' is default value
+If ADMIN_PASSWORD is not set, a random value is set and printed on log container.</p>
+
+<p>To show log container</p>
+
+<pre><code>docker logs server1
 </code></pre>
 
 <p>See more in <a href="https://docs.docker.com/engine/getstarted/">https://docs.docker.com/engine/getstarted/</a></p>
