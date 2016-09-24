@@ -87,11 +87,22 @@ AllowOverride=true, and so on). Change the docker-compose.yml as necessary.</p>
 <pre><code>docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
 </code></pre>
 
+<p>Open a web browser and access http:// or http://localhost if 'docker run' executed in your local machine</p>
+
+<p>If you wish run container in other port:</p>
+
+<pre><code>docker run -p 8081:80 --name=server1 marcelofmatos/phpnetmap
+</code></pre>
+
+<p>And open http://localhost:8081</p>
+
 <p>To manage container:</p>
 
 <pre><code>docker start server1
 docker stop server1
 </code></pre>
+
+<p>See more in <a href="https://docs.docker.com/engine/getstarted/">https://docs.docker.com/engine/getstarted/</a></p>
 
 <h2>
 <a id="using-with-docker-compose" class="anchor" href="#using-with-docker-compose" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using with docker-compose</h2>
@@ -155,6 +166,7 @@ read the instructions</p>
 <ul>
 <li><a href="http://www.yiiframework.com/">http://www.yiiframework.com/</a></li>
 <li><a href="http://d3js.org/">http://d3js.org/</a></li>
+<li><a href="https://docs.docker.com/engine/getstarted/">https://docs.docker.com/engine/getstarted/</a></li>
 <li><a href="https://docs.docker.com/engine/installation/">https://docs.docker.com/engine/installation/</a></li>
 <li><a href="https://docs.docker.com/compose/compose-file/">https://docs.docker.com/compose/compose-file/</a></li>
 </ul>
