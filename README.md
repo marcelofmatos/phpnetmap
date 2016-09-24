@@ -44,11 +44,22 @@ Create and run a single container
 docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
 ```
 
+Open a web browser and access http://<server_ip> or http://localhost if 'docker run' executed in your local machine
+
+If you wish run container in other port:
+```
+docker run -p 8081:80 --name=server1 marcelofmatos/phpnetmap
+```
+And open http://localhost:8081
+
+
 To manage container:
 ```
 docker start server1
 docker stop server1
 ```
+
+See more in https://docs.docker.com/engine/getstarted/
 
 
 ## Using with docker-compose
@@ -101,5 +112,6 @@ read the instructions
 # References
 * http://www.yiiframework.com/
 * http://d3js.org/
+* https://docs.docker.com/engine/getstarted/
 * https://docs.docker.com/engine/installation/
 * https://docs.docker.com/compose/compose-file/
