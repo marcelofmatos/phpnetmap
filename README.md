@@ -1,5 +1,7 @@
 # PHPNetMap
 
+[![](https://images.microbadger.com/badges/image/marcelofmatos/phpnetmap.svg)](https://microbadger.com/images/marcelofmatos/phpnetmap "Get your own image badge on microbadger.com")
+
 [README.pt-BR](https://github.com/marcelofmatos/phpnetmap/blob/master/README.pt-BR.md)
 
 PHP Software for network device monitoring with
