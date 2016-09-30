@@ -1,7 +1,5 @@
 # PHPNetMap
 
-[![](https://images.microbadger.com/badges/image/marcelofmatos/phpnetmap.svg)](https://microbadger.com/images/marcelofmatos/phpnetmap "Get your own image badge on microbadger.com")
-
 [README.pt-BR](https://github.com/marcelofmatos/phpnetmap/blob/master/README.pt-BR.md)
 
 PHP Software for network device monitoring with
@@ -28,6 +26,8 @@ permission you can change the ifAdminStatus or set ifAlias
 
 
 # PHPNetMap and Docker
+
+[![](https://images.microbadger.com/badges/image/marcelofmatos/phpnetmap.svg)](https://microbadger.com/images/marcelofmatos/phpnetmap "Get your own image badge on microbadger.com")
 
 I created a Docker image with all the configuration ready for use PHPNetMap,
 available in [Docker Hub](https://hub.docker.com/r/marcelofmatos/phpnetmap/).
