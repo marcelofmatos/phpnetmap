@@ -5,7 +5,7 @@ FROM tutum/apache-php
 MAINTAINER Marcelo Matos <marcelo.matos@ufrr.br>
 
 RUN apt-get update \
-    && apt-get install -y php5-snmp php5-sqlite sqlite3 snmpd git apache2-utils \
+    && apt-get install -y snmp php5-snmp php5-sqlite sqlite3 snmpd git apache2-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
