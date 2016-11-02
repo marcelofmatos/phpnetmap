@@ -49,7 +49,11 @@ class ConfigForm extends CFormModel {
 
     public function load() {
         if(!is_readable(PARAMS_INI_FILE_PATH)) {
-            throw new Exception("Error accessing ". PARAMS_INI_FILE_PATH);
+            try {
+                touch(PARAMS_INI_FILE_PATH);
+            } catch(Exception $e) {
+                throw new Exception("Config file is not readable: ". PARAMS_INI_FILE_PATH);
+            }
         }
         foreach(@parse_ini_file(PARAMS_INI_FILE_PATH) as $key => $val) {
             $this->$key = $val;
@@ -58,7 +62,7 @@ class ConfigForm extends CFormModel {
     
     public function save() {
         if(!is_writeable(PARAMS_INI_FILE_PATH)) {
-            throw new Exception("Error accessing ". PARAMS_INI_FILE_PATH);
+            throw new Exception("Config file is not writable: ". PARAMS_INI_FILE_PATH);
         }
         
         $res = array(
