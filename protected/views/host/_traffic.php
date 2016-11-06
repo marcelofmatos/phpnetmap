@@ -82,7 +82,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
 
             trafficIn = portData.ifInOctets ? (portDataNew.ifInOctets - portData.ifInOctets) * 8 / (portsTraffic.time - portData.time) : 0;
             trafficOut = portData.ifOutOctets ? (portDataNew.ifOutOctets - portData.ifOutOctets) * 8 / (portsTraffic.time - portData.time) : 0;
-            speed = (trafficIn > 0 ||trafficOut > 0) ? portDataNew.ifSpeed : 0;
+            speed = (portDataNew.ifSpeed) ? portDataNew.ifSpeed : 0;
 
             // bullet chart info
             portData.markers = portData.measures;
