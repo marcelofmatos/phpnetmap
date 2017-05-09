@@ -33,6 +33,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         var selectedPort = null;
         var allPorts = null;
         var actionViewHostURL = '<?php echo Yii::app()->baseUrl; ?>/host/view/';
+        var actionCreateHostURL = '<?php echo Yii::app()->baseUrl; ?>/host/create?';
 
 
         function drawPorts(portsData){
@@ -224,7 +225,11 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         }
         
         function linkToHost(host) {
-            return actionViewHostURL + host.name;
+            if(host.type=='unknown') {
+                return actionCreateHostURL + 'ip='host.ip + '&mac=' + host.mac;
+            else {
+                return actionViewHostURL + host.name;
+            }
         }
 
         function setSNMPValue(obj) {
