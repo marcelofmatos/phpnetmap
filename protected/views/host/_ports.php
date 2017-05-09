@@ -226,10 +226,10 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         function linkToHost(host) {
             if(host.href) {
                 return host.href;
-            } else {
-                if(this.target) {
+            } else if(this.target) {
                     return this.target.href;
-                }
+            } else if(host.name) {
+                return actionViewHostURL + host.name;
             }
         }
 
