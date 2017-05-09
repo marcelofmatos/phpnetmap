@@ -226,7 +226,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         
         function linkToHost(host) {
             if(host.type=='unknown') {
-                return actionCreateHostURL + 'ip='host.ip + '&mac=' + host.mac;
+                return actionCreateHostURL + 'ip=' + host.ip + '&mac=' + host.mac;
             } else {
                 return actionViewHostURL + host.name;
             }
