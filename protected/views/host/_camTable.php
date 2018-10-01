@@ -42,7 +42,7 @@ if (is_array($cam_table)) {
             ),
             array(
                 'name'  => 'host',
-                'value' => '( isset($data[host]->id) ) ? CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)),array("title"=>"$data[host]")) : $data[host]->ip',
+                'value' => '( isset($data[host]->id) ) ? CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)),array("title"=>"$data[host]")) : null',
                 'type'  => 'raw',
                 'visible'=>' ! $data[host_dst] instanceof Host && $data[host]->id',
             ),
