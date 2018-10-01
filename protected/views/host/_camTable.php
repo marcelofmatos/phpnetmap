@@ -36,9 +36,15 @@ if (is_array($cam_table)) {
             ),
             'mac',
             array(
+                'name'  => 'ip',
+                'value' => '( isset($data[host]->ip) ) ? $data[host]->ip : null',
+                'type'  => 'raw',
+            ),
+            array(
                 'name'  => 'host',
                 'value' => '( isset($data[host]->id) ) ? CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)),array("title"=>"$data[host]")) : $data[host]->ip',
                 'type'  => 'raw',
+                'visible'=>' ! $data[host_dst] instanceof Host && $data[host]->id',
             ),
             array(
                 'class'=>'CButtonColumn',
