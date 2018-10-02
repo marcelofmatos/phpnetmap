@@ -464,7 +464,7 @@ class Host extends CActiveRecord {
         
         $this->mac = strtolower($this->mac);
         
-        parent::save($runValidation, $attributes);
+        return parent::save($runValidation, $attributes);
     }
 
 }
