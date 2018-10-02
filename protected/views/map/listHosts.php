@@ -24,12 +24,10 @@ foreach ($hosts as $host) {
         $params = array('name' => $host->name);
     }
     
-    $array2json['nodes'][$host->name] = array(
-        'name' => $host->name,
-        'group' => 1, // TODO: criar grupos de hosts
-        'href' => Yii::app()->createUrl('host/viewByName', $params), 
-        'type' => $host->type,
-    );
+    $array2json['nodes'][$host->name] = $host;
+    $array2json['nodes'][$host->name]['group'] = 1; // TODO: criar grupos de hosts
+    $array2json['nodes'][$host->name]['href'] = Yii::app()->createUrl('host/viewByName', $params); 
+
 }
 
 // links
