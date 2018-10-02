@@ -455,6 +455,17 @@ class Host extends CActiveRecord {
     public function setSNMPValue($oid, $type, $value) {
         return PNMSnmp::set($this, $oid, $type, $value);
     }
+    
+    public function save($runValidation = true, $attributes = null) {
+        
+        if(preg_match('/([0-9A-F]{2})([0-9A-F]{2})-([0-9A-F]{2})([0-9A-F]{2})-([0-9A-F]{2})([0-9A-F]{2})/', $this->mac, $m)) {
+            $this->mac = "{$m[1]}:{$m[2]}:{$m[3]}:{$m[4]}:{$m[5]}:{$m[6]}";
+        }
+        
+        $this->mac = strtolower($this->mac);
+        
+        parent::save($runValidation, $attributes);
+    }
 
 }
 
