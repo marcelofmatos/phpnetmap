@@ -121,7 +121,7 @@ class HostController extends Controller {
         if (isset($_POST['Host'])) {
             $model->attributes = $_POST['Host'];
             if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+                $this->redirect(array('viewByName', 'name' => $model->name));
         }
 
         $this->render('update', array(
