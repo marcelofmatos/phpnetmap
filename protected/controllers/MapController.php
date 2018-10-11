@@ -112,7 +112,7 @@ class MapController extends Controller {
                             $h->name = ($h->ip) ? $h->ip : $h->mac;
                             $h->setTypeByMAC();
                         }
-                        $h->ip = ($gateway instanceof Host) ? $gateway->getIpInArpTable($camHost['mac']) : null;
+                        $h->ip = ($gateway instanceof Host) ? $gateway->getIpInArpTable($camHost['mac']) : $h->ip;
                         array_push($hosts, $h);
 
                         // connection
