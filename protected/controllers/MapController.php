@@ -109,10 +109,10 @@ class MapController extends Controller {
                         } else {
                             $h = new Host();
                             $h->mac = $camHost['mac'];
-                            $h->name = ($h->ip) ? $h->ip : $h->mac;
                             $h->setTypeByMAC();
                         }
                         $h->ip = ($gateway instanceof Host) ? $gateway->getIpInArpTable($camHost['mac']) : $h->ip;
+                        $h->name = ($h->ip) ? $h->ip : $h->mac;
                         array_push($hosts, $h);
 
                         // connection
