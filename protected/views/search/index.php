@@ -7,12 +7,12 @@ $this->breadcrumbs = array(
 );
 ?>
 
-<div class="form">
+<div class="form span3">
     <?php echo $form ?>
 </div>
 
 <?php if ($result) : ?>
-    <div class="result">
+    <div class="result span9">
         <?php
         switch ($searchModel->type) {
 
