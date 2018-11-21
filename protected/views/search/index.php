@@ -72,13 +72,13 @@ $this->breadcrumbs = array(
                                     'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
                                     'visible' => '! $data[hostDst] instanceof Host',
                                 ),
-                                'search_in' => array(
-                                    'label' => 'Search in Host',
-                                    'imageUrl' => Yii::app()->request->baseUrl . '/images/search.png',
-                                    'url' => 'javascript:\$("#SearchForm_hosts").val($data[hostDst].id);document.forms["yw0"].submit.click();',
-                                    'visible' => '! $data[hostDst] instanceof Host',
-                                ),
                             ),
+                        ),
+                        array(
+                            'name' => 'search',
+                            'value' => '$data[hostDst] instanceof Host ? CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[hostDst]->id});document.forms[\'yw0\'].submit.click()")) : ""',
+                            'type' => 'raw',
+                            'visible' => '$data[hostDst] instanceof Host',
                         ),
                     ),
                 ));
@@ -131,7 +131,7 @@ $this->breadcrumbs = array(
                     ),
                 ));
                 break;
-            
+
             case 'portsinfo:ifAlias':
 
                 $dataProvider = new CArrayDataProvider($result, array(
@@ -164,11 +164,10 @@ $this->breadcrumbs = array(
                     ),
                 ));
                 break;
-            
+
             default:
                 echo 'unknown search type';
         }
         ?>
     </div>
     <?php endif; ?>
-
