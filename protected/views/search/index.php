@@ -56,6 +56,12 @@ $this->breadcrumbs = array(
                             'type' => 'raw',
                         ),
                         array(
+                            'name' => 'search',
+                            'value' => '$data[hostDst] instanceof Host ? CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[hostDst]->id});document.forms[\'yw0\'].submit.click()")) : ""',
+                            'type' => 'raw',
+                            'visible' => '$data[hostDst] instanceof Host',
+                        ),
+                        array(
                             'class' => 'CButtonColumn',
                             //                    'template'=> '{create_host}{show_host}',
                             'template' => '{create_conn}{create_host}',
@@ -73,12 +79,6 @@ $this->breadcrumbs = array(
                                     'visible' => '! $data[hostDst] instanceof Host',
                                 ),
                             ),
-                        ),
-                        array(
-                            'name' => 'search',
-                            'value' => '$data[hostDst] instanceof Host ? CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[hostDst]->id});document.forms[\'yw0\'].submit.click()")) : ""',
-                            'type' => 'raw',
-                            'visible' => '$data[hostDst] instanceof Host',
                         ),
                     ),
                 ));
