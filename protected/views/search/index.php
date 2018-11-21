@@ -52,7 +52,7 @@ $this->breadcrumbs = array(
                         'mac',
                         array(
                             'name' => 'hostDst',
-                            'value' => '$data[hostDst] instanceof Host ? "<span class=\'text-nowrap\'>".CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))." ".CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[hostDst]->id});document.forms[\'yw0\'].submit.click()"))."</span>" : ""',
+                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("style"=>"float:right", "class"=>"view host-type ". $data[hostDst]->type))." ".CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[hostDst]->id});document.forms[\'yw0\'].submit.click()")) : ""',
                             'type' => 'raw',
                         ),
                         array(
