@@ -94,3 +94,7 @@ select {
 .filter-container #Connection_type {
     width: 100px !important;
 }
+
+.text-nowrap {
+    white-space: nowrap;
+}
