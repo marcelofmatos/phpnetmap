@@ -67,6 +67,10 @@ select {
     padding:0 !important;
 }
 
+#portInfoBox select {
+    width: auto !important;
+}
+
 .table th, .table td {
     padding: 5px !important;
 }
