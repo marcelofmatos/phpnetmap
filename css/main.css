@@ -65,7 +65,6 @@ body
 
 select {
     padding:0 !important;
-    width: auto !important;
 }
 
 .table th, .table td {

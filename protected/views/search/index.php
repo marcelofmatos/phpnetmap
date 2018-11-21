@@ -72,6 +72,12 @@ $this->breadcrumbs = array(
                                     'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
                                     'visible' => '! $data[hostDst] instanceof Host',
                                 ),
+                                'search_in' => array(
+                                    'label' => 'Search in Host',
+                                    'imageUrl' => Yii::app()->request->baseUrl . '/images/search.png',
+                                    'url' => 'javascript:\$("#SearchForm_hosts").val($data[hostDst].id);document.forms["yw0"].submit.click();',
+                                    'visible' => '! $data[hostDst] instanceof Host',
+                                ),
                             ),
                         ),
                     ),
