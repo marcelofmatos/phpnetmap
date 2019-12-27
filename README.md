@@ -1,5 +1,7 @@
 # PHPNetMap
 
+[![Codeac.io](https://static.codeac.io/badges/2-3565924.svg)](https://app.codeac.io/github/marcelofmatos/phpnetmap)
+
 [README.pt-BR](https://github.com/marcelofmatos/phpnetmap/blob/master/README.pt-BR.md)
 
 PHP Software for network device monitoring with
