@@ -1,0 +1,140 @@
+name: Auto Label PRs
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label PRs based on title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const prNumber = context.payload.pull_request.number;
+            
+            console.log(`Analyzing PR title: "${title}"`);
+            
+            const labelsToAdd = [];
+            
+            // === REGRAS DE TIPO DE MUDANÇA ===
+            
+            // Bug fixes
+            if (/^fix:/i.test(title) || /^fix\(/i.test(title)) {
+              labelsToAdd.push('bug');
+            }
+            
+            if (/^bugfix:/i.test(title) || /^bugfix\(/i.test(title)) {
+              labelsToAdd.push('bug');
+            }
+            
+            // Hotfixes (críticos)
+            if (/^hotfix:/i.test(title) || /^hotfix\(/i.test(title)) {
+              labelsToAdd.push('hotfix');
+            }
+            
+            // Features
+            if (/^feat:/i.test(title) || /^feat\(/i.test(title) || /^feature:/i.test(title)) {
+              labelsToAdd.push('feature');
+            }
+            
+            // Melhorias
+            if (/^improve:/i.test(title) || /^enhance:/i.test(title) || /^update:/i.test(title)) {
+              labelsToAdd.push('enhancement');
+            }
+            
+            // Documentação
+            if (/^docs:/i.test(title) || /^doc:/i.test(title) || /^readme:/i.test(title)) {
+              labelsToAdd.push('documentation');
+            }
+            
+            // Refatoração
+            if (/^refactor:/i.test(title) || /^cleanup:/i.test(title) || /^clean:/i.test(title)) {
+              labelsToAdd.push('refactor');
+            }
+            
+            // Performance
+            if (/^perf:/i.test(title) || /^performance:/i.test(title) || /^optimize:/i.test(title)) {
+              labelsToAdd.push('performance');
+            }
+            
+            // Testes
+            if (/^test:/i.test(title) || /^tests:/i.test(title) || /^testing:/i.test(title)) {
+              labelsToAdd.push('test');
+            }
+            
+            // Chores (build, CI, etc)
+            if (/^chore:/i.test(title) || /^build:/i.test(title) || /^ci:/i.test(title)) {
+              labelsToAdd.push('chore');
+            }
+            
+            // === REGRAS DE PRIORIDADE/URGÊNCIA ===
+            
+            // Urgente/Crítico
+            if (/\b(urgent|critical|emergency|breaking)\b/i.test(title)) {
+              labelsToAdd.push('urgent');
+            }
+            
+            // === REGRAS POR ÁREA/ESCOPO ===
+            
+            // Frontend
+            if (/\b(ui|frontend|react|vue|angular|css|html|js|javascript|typescript)\b/i.test(title)) {
+              labelsToAdd.push('frontend');
+            }
+            
+            // Backend
+            if (/\b(api|backend|server|database|db|sql|mongodb|postgres)\b/i.test(title)) {
+              labelsToAdd.push('backend');
+            }
+            
+            // Security
+            if (/\b(security|auth|authentication|authorization|vulnerability|xss|csrf)\b/i.test(title)) {
+              labelsToAdd.push('security');
+            }
+            
+            // DevOps/Infrastructure
+            if (/\b(docker|kubernetes|k8s|deployment|infrastructure|aws|gcp|azure)\b/i.test(title)) {
+              labelsToAdd.push('devops');
+            }
+            
+            // === APLICAR LABELS ===
+            
+            if (labelsToAdd.length > 0) {
+              // Remove duplicatas
+              const uniqueLabels = [...new Set(labelsToAdd)];
+              
+              console.log(`Adding labels: ${uniqueLabels.join(', ')}`);
+              
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  labels: uniqueLabels
+                });
+                
+                console.log(`✅ Successfully added labels: ${uniqueLabels.join(', ')}`);
+                
+                // Comentário opcional no PR (pode remover se não quiser)
+                const labelComment = `🏷️ **Auto-labeled** this PR: \`${uniqueLabels.join('`, `')}\``;
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  body: labelComment
+                });
+                
+              } catch (error) {
+                // console.error('❌ Error applying labels:', error);
+                // core.setFailed(`Failed to apply labels: ${error.message}`);
+                console.log('ℹ️ No labels to add', error);
+              }
+            } else {
+              console.log('ℹ️ No matching patterns found in title - no labels to add');
+            }

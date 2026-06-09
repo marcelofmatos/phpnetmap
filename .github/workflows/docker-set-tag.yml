@@ -1,0 +1,91 @@
+name: Docker set tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseTag:
+        description: "release tag"
+        required: true
+      dockerTag:
+        description: "docker tag"
+        required: true
+
+jobs:
+  set-docker-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.set_outputs.outputs.image_name }}
+      repository_name: ${{ steps.set_outputs.outputs.repository_name }}
+    
+    steps:
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Convert repository and tag name to lowercase
+        id: lowercase_names
+        run: |
+          echo "repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Set IMAGE_NAME
+        run: |
+          echo "IMAGE_NAME=ghcr.io/${{ env.repository_name }}:${{ inputs.dockerTag }}" >> $GITHUB_ENV
+          echo "IMAGE_NAME_INPUT_TAG=ghcr.io/${{ env.repository_name }}:${{ inputs.releaseTag }}" >> $GITHUB_ENV
+
+      - name: Associa a docker tag com a release tag
+        run: |
+          echo "A tag ${{ inputs.dockerTag }} será apontada para a release ${{ inputs.releaseTag }}"
+          docker pull ${{ env.IMAGE_NAME_INPUT_TAG }}
+          docker tag ${{ env.IMAGE_NAME_INPUT_TAG }} ${{ env.IMAGE_NAME }}
+          docker push ${{ env.IMAGE_NAME }}
+
+      - name: Set outputs for next job
+        id: set_outputs
+        run: |
+          echo "image_name=ghcr.io/${{ env.repository_name }}:${{ inputs.dockerTag }}" >> $GITHUB_OUTPUT
+          echo "repository_name=${{ env.repository_name }}" >> $GITHUB_OUTPUT
+
+  update-services:
+    runs-on: ubuntu-latest
+    needs: set-docker-tag
+    if: success()
+    
+    steps:
+      - name: Deploy Services
+        shell: bash
+        run: |
+          IMAGE_NAME="${{ needs.set-docker-tag.outputs.image_name }}"
+          echo "IMAGE_NAME=$IMAGE_NAME"
+          echo "Deploying to ${{ github.ref }}..."
+          
+          case "${{ github.ref }}" in
+            "refs/heads/main" | "refs/heads/master")
+              WEBHOOK_URL=${{ secrets.WEBHOOK_DEPLOY_MAIN }}
+              ENVIRONMENT="MAIN"
+              ;;
+            "refs/heads/homolog")
+              WEBHOOK_URL=${{ secrets.WEBHOOK_DEPLOY_HOMOLOG }}
+              ENVIRONMENT="HOMOLOG"
+              ;;
+            *)
+              echo "No deployment for branch ${{ github.ref }}"
+              exit 0
+              ;;
+          esac
+          
+          echo "Environment: $ENVIRONMENT"
+          
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "❌ WEBHOOK_URL not configured for $ENVIRONMENT environment"
+            echo "Please configure the webhook secret for this environment"
+            exit 0
+          fi
+          
+          echo "✅ Webhook URL configured for $ENVIRONMENT environment"
+          echo "Sending deployment request..."
+          
+          response=$(curl --silent --fail -X POST "${WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"image_name\": \"$IMAGE_NAME\"}")
+          
+          echo "✅ Deployment request sent successfully!"
+          echo "Response: $response"

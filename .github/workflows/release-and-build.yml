@@ -1,0 +1,291 @@
+name: 🚀 Release and build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Type of version increment'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⚙️ Setup Git
+        run: |
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+
+      - name: 🔢 Calculate new version
+        id: version
+        run: |
+          git fetch --tags
+
+          # Get latest semantic version tag
+          LATEST_TAG=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            CURRENT_VERSION="0.0.0"
+          else
+            CURRENT_VERSION="$LATEST_TAG"
+          fi
+
+          echo "Current version: $CURRENT_VERSION"
+
+          # Calculate new version
+          if [ "$CURRENT_VERSION" = "0.0.0" ]; then
+            NEW_VERSION="1.0.0"
+          else
+            MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+            MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+            PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
+
+            case "${{ github.event.inputs.version_type }}" in
+              "major")
+                NEW_VERSION="$((MAJOR + 1)).0.0"
+                ;;
+              "minor")
+                NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+                ;;
+              "patch")
+                NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+                ;;
+            esac
+          fi
+
+          echo "New version: $NEW_VERSION"
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: 📝 Get Recent Changes
+        id: changes
+        run: |
+          CURRENT="${{ steps.version.outputs.current_version }}"
+
+          if [ "$CURRENT" = "0.0.0" ]; then
+            echo "Getting recent commits for initial release"
+            CHANGES=$(git log --oneline --no-merges -20 | sed 's/^/- /' | head -10)
+          else
+            echo "Getting changes since $CURRENT"
+            CHANGES=$(git log "$CURRENT"..HEAD --oneline --no-merges | sed 's/^/- /' | head -20)
+          fi
+
+          if [ -z "$CHANGES" ]; then
+            CHANGES="- Minor updates and improvements"
+          fi
+
+          {
+            echo "changelog<<EOF"
+            echo "$CHANGES"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: 🏷️ Create and push tag
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.new_version }}"
+
+          # Check if tag already exists
+          if git rev-parse "$NEW_VERSION" >/dev/null 2>&1; then
+            echo "Tag $NEW_VERSION already exists"
+          else
+            echo "Creating tag $NEW_VERSION"
+            git tag "$NEW_VERSION"
+            git push origin "$NEW_VERSION"
+          fi
+
+      - name: 📋 Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.new_version }}"
+          CURRENT_VERSION="${{ steps.version.outputs.current_version }}"
+          VERSION_TYPE="${{ github.event.inputs.version_type }}"
+          CHANGES="${{ steps.changes.outputs.changelog }}"
+
+          PRERELEASE_FLAG=""
+          if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          # Check if release already exists
+          if gh release view "$NEW_VERSION" >/dev/null 2>&1; then
+            echo "Release $NEW_VERSION already exists"
+          else
+            # Extract semantic versions for release notes
+            MAJOR=$(echo "$NEW_VERSION" | cut -d. -f1)
+            MINOR_VERSION="$MAJOR.$(echo "$NEW_VERSION" | cut -d. -f2)"
+
+            RELEASE_NOTES=$(cat << EOF
+          ## $NEW_VERSION
+
+          ### 🚀 What's Changed
+
+          $CHANGES
+
+          ### 🐳 Docker Images
+
+          Multiple Docker tags are available for different use cases:
+
+          \`\`\`bash
+          # Specific version (recommended for production)
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION
+
+          # Minor version (gets latest patch updates)
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MINOR_VERSION
+
+          # Major version (gets latest minor.patch updates)
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MAJOR
+
+          # Latest (always gets the newest release)
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          \`\`\`
+
+          **Run the container:**
+          \`\`\`bash
+          docker run -d -p 8080:3000 --env-file .env ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION
+          \`\`\`
+
+          **Platforms**: linux/amd64
+
+          ### 📋 Release Info
+          - **Type**: $VERSION_TYPE release
+          - **Previous Version**: $CURRENT_VERSION
+          - **Released by**: @${{ github.actor }}
+          EOF
+          )
+
+            echo "Creating GitHub release $NEW_VERSION..."
+            gh release create "$NEW_VERSION" \
+              --title "$NEW_VERSION" \
+              --notes "$RELEASE_NOTES" \
+              --draft=false \
+              --latest \
+              $PRERELEASE_FLAG
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64
+
+      - name: 🔐 Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧮 Generate semantic tags
+        id: semantic_tags
+        run: |
+          NEW_VERSION=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+          MAJOR=$(echo "$NEW_VERSION" | cut -d. -f1)
+          MINOR=$(echo "$NEW_VERSION" | cut -d. -f2)
+          PATCH=$(echo "$NEW_VERSION" | cut -d. -f3)
+          echo "Full version: $NEW_VERSION"
+          echo "Major: $MAJOR, Minor: $MINOR, Patch: $PATCH"
+          echo "major_version=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor_version=$MAJOR.$MINOR" >> $GITHUB_OUTPUT
+          echo "full_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: 🏷️ Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ steps.semantic_tags.outputs.full_version }}
+            type=raw,value=${{ steps.semantic_tags.outputs.minor_version }}
+            type=raw,value=${{ steps.semantic_tags.outputs.major_version }}
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=Fishboard
+            org.opencontainers.image.description=Modern project management dashboard
+            org.opencontainers.image.vendor=Abstrakt Agencia
+            org.opencontainers.image.licenses=MIT
+
+      - name: 🔍 Build and test Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: test-image
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🚀 Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 📋 Generate summary
+        run: |
+          NEW_VERSION="${{ steps.semantic_tags.outputs.full_version }}"
+          MAJOR_VERSION="${{ steps.semantic_tags.outputs.major_version }}"
+          MINOR_VERSION="${{ steps.semantic_tags.outputs.minor_version }}"
+          echo "## ✅ Release $NEW_VERSION Created and Published!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**🏷️ Version**: $NEW_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**🌍 Platforms**: linux/amd64" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐳 Docker Tags Available" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION\` (full version)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MINOR_VERSION\` (minor version)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MAJOR_VERSION\` (major version)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest\` (latest)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Quick Start" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "# Use specific version" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "# Or use minor version (gets latest patch)" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MINOR_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "# Or use major version (gets latest minor.patch)" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MAJOR_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,98 @@
+name: Docker image on GHCR
+
+on:
+  push:
+    branches:
+      #- 'main'
+      - 'homolog'
+      - 'prod'
+    #tags:
+    #  - '**'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    if: github.ref_name != 'prod' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive  # Equivalente ao GIT_SUBMODULE_STRATEGY
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Convert repository and tag name to lowercase
+      id: lowercase_names
+      run: |
+        echo "repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        echo "tag_name=$(echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+    - name: Build Docker image
+      run: docker build --build-arg APP_VERSION=${{ env.tag_name }} --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) -t ghcr.io/${{ env.repository_name }}:${{ env.tag_name }} .
+
+    - name: Push Docker image
+      run: |
+        docker push ghcr.io/${{ env.repository_name }}:${{ env.tag_name }}
+        if [ "${{ github.event_name }}" = "release" ]; then
+          docker tag ghcr.io/${{ env.repository_name }}:${{ env.tag_name }} ghcr.io/${{ env.repository_name }}:latest
+          docker push ghcr.io/${{ env.repository_name }}:latest
+        fi
+
+  update-services:
+    runs-on: ubuntu-latest
+    needs: build-image
+    container:
+      image: alpine/curl
+    steps:
+      - name: Install Bash
+        run: apk add --no-cache bash
+          
+      - name: Convert repository and tag name to lowercase
+        id: lowercase_names
+        run: |
+          echo "repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "tag_name=$(echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Deploy Services
+        run: |
+          IMAGES=(
+            "ghcr.io/${{ env.repository_name }}:${{ env.tag_name }}"
+          )
+          
+          if [ "${{ github.event_name }}" = "release" ]; then
+            IMAGES+=("ghcr.io/${{ env.repository_name }}:latest")
+          fi
+
+          echo "Images to deploy:"
+          printf '%s\n' "${IMAGES[@]}"
+          
+          case "${{ github.ref }}" in
+            "refs/heads/main" | "refs/tags/"*)
+              WEBHOOK_URL="${{ secrets.WEBHOOK_DEPLOY_MAIN }}"
+              ;;
+            "refs/heads/homolog")
+              WEBHOOK_URL="${{ secrets.WEBHOOK_DEPLOY_HOMOLOG }}"
+              ;;
+            *)
+              echo "No deployment for branch ${{ github.ref }}"
+              exit 0
+              ;;
+          esac
+          
+          echo "Webhook URL: $WEBHOOK_URL"
+          
+          echo "Deploying to ${{ github.ref }}..."
+          for IMAGE_NAME in "${IMAGES[@]}"; do
+            echo "Deploying image: $IMAGE_NAME"
+            curl --silent --fail -X POST "$WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{\"image_name\": \"$IMAGE_NAME\"}"
+            sleep 1
+          done
+        shell: bash
