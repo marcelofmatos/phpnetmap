@@ -169,10 +169,10 @@ jobs:
 
           **Run the container:**
           \`\`\`bash
-          docker run -d -p 8080:3000 --env-file .env ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION
+          docker run -d -p 80:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION
           \`\`\`
 
-          **Platforms**: linux/amd64
+          **Platforms**: linux/amd64, linux/arm64
 
           ### 📋 Release Info
           - **Type**: $VERSION_TYPE release
@@ -200,10 +200,13 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 🧰 Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: 🏗️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
 
       - name: 🔐 Login to Container Registry
         uses: docker/login-action@v3
@@ -236,9 +239,9 @@ jobs:
             type=raw,value=${{ steps.semantic_tags.outputs.major_version }}
             type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.title=Fishboard
-            org.opencontainers.image.description=Modern project management dashboard
-            org.opencontainers.image.vendor=Abstrakt Agencia
+            org.opencontainers.image.title=PHPNetMap
+            org.opencontainers.image.description=Network device monitoring with SNMP
+            org.opencontainers.image.vendor=Marcelo Matos
             org.opencontainers.image.licenses=MIT
 
       - name: 🔍 Build and test Docker image
@@ -254,7 +257,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -269,7 +272,7 @@ jobs:
           echo "## ✅ Release $NEW_VERSION Created and Published!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**🏷️ Version**: $NEW_VERSION" >> $GITHUB_STEP_SUMMARY
-          echo "**🌍 Platforms**: linux/amd64" >> $GITHUB_STEP_SUMMARY
+          echo "**🌍 Platforms**: linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🐳 Docker Tags Available" >> $GITHUB_STEP_SUMMARY
           echo "- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION\` (full version)" >> $GITHUB_STEP_SUMMARY

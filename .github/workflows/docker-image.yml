@@ -24,8 +24,18 @@ jobs:
         submodules: recursive  # Equivalente ao GIT_SUBMODULE_STRATEGY
         token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Log in to GitHub Container Registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Convert repository and tag name to lowercase
       id: lowercase_names
@@ -33,16 +43,24 @@ jobs:
         echo "repository_name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
         echo "tag_name=$(echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-    - name: Build Docker image
-      run: docker build --build-arg APP_VERSION=${{ env.tag_name }} --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) -t ghcr.io/${{ env.repository_name }}:${{ env.tag_name }} .
-
-    - name: Push Docker image
+    - name: Compose image tags
+      id: tags
       run: |
-        docker push ghcr.io/${{ env.repository_name }}:${{ env.tag_name }}
+        TAGS="ghcr.io/${{ env.repository_name }}:${{ env.tag_name }}"
         if [ "${{ github.event_name }}" = "release" ]; then
-          docker tag ghcr.io/${{ env.repository_name }}:${{ env.tag_name }} ghcr.io/${{ env.repository_name }}:latest
-          docker push ghcr.io/${{ env.repository_name }}:latest
+          TAGS="$TAGS,ghcr.io/${{ env.repository_name }}:latest"
         fi
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+    - name: Build and push Docker image (multi-arch)
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.tags.outputs.tags }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
   update-services:
     runs-on: ubuntu-latest

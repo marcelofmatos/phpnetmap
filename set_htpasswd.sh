@@ -1,3 +1,4 @@
+#!/bin/bash
 
 if [ -z "$ADMIN_USER" ]; then
 ADMIN_USER=admin
