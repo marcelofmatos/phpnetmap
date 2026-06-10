@@ -10,7 +10,7 @@ proxy:
    
    
 server1:
-  image: marcelofmatos/phpnetmap
+  image: ghcr.io/marcelofmatos/phpnetmap:latest
   environment:
    - VIRTUAL_HOST=server1.example.com
    - ADMIN_USER=admin1
@@ -19,7 +19,7 @@ server1:
   
   
 server2:
-  image: marcelofmatos/phpnetmap
+  image: ghcr.io/marcelofmatos/phpnetmap:latest
   environment:
    - VIRTUAL_HOST=server2.example.com
    - ADMIN_USER=admin2
@@ -28,7 +28,7 @@ server2:
   
   
 server3:
-  image: marcelofmatos/phpnetmap
+  image: ghcr.io/marcelofmatos/phpnetmap:latest
   environment:
    - VIRTUAL_HOST=server3.example.com
    - ADMIN_USER=admin3

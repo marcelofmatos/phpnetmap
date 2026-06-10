@@ -1,6 +1,6 @@
 # Example to use single server
 server:
-  image: marcelofmatos/phpnetmap
+  image: ghcr.io/marcelofmatos/phpnetmap:latest
   environment:
    - ADMIN_USER=admin
    - ADMIN_PASSWORD=pnm
