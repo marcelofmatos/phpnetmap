@@ -138,8 +138,27 @@ class HostFaceController extends Controller
 			return;
 		}
 
+		$scheme = parse_url($url, PHP_URL_SCHEME);
+		if ($scheme !== 'http' && $scheme !== 'https') {
+			$this->render('jsonError', array('error' => 'Só URLs http/https são permitidas.'));
+			return;
+		}
+
+		// Proteção básica contra SSRF: recusa endereços privados/reservados
+		// (ex.: 127.0.0.1, 10.0.0.0/8, 169.254.169.254 — metadata endpoint
+		// de provedores de nuvem) antes de fazer a requisição.
+		$host = parse_url($url, PHP_URL_HOST);
+		$ip = $host ? gethostbyname($host) : false;
+		if (!$ip || !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+			$this->render('jsonError', array('error' => 'Essa URL aponta para um endereço não permitido.'));
+			return;
+		}
+
+		// follow_location desligado de propósito: seguir redirect faria a
+		// checagem de IP acima (feita só na URL original) não valer pro
+		// destino final, reabrindo a mesma brecha de SSRF.
 		$context = stream_context_create(array(
-			'http' => array('timeout' => 10, 'follow_location' => 1, 'max_redirects' => 3),
+			'http' => array('timeout' => 10, 'follow_location' => 0),
 			'https' => array('timeout' => 10),
 		));
 
