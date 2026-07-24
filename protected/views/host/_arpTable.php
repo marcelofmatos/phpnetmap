@@ -23,7 +23,7 @@ if (is_array($arp_table)) {
                             'ip',
                             array(
                                 'name'  => 'host',
-                                'value' => '( $data[host] instanceof Host ) ? CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)),array("title"=>"$data[host]")) : ""',
+                                'value' => '( $data[\'host\'] instanceof Host ) ? CHtml::link($data[\'host\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host\']->name)),array("title"=>"$data[host]")) : ""',
                                 'type'  => 'raw',
                             ),
                             array(
@@ -34,8 +34,8 @@ if (is_array($arp_table)) {
                                     'create_host'=>array(
                                         'label' => 'Create Host',
                                         'imageUrl'=>Yii::app()->request->baseUrl.'/images/host/add.png',
-                                        'url'=>'$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
-                                        'visible'=>' ! $data[host] instanceof Host',
+                                        'url'=>'$this->grid->controller->createUrl("host/create", array("ip" => $data[\'ip\'], "mac" => $data[\'mac\']))',
+                                        'visible'=>' ! $data[\'host\'] instanceof Host',
                                     ),
                                 ),
                         ),

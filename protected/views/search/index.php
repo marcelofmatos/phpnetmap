@@ -36,23 +36,23 @@ $this->breadcrumbs = array(
                     'columns' => array(
                         array(
                             'name' => 'host',
-                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("class"=>"view host-type ". $data[host]->type))',
+                            'value' => 'CHtml::link($data[\'host\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host\']->name)), array("class"=>"view host-type ". $data[\'host\']->type))',
                             'type' => 'raw',
                         ),
                         array(
                             'name' => 'port',
-                            'value' => 'CHtml::link($data[port], Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("name"=>"port_{$data[port]}", "class"=>"portlabel"))',
+                            'value' => 'CHtml::link($data[\'port\'], Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host\']->name)), array("name"=>"port_{$data[\'port\']}", "class"=>"portlabel"))',
                             'type' => 'raw',
                         ),
                         array(
                             'name' => 'vlan',
-                            'value' => 'CHtml::link($data[vlan]->tag, Yii::app()->createUrl("vlan/tag",array("id"=>$data[vlan]->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[vlan]->font_color}; background-color:#{$data[vlan]->background_color}","class"=>"vlanlabel"))',
+                            'value' => 'CHtml::link($data[\'vlan\']->tag, Yii::app()->createUrl("vlan/tag",array("id"=>$data[\'vlan\']->tag)),array("title"=>"$data[vlan]", "style"=>"color:#{$data[\'vlan\']->font_color}; background-color:#{$data[\'vlan\']->background_color}","class"=>"vlanlabel"))',
                             'type' => 'raw',
                         ),
                         'mac',
                         array(
                             'name' => 'hostDst',
-                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("style"=>"float:left", "class"=>"view host-type ". $data[hostDst]->type))." ".CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png","Search in this host"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[hostDst]->id});document.forms[\'yw0\'].submit.click()")) : ""',
+                            'value' => '$data[\'hostDst\'] instanceof Host ? CHtml::link($data[\'hostDst\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'hostDst\']->name)), array("style"=>"float:left", "class"=>"view host-type ". $data[\'hostDst\']->type))." ".CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/search.png","Search in this host"), "#", array("onclick"=>"$(\'#SearchForm_hosts\').val({$data[\'hostDst\']->id});document.forms[\'yw0\'].submit.click()")) : ""',
                             'type' => 'raw',
                         ),
                         array(
@@ -63,14 +63,14 @@ $this->breadcrumbs = array(
                                 'create_conn'=>array(
                                     'label' => 'Create Connection',
                                     'imageUrl' => Yii::app()->request->baseUrl.'/images/connection/add.png',
-                                    'url' => '$this->grid->controller->createUrl("connection/create", array("host_src_id" => $data[host]->id, "host_src_port" => $data[port], "host_dst_id" => $data[hostDst]->id))',
-                                    'visible' => '! $data[host]->getHostOnPort($data[port]) && $data[hostDst] instanceof Host',
+                                    'url' => '$this->grid->controller->createUrl("connection/create", array("host_src_id" => $data[\'host\']->id, "host_src_port" => $data[\'port\'], "host_dst_id" => $data[\'hostDst\']->id))',
+                                    'visible' => '! $data[\'host\']->getHostOnPort($data[\'port\']) && $data[\'hostDst\'] instanceof Host',
                                 ),
                                 'create_host' => array(
                                     'label' => 'Create Host',
                                     'imageUrl' => Yii::app()->request->baseUrl . '/images/host/add.png',
-                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
-                                    'visible' => '! $data[hostDst] instanceof Host',
+                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[\'ip\'], "mac" => $data[\'mac\']))',
+                                    'visible' => '! $data[\'hostDst\'] instanceof Host',
                                 ),
                             ),
                         ),
@@ -99,14 +99,14 @@ $this->breadcrumbs = array(
                     'columns' => array(
                         array(
                             'name' => 'host',
-                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("class"=>"view host-type ". $data[host]->type))',
+                            'value' => 'CHtml::link($data[\'host\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host\']->name)), array("class"=>"view host-type ". $data[\'host\']->type))',
                             'type' => 'raw',
                         ),
                         'mac',
                         'ip',
                         array(
                             'name' => 'hostDst',
-                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type)) : ""',
+                            'value' => '$data[\'hostDst\'] instanceof Host ? CHtml::link($data[\'hostDst\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'hostDst\']->name)), array("class"=>"view host-type ". $data[\'hostDst\']->type)) : ""',
                             'type' => 'raw',
                         ),
                         array(
@@ -117,8 +117,8 @@ $this->breadcrumbs = array(
                                 'create_host' => array(
                                     'label' => 'Create Host',
                                     'imageUrl' => Yii::app()->request->baseUrl . '/images/host/add.png',
-                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[ip], "mac" => $data[mac]))',
-                                    'visible' => ' ! $data[hostDst] instanceof Host',
+                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[\'ip\'], "mac" => $data[\'mac\']))',
+                                    'visible' => ' ! $data[\'hostDst\'] instanceof Host',
                                 ),
                             ),
                         ),
@@ -145,13 +145,13 @@ $this->breadcrumbs = array(
                     'columns' => array(
                         array(
                             'name' => 'host',
-                            'value' => 'CHtml::link($data[host]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[host]->name)), array("class"=>"view host-type ". $data[host]->type))',
+                            'value' => 'CHtml::link($data[\'host\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host\']->name)), array("class"=>"view host-type ". $data[\'host\']->type))',
                             'type' => 'raw',
                         ),
                         'port',
                         array(
                             'name' => 'hostDst',
-                            'value' => '$data[hostDst] instanceof Host ? CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type)) : ""',
+                            'value' => '$data[\'hostDst\'] instanceof Host ? CHtml::link($data[\'hostDst\']->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'hostDst\']->name)), array("class"=>"view host-type ". $data[\'hostDst\']->type)) : ""',
                             'type' => 'raw',
                         ),
                         'info',

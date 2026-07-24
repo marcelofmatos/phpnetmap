@@ -46,19 +46,19 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
                 array(
                     'name' => 'hostSrc',
                     'type' => 'raw',
-                    'value' => 'CHtml::link($data[hostSrc]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostSrc]->name)), array("class"=>"view host-type ". $data[hostSrc]->type))',
+                    'value' => 'CHtml::link($data->hostSrc->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data->hostSrc->name)), array("class"=>"view host-type ". $data->hostSrc->type))',
                 ),
 		'host_src_port',
                 array(
                     'name' => 'hostDst',
                     'type' => 'raw',
-                    'value' => 'CHtml::link($data[hostDst]->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data[hostDst]->name)), array("class"=>"view host-type ". $data[hostDst]->type))',
+                    'value' => 'CHtml::link($data->hostDst->name, Yii::app()->createUrl("host/viewByName",array("name"=>$data->hostDst->name)), array("class"=>"view host-type ". $data->hostDst->type))',
                 ),
 		'host_dst_port',
                 array(
                     'name' => 'type',
                     'type' => 'raw',
-                    'value' => '$data[type]',
+                    'value' => '$data->type',
                 ),
             
             
