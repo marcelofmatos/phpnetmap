@@ -252,29 +252,37 @@ class Host extends CActiveRecord {
 
         try {
 
+            // Q-BRIDGE-MIB (dot1qTpFdbPort): tabela CAM com VLAN, suportada pela maioria
+            // dos switches gerenciáveis.
             $res = PNMSnmp::walk($this, '.1.3.6.1.2.1.17.7.1.2.2.1.2', Yii::app()->params['cacheTtlCam']);
 
-            if (is_array($res)) {
-                while (list($key, $data) = each($res)) {
-                    #$dt = explode('::', $key);
-                    #$dt[1] = str_replace('mib-2.17.7.1.2.2.1.2.', '', $dt[1]);
-                    // TODO: trocar OIDs por campos das MIBs a carregar
+            if (is_array($res) && $res) {
+                foreach ($res as $key => $data) {
                     $dt = str_replace('.1.3.6.1.2.1.17.7.1.2.2.1.2.', '', $key);
                     $str = explode('.', $dt);
 
-                    // vlan
                     $vlan_tag = $str[0];
-
-                    // port
                     $port = (int) str_replace('INTEGER: ', '', $data);
+                    $mac = $this->macFromOidSuffix($str, 1);
 
-                    // mac
-                    $mac = null;
-                    for ($i = 1; $i < 7; $i++) {
-                        @$mac .= str_pad(dechex($str[$i]), 2, "0", STR_PAD_LEFT) . (($str[$i + 1] !== null) ? ':' : '');
+                    @$this->cam_table[] = array('port' => $port, 'vlan_tag' => $vlan_tag, 'mac' => $mac);
+                }
+            } else {
+                // Alguns equipamentos (ex.: switches Huawei) não implementam o
+                // Q-BRIDGE-MIB. Nesse caso cai para o BRIDGE-MIB clássico
+                // (dot1dTpFdbPort), que não tem VLAN no índice.
+                $res = PNMSnmp::walk($this, '.1.3.6.1.2.1.17.4.3.1.2', Yii::app()->params['cacheTtlCam']);
+
+                if (is_array($res)) {
+                    foreach ($res as $key => $data) {
+                        $dt = str_replace('.1.3.6.1.2.1.17.4.3.1.2.', '', $key);
+                        $str = explode('.', $dt);
+
+                        $port = (int) str_replace('INTEGER: ', '', $data);
+                        $mac = $this->macFromOidSuffix($str, 0);
+
+                        @$this->cam_table[] = array('port' => $port, 'vlan_tag' => null, 'mac' => $mac);
                     }
-
-                    @$this->cam_table[] = array('port' => $port, 'vlan_tag' => $vlan_tag, 'mac' => strtolower($mac));
                 }
             }
 
@@ -282,6 +290,21 @@ class Host extends CActiveRecord {
         } catch (Exception $exc) {
             throw new Exception($exc->getMessage());
         }
+    }
+
+    /**
+     * Monta um MAC address (aa:bb:cc:dd:ee:ff) a partir dos 6 octetos que ficam
+     * no sufixo do OID de uma tabela FDB (Q-BRIDGE-MIB ou BRIDGE-MIB clássico).
+     * @param array $oidParts sufixo do OID já explodido por "."
+     * @param int $offset posição do primeiro octeto do MAC dentro de $oidParts
+     * @return string
+     */
+    private function macFromOidSuffix($oidParts, $offset) {
+        $mac = null;
+        for ($i = $offset; $i < $offset + 6; $i++) {
+            $mac .= str_pad(dechex($oidParts[$i]), 2, "0", STR_PAD_LEFT) . (($i < $offset + 5) ? ':' : '');
+        }
+        return strtolower($mac);
     }
 
     /**

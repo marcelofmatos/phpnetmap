@@ -59,31 +59,36 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         function loadPortInfo() {
             d3.json(portsInfoURL, function (error, json) {
                 if (error) {
-                    return console.warn(error);
-                }
-                
-                hostFace = d3.selectAll('#hostFace svg, #hostFace div');
-                
-                if(hostFace.empty()) {
-                    drawPorts(json); 
-                }
+                    console.warn(error);
+                } else {
 
-                json.forEach(function (d) {
-                    
-                    port = d3.select('#hostFace #port' + d.ifIndex);
-                    if (port.empty()) return;
-                    portData = port.datum();
-                    if(portData) {
-                        d = $.extend(portData, d);
+                    hostFace = d3.selectAll('#hostFace svg, #hostFace div');
+
+                    if(hostFace.empty()) {
+                        drawPorts(json);
                     }
-                    port.data([d])
-                        .attr('title', d.hasConnection ? 'Link to: '+ d.hasConnection.name +' (double click here will open this host)' : 'Port '+ d.ifDescr)
-                        .on('click', function (d) {
-                            showPortInfo(d.ifIndex)
-                        });
 
-                });
+                    json.forEach(function (d) {
 
+                        port = d3.select('#hostFace #port' + d.ifIndex);
+                        if (port.empty()) return;
+                        portData = port.datum();
+                        if(portData) {
+                            d = $.extend(portData, d);
+                        }
+                        port.data([d])
+                            .attr('title', d.hasConnection ? 'Link to: '+ d.hasConnection.name +' (double click here will open this host)' : 'Port '+ d.ifDescr)
+                            .on('click', function (d) {
+                                showPortInfo(d.ifIndex)
+                            });
+
+                    });
+                }
+
+                // Só inicia o polling de status depois que a lista de portas terminou de
+                // carregar: alguns equipamentos (ex.: switches Huawei) não respondem bem
+                // a duas sessões SNMP simultâneas contra o mesmo host.
+                loadPortStatus();
             });
         }
 
@@ -253,8 +258,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         $(document).ready(function () {
             portInfoBox = $('#portInfoBox');
             allPorts = d3.selectAll('#hostFace .port');
-            loadPortInfo();
-            loadPortStatus();
+            loadPortInfo(); // loadPortStatus() é encadeado no fim de loadPortInfo()
         });
     </script>
 
