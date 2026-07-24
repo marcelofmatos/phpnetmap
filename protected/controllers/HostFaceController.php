@@ -32,7 +32,7 @@ class HostFaceController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update','fetchImage'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -119,6 +119,53 @@ class HostFaceController extends Controller
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
 			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+	}
+
+	/**
+	 * Baixa uma imagem a partir de uma URL informada pelo usuário e devolve
+	 * como data URI base64 — feito no servidor (não no navegador) porque o
+	 * navegador bloquearia por CORS ao tentar isso direto num domínio de
+	 * terceiro (ex.: site do fabricante do switch).
+	 */
+	public function actionFetchImage()
+	{
+		$this->layout = '//layouts/json';
+
+		$url = isset($_GET['url']) ? trim($_GET['url']) : '';
+
+		if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+			$this->render('jsonError', array('error' => 'URL inválida.'));
+			return;
+		}
+
+		$context = stream_context_create(array(
+			'http' => array('timeout' => 10, 'follow_location' => 1, 'max_redirects' => 3),
+			'https' => array('timeout' => 10),
+		));
+
+		$imageData = @file_get_contents($url, false, $context);
+
+		if ($imageData === false) {
+			$this->render('jsonError', array('error' => 'Não foi possível baixar a imagem dessa URL.'));
+			return;
+		}
+
+		if (strlen($imageData) > 5 * 1024 * 1024) {
+			$this->render('jsonError', array('error' => 'A imagem tem mais de 5MB.'));
+			return;
+		}
+
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$mimeType = $finfo->buffer($imageData);
+
+		if (strpos($mimeType, 'image/') !== 0) {
+			$this->render('jsonError', array('error' => 'Essa URL não aponta para uma imagem (tipo detectado: ' . $mimeType . ').'));
+			return;
+		}
+
+		$dataUri = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+
+		$this->render('jsonFetchImage', array('dataUri' => $dataUri));
 	}
 
 	/**
