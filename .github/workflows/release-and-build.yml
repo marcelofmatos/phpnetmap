@@ -30,6 +30,8 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
 
     steps:
       - name: 📦 Checkout repository
@@ -200,23 +202,67 @@ jobs:
               $PRERELEASE_FLAG
           fi
 
+  # Builda cada arquitetura em runner nativo (sem QEMU) — compilar as extensões
+  # do PHP (snmp, pdo_sqlite, apcu via pecl) sob emulação arm64 levava ~6min
+  # sozinho; nativo é só mais uma plataforma normal, sem tradução de instrução.
   build:
-    runs-on: ubuntu-latest
     needs: release
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            suffix: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            suffix: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: 📦 Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🧰 Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: 🏗️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Login to Container Registry
+        uses: docker/login-action@v3
         with:
-          platforms: linux/amd64,linux/arm64
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=raw,value=${{ needs.release.outputs.new_version }}-${{ matrix.suffix }}
+          labels: |
+            org.opencontainers.image.title=PHPNetMap
+            org.opencontainers.image.description=Network device monitoring with SNMP
+            org.opencontainers.image.vendor=Marcelo Matos
+            org.opencontainers.image.licenses=MIT
+
+      - name: 🚀 Build and push per-arch image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.suffix }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.suffix }}
+
+  # Junta as imagens per-arch (amd64/arm64) publicadas pelo job "build" num
+  # único manifest multi-arch, sob as tags de verdade (versão, minor, major,
+  # latest) — é isso que os "docker pull"/"docker run" das release notes usam.
+  manifest:
+    needs: [release, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: 🔐 Login to Container Registry
         uses: docker/login-action@v3
@@ -228,51 +274,33 @@ jobs:
       - name: 🧮 Generate semantic tags
         id: semantic_tags
         run: |
-          NEW_VERSION=$(git tag -l | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+          NEW_VERSION="${{ needs.release.outputs.new_version }}"
           MAJOR=$(echo "$NEW_VERSION" | cut -d. -f1)
           MINOR=$(echo "$NEW_VERSION" | cut -d. -f2)
-          PATCH=$(echo "$NEW_VERSION" | cut -d. -f3)
           echo "Full version: $NEW_VERSION"
-          echo "Major: $MAJOR, Minor: $MINOR, Patch: $PATCH"
+          echo "Major: $MAJOR, Minor: $MINOR"
           echo "major_version=$MAJOR" >> $GITHUB_OUTPUT
           echo "minor_version=$MAJOR.$MINOR" >> $GITHUB_OUTPUT
           echo "full_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: 🏷️ Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=${{ steps.semantic_tags.outputs.full_version }}
-            type=raw,value=${{ steps.semantic_tags.outputs.minor_version }}
-            type=raw,value=${{ steps.semantic_tags.outputs.major_version }}
-            type=raw,value=latest,enable={{is_default_branch}}
-          labels: |
-            org.opencontainers.image.title=PHPNetMap
-            org.opencontainers.image.description=Network device monitoring with SNMP
-            org.opencontainers.image.vendor=Marcelo Matos
-            org.opencontainers.image.licenses=MIT
+      - name: 🧩 Create and push multi-arch manifest
+        env:
+          NEW_VERSION: ${{ steps.semantic_tags.outputs.full_version }}
+          MINOR_VERSION: ${{ steps.semantic_tags.outputs.minor_version }}
+          MAJOR_VERSION: ${{ steps.semantic_tags.outputs.major_version }}
+          IS_DEFAULT_BRANCH: ${{ github.ref_name == 'main' }}
+        run: |
+          IMAGE_REF="$REGISTRY/$IMAGE_NAME"
 
-      - name: 🔍 Build and test Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: test-image
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          TAG_ARGS=(-t "$IMAGE_REF:$NEW_VERSION" -t "$IMAGE_REF:$MINOR_VERSION" -t "$IMAGE_REF:$MAJOR_VERSION")
+          if [ "$IS_DEFAULT_BRANCH" = "true" ]; then
+            TAG_ARGS+=(-t "$IMAGE_REF:latest")
+          fi
 
-      - name: 🚀 Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          docker buildx imagetools create \
+            "${TAG_ARGS[@]}" \
+            "$IMAGE_REF:$NEW_VERSION-amd64" \
+            "$IMAGE_REF:$NEW_VERSION-arm64"
 
       - name: 📋 Generate summary
         run: |
