@@ -10,4 +10,6 @@ fi;
 
 htpasswd -b /app/.htpasswd "$ADMIN_USER" "$ADMIN_PASSWORD"
 
-echo -e "\nPHPNetMap HTTP Authentication:\n\nUser: $ADMIN_USER\nPassword: $ADMIN_PASSWORD\n\n"
+MASKED_PASSWORD="${ADMIN_PASSWORD:0:2}$(printf '%*s' "$((${#ADMIN_PASSWORD} - 2))" '' | tr ' ' '*')"
+
+echo -e "\nPHPNetMap HTTP Authentication:\n\nUser: $ADMIN_USER\nPassword: $MASKED_PASSWORD\n\n"
