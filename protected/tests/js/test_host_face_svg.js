@@ -39,6 +39,21 @@ check('round-trip sintetico', function () {
     assert.strictEqual(parsed.ports[1].id, '2');
 });
 
+// 1b. Regressão: atributos como "rx"/"ry" (cantos arredondados, comuns em
+// SVG exportado do Inkscape) não podem ser confundidos com "x"/"y" só
+// porque terminam com a mesma letra e aparecem antes na tag.
+check('nao confunde rx/ry com x/y', function () {
+    var svgComRxRy = '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">' +
+        '<image xlink:href="data:image/png;base64,AAAA" x="0" y="0" width="50" height="50" />' +
+        '<rect class="port" id="port1" ry="0.5" rx="0.3" width="20" height="15" x="10" y="5" />' +
+        '</svg>';
+    var parsed = HostFaceSvg.parseSvgToPorts(svgComRxRy);
+    assert.ok(parsed, 'parse não deveria retornar null');
+    assert.strictEqual(parsed.ports.length, 1);
+    assert.strictEqual(parsed.ports[0].x, 10, 'x não pode pegar o valor de rx');
+    assert.strictEqual(parsed.ports[0].y, 5, 'y não pode pegar o valor de ry');
+});
+
 // 2. SVG sem imagem válida deve falhar o parse (retornar null), não lançar exceção.
 check('svg sem imagem retorna null', function () {
     var parsed = HostFaceSvg.parseSvgToPorts('<svg width="10" height="10"></svg>');

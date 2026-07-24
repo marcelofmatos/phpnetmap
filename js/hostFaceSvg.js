@@ -7,7 +7,10 @@
     'use strict';
 
     function extractAttr(tagText, attrName) {
-        var re = new RegExp(attrName + '="([^"]*)"');
+        // (?:^|\s) evita casar o final de outro atributo (ex.: buscar "x"
+        // não pode casar dentro de "rx=" ou "dx=" quando esses vierem antes
+        // do atributo "x" de verdade na mesma tag).
+        var re = new RegExp('(?:^|\\s)' + attrName + '="([^"]*)"');
         var match = tagText.match(re);
         return match ? match[1] : null;
     }
