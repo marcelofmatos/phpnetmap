@@ -47,7 +47,7 @@ WORKDIR /app
 # Diretórios que precisam de escrita pelo Apache (SQLite e runtime do Yii).
 RUN chmod +x /app/set_htpasswd.sh \
     && mkdir -p /app/protected/data /app/protected/runtime /app/assets \
-    && chown -R www-data:www-data /app/protected/data /app/protected/runtime /app/assets
+    && chown -R www-data:www-data /app
 
 VOLUME /app/protected/data
 EXPOSE 80
