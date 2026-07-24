@@ -132,11 +132,11 @@ jobs:
         run: |
           # NEW_VERSION/CURRENT_VERSION/VERSION_TYPE/CHANGES/RELEASED_BY chegam via
           # env (não interpolados direto no script) porque podem conter aspas ou
-          # outros caracteres especiais de shell (ex.: mensagens de commit com "texto
-          # entre aspas"), o que quebraria o parsing se fossem colados aqui como
-          # ${{ ... }}.
-          # REGISTRY/IMAGE_NAME já são env vars do workflow (env: no topo do
-          # arquivo), então já chegam no shell sem precisar de ${{ }}.
+          # outros caracteres especiais de shell (ex.: mensagens de commit com
+          # texto entre aspas), o que quebraria o parsing do bash se fossem
+          # colados direto aqui como expressao do GitHub Actions.
+          # REGISTRY/IMAGE_NAME já são env vars do workflow (topo do arquivo),
+          # então já chegam no shell automaticamente, sem precisar de expressao.
           IMAGE_REF="$REGISTRY/$IMAGE_NAME"
 
           PRERELEASE_FLAG=""
