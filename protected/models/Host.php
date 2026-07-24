@@ -308,6 +308,21 @@ class Host extends CActiveRecord {
     }
 
     /**
+     * Formata um valor obtido via SNMP para exibição na tela do equipamento,
+     * deixando claro quando é o próprio equipamento que não relatou aquele
+     * dado (em vez do "Not set" genérico do Yii, usado também por atributos
+     * de banco vazios como mac/ip).
+     * @param mixed $value
+     * @return string
+     */
+    public static function formatSnmpInfo($value) {
+        if ($value === null || $value === '') {
+            return '<span class="text-muted">não informado via SNMP</span>';
+        }
+        return CHtml::encode($value);
+    }
+
+    /**
      *  Get ports information by SNMP
      * @param array $keys
      * @return array 
