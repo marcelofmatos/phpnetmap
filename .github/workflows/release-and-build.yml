@@ -123,14 +123,21 @@ jobs:
       - name: 📋 Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ steps.version.outputs.new_version }}
+          CURRENT_VERSION: ${{ steps.version.outputs.current_version }}
+          VERSION_TYPE: ${{ github.event.inputs.version_type }}
+          CHANGES: ${{ steps.changes.outputs.changelog }}
+          PRERELEASE_INPUT: ${{ github.event.inputs.prerelease }}
+          RELEASED_BY: ${{ github.actor }}
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
-          NEW_VERSION="${{ steps.version.outputs.new_version }}"
-          CURRENT_VERSION="${{ steps.version.outputs.current_version }}"
-          VERSION_TYPE="${{ github.event.inputs.version_type }}"
-          CHANGES="${{ steps.changes.outputs.changelog }}"
-
+          # NEW_VERSION/CURRENT_VERSION/VERSION_TYPE/CHANGES/RELEASED_BY chegam via
+          # env (não interpolados direto no script) porque podem conter aspas ou
+          # outros caracteres especiais de shell (ex.: mensagens de commit com "texto
+          # entre aspas"), o que quebraria o parsing se fossem colados aqui como
+          # ${{ ... }}.
           PRERELEASE_FLAG=""
-          if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+          if [ "$PRERELEASE_INPUT" = "true" ]; then
             PRERELEASE_FLAG="--prerelease"
           fi
 
@@ -155,21 +162,21 @@ jobs:
 
           \`\`\`bash
           # Specific version (recommended for production)
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION
+          docker pull $IMAGE_REF:$NEW_VERSION
 
           # Minor version (gets latest patch updates)
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MINOR_VERSION
+          docker pull $IMAGE_REF:$MINOR_VERSION
 
           # Major version (gets latest minor.patch updates)
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$MAJOR
+          docker pull $IMAGE_REF:$MAJOR
 
           # Latest (always gets the newest release)
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker pull $IMAGE_REF:latest
           \`\`\`
 
           **Run the container:**
           \`\`\`bash
-          docker run -d -p 80:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$NEW_VERSION
+          docker run -d -p 80:80 $IMAGE_REF:$NEW_VERSION
           \`\`\`
 
           **Platforms**: linux/amd64, linux/arm64
@@ -177,7 +184,7 @@ jobs:
           ### 📋 Release Info
           - **Type**: $VERSION_TYPE release
           - **Previous Version**: $CURRENT_VERSION
-          - **Released by**: @${{ github.actor }}
+          - **Released by**: @$RELEASED_BY
           EOF
           )
 
