@@ -23,9 +23,60 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'svg'); ?>
-		<?php echo $form->textArea($model,'svg',array('rows'=>6, 'cols'=>50)); ?>
+
+		<div id="host-face-editor">
+			<div class="host-face-editor-toolbar">
+				<label>Host de origem (SNMP):
+					<select id="hfe-host-select">
+						<option value="">-- escolher --</option>
+						<?php foreach (Host::model()->findAll() as $hostOption): ?>
+							<option value="<?php echo $hostOption->id; ?>"><?php echo CHtml::encode($hostOption->name); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</label>
+				<label>Tamanho da porta:
+					<input type="number" id="hfe-port-width" value="22" min="1" style="width:60px" /> x
+					<input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /> px
+				</label>
+			</div>
+
+			<div class="host-face-editor-image-source">
+				<label>Upload de imagem: <input type="file" id="hfe-image-upload" accept="image/*" /></label>
+				<label>ou URL da imagem: <input type="text" id="hfe-image-url" style="width:300px" placeholder="https://..." /></label>
+				<button type="button" id="hfe-image-url-load">Carregar</button>
+				<span id="hfe-image-status"></span>
+			</div>
+
+			<div class="host-face-editor-body">
+				<div id="hfe-canvas" class="host-face-editor-canvas">
+					<p class="host-face-editor-empty-hint">Envie ou cole a URL de uma imagem do switch para começar.</p>
+				</div>
+				<div id="hfe-palette" class="host-face-editor-palette">
+					<p class="host-face-editor-empty-hint">Escolha um host acima para carregar a lista de portas.</p>
+				</div>
+			</div>
+		</div>
+
+		<div id="hfe-fallback" class="host-face-editor-fallback" style="display:none">
+			<p class="host-face-editor-empty-hint">Não foi possível interpretar o SVG existente desta face no editor visual. Você pode editar o SVG bruto abaixo (fica igual ao campo de texto antigo) — as mudanças aqui são salvas normalmente.</p>
+			<textarea id="hfe-fallback-textarea" rows="10" style="width:100%"></textarea>
+		</div>
+
+		<?php echo $form->hiddenField($model,'svg',array('id'=>'hfe-svg-field')); ?>
 		<?php echo $form->error($model,'svg'); ?>
 	</div>
+
+	<?php
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceSvg.js', CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js', CClientScript::POS_END);
+	Yii::app()->clientScript->registerScript('host-face-editor-init', '
+		HostFaceEditor.init({
+			loadPortInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadPortInfo/99999999')) . ',
+			fetchImageUrl: ' . CJSON::encode(Yii::app()->createUrl('hostFace/fetchImage')) . ',
+			existingSvg: ' . CJSON::encode($model->svg) . '
+		});
+	', CClientScript::POS_END);
+	?>
         
 	<div class="row">
 		<?php echo $form->labelEx($model,'hosts'); ?>

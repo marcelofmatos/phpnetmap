@@ -157,3 +157,69 @@ select {
     margin-bottom: 20px;
     overflow: auto;
 }
+
+/* hostFace - editor visual */
+.host-face-editor-toolbar,
+.host-face-editor-image-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.host-face-editor-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.host-face-editor-canvas {
+    flex: 3;
+    border: 1px solid #ddd;
+    padding: 10px;
+    overflow: auto;
+}
+
+.host-face-editor-canvas-image-wrapper {
+    position: relative;
+    background-repeat: no-repeat;
+}
+
+.host-face-editor-port {
+    position: absolute;
+    border: 2px solid #4a9eff;
+    background-color: rgba(74, 158, 255, 0.15);
+    font-size: 9px;
+    text-align: center;
+    line-height: 1.6;
+    cursor: move;
+    color: #003366;
+}
+
+.host-face-editor-palette {
+    flex: 1;
+    min-width: 160px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.host-face-editor-palette-item {
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: grab;
+    font-size: 12px;
+}
+
+.host-face-editor-empty-hint {
+    color: #999;
+    font-size: 12px;
+}
+
+.host-face-editor-fallback {
+    margin-top: 12px;
+}
