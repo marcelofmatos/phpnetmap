@@ -317,7 +317,7 @@ class Host extends CActiveRecord {
      */
     public static function formatSnmpInfo($value) {
         if ($value === null || $value === '') {
-            return '<span class="text-muted">não informado via SNMP</span>';
+            return '<span class="muted">não informado via SNMP</span>';
         }
         return CHtml::encode($value);
     }
