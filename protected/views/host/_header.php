@@ -9,7 +9,7 @@
     </div>
     <div class="btn-group host-header-actions">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            Ações
+            Actions
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu pull-right">

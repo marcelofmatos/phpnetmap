@@ -3,6 +3,6 @@
 /* @var $model Host */
 ?>
 <div class="tab-empty-state">
-    <p>Nenhum registro de manutenção ainda.</p>
-    <p class="tab-empty-hint">(recurso chega numa próxima etapa)</p>
+    <p>No maintenance records yet.</p>
+    <p class="tab-empty-hint">(coming in a future update)</p>
 </div>

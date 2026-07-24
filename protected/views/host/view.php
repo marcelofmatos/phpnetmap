@@ -11,40 +11,43 @@ $this->pageTitle = $model ." ". $this->pageTitle;
 
 ?>
 <?php $this->renderPartial('/host/_header', array('model' => $model)); ?>
-<?php
 
-$this->renderPartial('/map/_view', array(
-    'height' => 300,
-    'width' => 800,
-    'navigation' => true,
-    'dataUrl' => Yii::app()->createUrl('/map/listHosts?hostId=' . $model->id),
-));
+<div class="card">
+    <?php $this->renderPartial('/map/_view', array(
+        'height' => 300,
+        'width' => 800,
+        'navigation' => true,
+        'dataUrl' => Yii::app()->createUrl('/map/listHosts?hostId=' . $model->id),
+    )); ?>
+</div>
 
-$this->renderPartial('/host/_ports', array('model' => $model));
+<div class="card">
+    <?php $this->renderPartial('/host/_ports', array('model' => $model)); ?>
+</div>
 
-$this->widget('bootstrap.widgets.TbTabs', array(
-    // 'type' não precisa ser passado — o default de TbTabs já é 'tabs' (ver
-    // protected/extensions/bootstrap/widgets/TbTabs.php:19).
-    'tabs' => array(
-        array(
-            'label' => 'Visão Geral',
-            'active' => true,
-            'view' => '/host/_tabOverview',
+<div class="card">
+    <?php $this->widget('bootstrap.widgets.TbTabs', array(
+        // 'type' não precisa ser passado — o default de TbTabs já é 'tabs' (ver
+        // protected/extensions/bootstrap/widgets/TbTabs.php:19).
+        'tabs' => array(
+            array(
+                'label' => 'Overview',
+                'active' => true,
+                'view' => '/host/_tabOverview',
+            ),
+            array(
+                'label' => 'Documentation',
+                'view' => '/host/_tabDocs',
+            ),
+            array(
+                'label' => 'History',
+                'view' => '/host/_tabHistory',
+            ),
+            array(
+                'label' => 'Diagnostics',
+                'view' => '/host/_tabDiagnostics',
+            ),
         ),
-        array(
-            'label' => 'Documentação',
-            'view' => '/host/_tabDocs',
-        ),
-        array(
-            'label' => 'Histórico',
-            'view' => '/host/_tabHistory',
-        ),
-        array(
-            'label' => 'Diagnóstico',
-            'view' => '/host/_tabDiagnostics',
-        ),
-    ),
-    'viewData' => array('model' => $model),
-));
-
-?>
+        'viewData' => array('model' => $model),
+    )); ?>
+</div>

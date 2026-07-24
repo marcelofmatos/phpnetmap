@@ -146,3 +146,14 @@ select {
 .tab-empty-state .tab-empty-hint {
     font-size: 12px;
 }
+
+/* host/view - cards (mapa, portas, abas) */
+.card {
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    margin-bottom: 20px;
+    overflow: auto;
+}
