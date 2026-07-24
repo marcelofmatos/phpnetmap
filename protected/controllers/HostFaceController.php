@@ -156,23 +156,38 @@ class HostFaceController extends Controller
 
 		// follow_location desligado de propósito: seguir redirect faria a
 		// checagem de IP acima (feita só na URL original) não valer pro
-		// destino final, reabrindo a mesma brecha de SSRF.
+		// destino final, reabrindo a mesma brecha de SSRF. O wrapper https://
+		// do PHP também lê essas opções daqui (a chave 'http' vale pros dois
+		// esquemas) — não existe uma seção 'https' separada pra isso.
 		$context = stream_context_create(array(
 			'http' => array('timeout' => 10, 'follow_location' => 0),
-			'https' => array('timeout' => 10),
 		));
 
-		$imageData = @file_get_contents($url, false, $context);
+		$maxBytes = 5 * 1024 * 1024;
+		$fp = @fopen($url, 'rb', false, $context);
 
-		if ($imageData === false) {
+		if ($fp === false) {
 			$this->render('jsonError', array('error' => 'Não foi possível baixar a imagem dessa URL.'));
 			return;
 		}
 
-		if (strlen($imageData) > 5 * 1024 * 1024) {
-			$this->render('jsonError', array('error' => 'A imagem tem mais de 5MB.'));
-			return;
+		// Lê em pedaços e aborta assim que passar do limite, em vez de
+		// baixar o corpo inteiro (sem limite) pra só then descartar — evita
+		// que uma resposta lenta/gigante prenda memória sem necessidade.
+		$imageData = '';
+		while (!feof($fp)) {
+			$chunk = fread($fp, 8192);
+			if ($chunk === false) {
+				break;
+			}
+			$imageData .= $chunk;
+			if (strlen($imageData) > $maxBytes) {
+				fclose($fp);
+				$this->render('jsonError', array('error' => 'A imagem tem mais de 5MB.'));
+				return;
+			}
 		}
+		fclose($fp);
 
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
 		$mimeType = $finfo->buffer($imageData);
