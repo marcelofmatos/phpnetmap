@@ -39,7 +39,7 @@ class SearchController extends Controller {
             $result = $model->searchResult();
             $this->render('index', array('form' => $form, 'searchModel'=> $model, 'result' => $result));
         } else {
-            $this->render('index', array('form' => $form));
+            $this->render('index', array('form' => $form, 'result' => null));
         }
     }
 
@@ -49,9 +49,9 @@ class SearchController extends Controller {
         if ($form->submitted('search') && $form->validate()) {
             $result = $model->searchResult();
             //$this->redirect(array('search/index'));
-            $this->render('index', array('form' => $form, 'result' => $result));
+            $this->render('index', array('form' => $form, 'searchModel' => $model, 'result' => $result));
         } else
-            $this->render('index', array('form' => $form));
+            $this->render('index', array('form' => $form, 'result' => null));
     }
 
     // Uncomment the following methods and override them if needed
