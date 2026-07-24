@@ -9,20 +9,8 @@ $this->breadcrumbs=array(
 
 $this->pageTitle = $model ." ". $this->pageTitle;
 
-$this->menu = array(
-    array('label' => 'Web Config. ' . $model->name , 'url' => 'http://' . $model->ip, 'linkOptions' => array('target'=>'_blank')),
-    array('label' => 'Show Host Connections', 'url' => array('host/connections','name' => $model->name )),
-    array('label' => 'Show ARP Table', 'url' => array('host/arpTable', 'name' => $model->name )),
-    array('label' => 'Show CAM Table', 'url' => array('host/camTable', 'name' => $model->name )),
-    array('label' => 'Show Traffic', 'url' => array('host/traffic', 'name' => $model->name )),
-    array('label' => 'Update Host', 'url' => array('update', 'id' => $model->id)),
-    array('label' => 'Delete Host', 'url' => '#', 'linkOptions' => array('submit' => array('delete', 'id' => $model->id), 'confirm' => 'Are you sure you want to delete this item?')),
-    array('label' => 'Manage Host', 'url' => array('admin')),
-    array('label' => 'Manage Host Faces', 'url' => array('hostFace/index')),
-    array('label' => 'List Host', 'url' => array('index')),
-    array('label' => 'Create Host', 'url' => array('create')),
-);
 ?>
+<?php $this->renderPartial('/host/_header', array('model' => $model)); ?>
 <table>
     <tr>
         <td>
