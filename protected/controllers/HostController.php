@@ -59,8 +59,8 @@ class HostController extends Controller {
      * @param string $name the Name of the model to be displayed
      */
     public function actionViewByName($name = null, $ip = null, $mac = null) {
-        $this->layout = '//layouts/column1';
         try {
+            $this->layout = '//layouts/column1';
             $this->render('view', array(
                 'model' => $this->loadModelByName($name, $ip, $mac),
             ));
