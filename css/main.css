@@ -135,3 +135,14 @@ select {
     background-color: #f5f5f5;
     text-decoration: none;
 }
+
+/* host/view - estado vazio (Documentação / Histórico) */
+.tab-empty-state {
+    text-align: center;
+    padding: 30px 10px;
+    color: #999;
+}
+
+.tab-empty-state .tab-empty-hint {
+    font-size: 12px;
+}
