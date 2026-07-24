@@ -129,13 +129,16 @@ jobs:
           CHANGES: ${{ steps.changes.outputs.changelog }}
           PRERELEASE_INPUT: ${{ github.event.inputs.prerelease }}
           RELEASED_BY: ${{ github.actor }}
-          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
           # NEW_VERSION/CURRENT_VERSION/VERSION_TYPE/CHANGES/RELEASED_BY chegam via
           # env (não interpolados direto no script) porque podem conter aspas ou
           # outros caracteres especiais de shell (ex.: mensagens de commit com "texto
           # entre aspas"), o que quebraria o parsing se fossem colados aqui como
           # ${{ ... }}.
+          # REGISTRY/IMAGE_NAME já são env vars do workflow (env: no topo do
+          # arquivo), então já chegam no shell sem precisar de ${{ }}.
+          IMAGE_REF="$REGISTRY/$IMAGE_NAME"
+
           PRERELEASE_FLAG=""
           if [ "$PRERELEASE_INPUT" = "true" ]; then
             PRERELEASE_FLAG="--prerelease"
