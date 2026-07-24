@@ -11,6 +11,8 @@ RUN apt-get update \
         snmp snmpd sqlite3 apache2-utils \
         libsnmp-dev libsqlite3-dev \
     && docker-php-ext-install snmp pdo_sqlite \
+    && pecl install apcu \
+    && docker-php-ext-enable apcu \
     && apt-get purge -y --auto-remove libsnmp-dev libsqlite3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

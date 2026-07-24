@@ -25,7 +25,7 @@ class CacheAPC{
     
     public function load($var) {
         $success = true;
-        $result = apc_fetch($this->prefix . $var, $success);
+        $result = apcu_fetch($this->prefix . $var, $success);
         return ($success === false) ? null : $result;
     }
 
@@ -34,7 +34,7 @@ class CacheAPC{
             $ttl = $this->ttl;
         }
 
-        if( apc_store($this->prefix . $var, $value, $ttl) ) {
+        if( apcu_store($this->prefix . $var, $value, $ttl) ) {
             return $value;
         }
 
@@ -42,12 +42,12 @@ class CacheAPC{
     }
 
     public function delete($var) {
-        return apc_delete($this->prefix . $var);
+        return apcu_delete($this->prefix . $var);
     }
 
     public function deleteAll() {
-        foreach( new APCIterator('user', '/^' . $this->_prefix . '/') as $var ) {
-            apc_delete($var);
+        foreach( new APCuIterator('/^' . $this->prefix . '/') as $var ) {
+            apcu_delete($var);
         }
     }
 
