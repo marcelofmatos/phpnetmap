@@ -41,6 +41,7 @@ var HostFaceEditor = (function () {
         state.placedPorts = [];
         redrawCanvas();
         syncHiddenField();
+        $('hfe-host-info').style.display = 'none';
 
         if (!hostId) {
             renderPalette([]);
@@ -83,6 +84,46 @@ var HostFaceEditor = (function () {
             setStatus('Network error while loading ports for this host.');
         };
         xhr.send();
+
+        // Segunda requisição, em paralelo, só de referência (não bloqueia nem
+        // reporta erro na área de status — se falhar, o painel simplesmente
+        // não aparece, sem competir com a mensagem de erro da lista de portas).
+        var infoUrl = config.loadSystemInfoUrlTemplate.replace('99999999', hostId);
+        var infoXhr = new XMLHttpRequest();
+        infoXhr.open('GET', infoUrl, true);
+        infoXhr.onload = function () {
+            if ($('hfe-host-select').value !== hostId || infoXhr.status !== 200) {
+                return;
+            }
+            var result;
+            try {
+                result = JSON.parse(infoXhr.responseText);
+            } catch (err) {
+                return;
+            }
+            if (!result || result.error) {
+                return;
+            }
+            renderHostInfo(result);
+        };
+        infoXhr.send();
+    }
+
+    function renderHostInfo(info) {
+        var fallback = 'not reported via SNMP';
+        $('hfe-host-info-sysname').textContent = info.sysName || fallback;
+        $('hfe-host-info-sysdescr').textContent = info.sysDescr || fallback;
+        $('hfe-host-info-ip').textContent = info.ip || fallback;
+
+        var searchLink = $('hfe-host-info-search');
+        if (info.sysDescr) {
+            searchLink.href = 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(info.sysDescr);
+            searchLink.style.display = '';
+        } else {
+            searchLink.style.display = 'none';
+        }
+
+        $('hfe-host-info').style.display = 'block';
     }
 
     function availablePorts() {

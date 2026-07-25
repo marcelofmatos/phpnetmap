@@ -41,6 +41,13 @@ $hostOptions = Host::model()->findAll();
 					<label>Port width (px): <input type="number" id="hfe-port-width" value="22" min="1" style="width:60px" /></label>
 					<label>Port height (px): <input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /></label>
 				</div>
+
+				<div id="hfe-host-info" class="host-face-editor-host-info" style="display:none">
+					<p><strong>System name:</strong> <span id="hfe-host-info-sysname"></span></p>
+					<p><strong>System description:</strong> <span id="hfe-host-info-sysdescr"></span></p>
+					<p><strong>IP:</strong> <span id="hfe-host-info-ip"></span></p>
+					<a id="hfe-host-info-search" href="#" target="_blank" rel="noopener">Search images for this model</a>
+				</div>
 			</div>
 
 			<div class="card host-face-editor-card">
@@ -85,6 +92,7 @@ $hostOptions = Host::model()->findAll();
 	Yii::app()->clientScript->registerScript('host-face-editor-init', '
 		HostFaceEditor.init({
 			loadPortInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadPortInfo/99999999')) . ',
+			loadSystemInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadSystemInfo/99999999')) . ',
 			fetchImageUrl: ' . CJSON::encode(Yii::app()->createUrl('hostFace/fetchImage')) . ',
 			existingSvg: ' . CJSON::encode($model->svg) . '
 		});
