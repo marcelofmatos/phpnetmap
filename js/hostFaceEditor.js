@@ -40,6 +40,7 @@ var HostFaceEditor = (function () {
         state.allPorts = [];
         state.placedPorts = [];
         redrawCanvas();
+        syncHiddenField();
 
         if (!hostId) {
             renderPalette([]);
