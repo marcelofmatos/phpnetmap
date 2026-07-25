@@ -134,13 +134,13 @@ class HostFaceController extends Controller
 		$url = isset($_GET['url']) ? trim($_GET['url']) : '';
 
 		if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
-			$this->render('jsonError', array('error' => 'URL inválida.'));
+			$this->render('jsonError', array('error' => 'Invalid URL.'));
 			return;
 		}
 
 		$scheme = parse_url($url, PHP_URL_SCHEME);
 		if ($scheme !== 'http' && $scheme !== 'https') {
-			$this->render('jsonError', array('error' => 'Só URLs http/https são permitidas.'));
+			$this->render('jsonError', array('error' => 'Only http/https URLs are allowed.'));
 			return;
 		}
 
@@ -150,7 +150,7 @@ class HostFaceController extends Controller
 		$host = parse_url($url, PHP_URL_HOST);
 		$ip = $host ? gethostbyname($host) : false;
 		if (!$ip || !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-			$this->render('jsonError', array('error' => 'Essa URL aponta para um endereço não permitido.'));
+			$this->render('jsonError', array('error' => 'This URL points to a disallowed address.'));
 			return;
 		}
 
@@ -167,7 +167,7 @@ class HostFaceController extends Controller
 		$fp = @fopen($url, 'rb', false, $context);
 
 		if ($fp === false) {
-			$this->render('jsonError', array('error' => 'Não foi possível baixar a imagem dessa URL.'));
+			$this->render('jsonError', array('error' => 'Could not download the image from this URL.'));
 			return;
 		}
 
@@ -183,7 +183,7 @@ class HostFaceController extends Controller
 			$imageData .= $chunk;
 			if (strlen($imageData) > $maxBytes) {
 				fclose($fp);
-				$this->render('jsonError', array('error' => 'A imagem tem mais de 5MB.'));
+				$this->render('jsonError', array('error' => 'The image is larger than 5MB.'));
 				return;
 			}
 		}
@@ -197,7 +197,7 @@ class HostFaceController extends Controller
 		// conteúdo com script embutido.
 		$allowedMimeTypes = array('image/png', 'image/jpeg', 'image/gif', 'image/webp');
 		if (!in_array($mimeType, $allowedMimeTypes)) {
-			$this->render('jsonError', array('error' => 'Essa URL não aponta para uma imagem PNG/JPEG/GIF/WEBP (tipo detectado: ' . $mimeType . ').'));
+			$this->render('jsonError', array('error' => 'This URL does not point to a PNG/JPEG/GIF/WEBP image (detected type: ' . $mimeType . ').'));
 			return;
 		}
 

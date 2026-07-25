@@ -59,18 +59,18 @@ var HostFaceEditor = (function () {
             }
 
             if (xhr.status !== 200) {
-                setStatus('Não foi possível carregar as portas desse host.');
+                setStatus('Could not load ports for this host.');
                 return;
             }
             var result;
             try {
                 result = JSON.parse(xhr.responseText);
             } catch (err) {
-                setStatus('Resposta inválida do servidor ao carregar portas.');
+                setStatus('Invalid server response while loading ports.');
                 return;
             }
             if (!result || result.error) {
-                setStatus(result && result.error ? result.error : 'Não foi possível carregar as portas desse host.');
+                setStatus(result && result.error ? result.error : 'Could not load ports for this host.');
                 return;
             }
             state.allPorts = result;
@@ -80,7 +80,7 @@ var HostFaceEditor = (function () {
             if ($('hfe-host-select').value !== hostId) {
                 return;
             }
-            setStatus('Erro de rede ao carregar as portas desse host.');
+            setStatus('Network error while loading ports for this host.');
         };
         xhr.send();
     }
@@ -100,8 +100,8 @@ var HostFaceEditor = (function () {
             var hint = document.createElement('p');
             hint.className = 'host-face-editor-empty-hint';
             hint.textContent = state.allPorts.length === 0
-                ? 'Escolha um host acima para carregar a lista de portas.'
-                : 'Todas as portas já foram posicionadas.';
+                ? 'Choose a host above to load the port list.'
+                : 'All ports have already been placed.';
             palette.appendChild(hint);
             return;
         }
@@ -130,7 +130,7 @@ var HostFaceEditor = (function () {
                 setImage(event.target.result, img.naturalWidth, img.naturalHeight);
             };
             img.onerror = function () {
-                setStatus('Esse arquivo não é uma imagem que o navegador consegue exibir.');
+                setStatus('This file is not an image the browser can display.');
             };
             img.src = event.target.result;
         };
@@ -142,7 +142,7 @@ var HostFaceEditor = (function () {
         if (!url) {
             return;
         }
-        setStatus('Carregando imagem...');
+        setStatus('Loading image...');
         var xhr = new XMLHttpRequest();
         xhr.open('GET', config.fetchImageUrl + '?url=' + encodeURIComponent(url), true);
         xhr.onload = function () {
@@ -150,7 +150,7 @@ var HostFaceEditor = (function () {
             try {
                 result = JSON.parse(xhr.responseText);
             } catch (err) {
-                setStatus('Resposta inválida do servidor.');
+                setStatus('Invalid server response.');
                 return;
             }
             if (result.error) {
@@ -163,12 +163,12 @@ var HostFaceEditor = (function () {
                 setStatus('');
             };
             img.onerror = function () {
-                setStatus('Essa imagem foi baixada, mas o navegador não conseguiu exibi-la.');
+                setStatus('This image was downloaded, but the browser could not display it.');
             };
             img.src = result.dataUri;
         };
         xhr.onerror = function () {
-            setStatus('Erro de rede ao buscar a imagem.');
+            setStatus('Network error while fetching the image.');
         };
         xhr.send();
     }
@@ -194,7 +194,7 @@ var HostFaceEditor = (function () {
         if (!state.imageDataUri) {
             var hint = document.createElement('p');
             hint.className = 'host-face-editor-empty-hint';
-            hint.textContent = 'Envie ou cole a URL de uma imagem do switch para começar.';
+            hint.textContent = 'Upload or paste the URL of a switch image to get started.';
             canvas.appendChild(hint);
             return;
         }
@@ -225,7 +225,7 @@ var HostFaceEditor = (function () {
         el.style.top = port.y + 'px';
         el.style.width = port.width + 'px';
         el.style.height = port.height + 'px';
-        el.title = 'port' + port.id + ' (arraste para mover, Alt+clique para remover)';
+        el.title = 'port' + port.id + ' (drag to move, Alt+click to remove)';
         el.textContent = port.id;
         el.setAttribute('draggable', 'true');
 
