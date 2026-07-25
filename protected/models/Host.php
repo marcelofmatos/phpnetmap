@@ -35,6 +35,8 @@ class Host extends CActiveRecord {
     public $arp_table = array();
     public $cam_table = array();
     public $connections = array();
+    public $sysDescr;
+    public $sysName;
     private $types_by_mac_prefix = array(
         '00:40:8c' => self::TYPE_SECURITY_CAMERA,
         'e4:aa:5d' => self::TYPE_WIFI_ROUTER,
@@ -375,6 +377,16 @@ class Host extends CActiveRecord {
         }
 
         return $this->ports;
+    }
+
+    /**
+     * Loads sysDescr/sysName via SNMP (scalar OIDs, not walked). Either can
+     * come back null if the device doesn't answer — PNMSnmp::get() already
+     * returns null on no response instead of throwing.
+     */
+    public function loadSystemInfo() {
+        $this->sysDescr = PNMSnmp::get($this, PNMSnmp::getOid('sysDescr'));
+        $this->sysName = PNMSnmp::get($this, PNMSnmp::getOid('sysName'));
     }
 
     /**

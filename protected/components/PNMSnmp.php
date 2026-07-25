@@ -36,6 +36,8 @@ class PNMSnmp {
         'ifHCOutOctets'     => '.1.3.6.1.2.1.31.1.1.1.10',
         'ifSpecific'        => '.1.3.6.1.2.1.2.2.1.22',
         'dot1dStpPortState' => '.1.3.6.1.2.1.17.2.15.1.3', // spanning Tree
+        'sysDescr'          => '.1.3.6.1.2.1.1.1.0', // system group (scalar, not a table)
+        'sysName'           => '.1.3.6.1.2.1.1.5.0',
     );
     
 //    public function read_mibs() {

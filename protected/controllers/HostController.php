@@ -295,6 +295,28 @@ class HostController extends Controller {
     }
 
     /**
+     * Returns sysDescr/sysName/ip for a host via SNMP, as a reference for
+     * the operator (e.g. to look up a product photo) — not persisted.
+     */
+    public function actionLoadSystemInfo($id) {
+        $this->layout = '//layouts/json';
+
+        try {
+            $model = $this->loadModel($id);
+            $model->loadSystemInfo();
+            $this->render('jsonSystemInfo', array(
+                'model' => $model,
+                    )
+            );
+        } catch (Exception $exc) {
+            $this->render('jsonError', array(
+                'error' => $exc->getMessage(),
+                    )
+            );
+        }
+    }
+
+    /**
      * Displays connections of Host.
      */
     public function actionCamTable() {
