@@ -51,21 +51,35 @@ var HostFaceEditor = (function () {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.onload = function () {
+            // Se o usuário já trocou de host de novo antes desta resposta
+            // chegar, ela não corresponde mais à seleção atual — descarta,
+            // pra não sobrescrever com a lista de portas do host errado.
+            if ($('hfe-host-select').value !== hostId) {
+                return;
+            }
+
             if (xhr.status !== 200) {
                 setStatus('Não foi possível carregar as portas desse host.');
                 return;
             }
-            var ports;
+            var result;
             try {
-                ports = JSON.parse(xhr.responseText);
+                result = JSON.parse(xhr.responseText);
             } catch (err) {
                 setStatus('Resposta inválida do servidor ao carregar portas.');
                 return;
             }
-            state.allPorts = ports;
+            if (!result || result.error) {
+                setStatus(result && result.error ? result.error : 'Não foi possível carregar as portas desse host.');
+                return;
+            }
+            state.allPorts = result;
             renderPalette(availablePorts());
         };
         xhr.onerror = function () {
+            if ($('hfe-host-select').value !== hostId) {
+                return;
+            }
             setStatus('Erro de rede ao carregar as portas desse host.');
         };
         xhr.send();
@@ -115,6 +129,9 @@ var HostFaceEditor = (function () {
             img.onload = function () {
                 setImage(event.target.result, img.naturalWidth, img.naturalHeight);
             };
+            img.onerror = function () {
+                setStatus('Esse arquivo não é uma imagem que o navegador consegue exibir.');
+            };
             img.src = event.target.result;
         };
         reader.readAsDataURL(file);
@@ -144,6 +161,9 @@ var HostFaceEditor = (function () {
             img.onload = function () {
                 setImage(result.dataUri, img.naturalWidth, img.naturalHeight);
                 setStatus('');
+            };
+            img.onerror = function () {
+                setStatus('Essa imagem foi baixada, mas o navegador não conseguiu exibi-la.');
             };
             img.src = result.dataUri;
         };
