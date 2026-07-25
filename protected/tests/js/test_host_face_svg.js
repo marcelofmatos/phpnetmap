@@ -54,6 +54,25 @@ check('nao confunde rx/ry com x/y', function () {
     assert.strictEqual(parsed.ports[0].y, 5, 'y não pode pegar o valor de ry');
 });
 
+// 1c. Regressão: SVGs desenhados no Inkscape costumam quebrar o base64 do
+// xlink:href em várias linhas (indentado, terminado em \r\n). Esses espaços/
+// quebras de linha não podem sobrar no imageDataUri extraído — se sobrarem,
+// o editor visual usa esse valor em `background-image: url(...)` no CSS, e
+// um url() sem aspas com espaço/quebra de linha dentro é inválido: o
+// navegador ignora a declaração inteira e a foto do switch não aparece,
+// mesmo com as portas posicionadas certinho (bug relatado pelo usuário ao
+// reabrir uma face já cadastrada).
+check('remove espacos/quebras de linha do data URI da imagem (base64 multi-linha)', function () {
+    var svgComBase64Quebrado = '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">' +
+        '<image\n     xlink:href="data:image/png;base64,AAAA\n   BBBB\r\n   CCCC"\n     x="0"\n     y="0"\n     width="50"\n     height="50" />' +
+        '<rect class="port" id="port1" x="10" y="5" width="20" height="15" />' +
+        '</svg>';
+    var parsed = HostFaceSvg.parseSvgToPorts(svgComBase64Quebrado);
+    assert.ok(parsed, 'parse não deveria retornar null');
+    assert.strictEqual(parsed.imageDataUri, 'data:image/png;base64,AAAABBBBCCCC',
+        'espacos/quebras de linha dentro do base64 devem ser removidos');
+});
+
 // 2. SVG sem imagem válida deve falhar o parse (retornar null), não lançar exceção.
 check('svg sem imagem retorna null', function () {
     var parsed = HostFaceSvg.parseSvgToPorts('<svg width="10" height="10"></svg>');
@@ -86,6 +105,8 @@ Object.keys(expectedPortCount).forEach(function (file) {
             'esperava ' + expectedPortCount[file] + ' portas, achou ' + result.ports.length);
         assert.strictEqual(result.imageDataUri.indexOf('data:image/'), 0,
             'imageDataUri não parece um data URI de imagem');
+        assert.ok(!/\s/.test(result.imageDataUri),
+            'imageDataUri não pode conter espaços/quebras de linha (quebra o url() do CSS)');
     });
 });
 

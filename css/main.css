@@ -159,13 +159,17 @@ select {
 }
 
 /* hostFace - editor visual */
+.host-face-editor-card h3 {
+    margin-top: 0;
+}
+
 .host-face-editor-toolbar,
 .host-face-editor-image-source {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .host-face-editor-body {

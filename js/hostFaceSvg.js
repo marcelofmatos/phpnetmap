@@ -66,6 +66,15 @@
         }
 
         var imageDataUri = extractAttr(imageTag, 'xlink:href') || extractAttr(imageTag, 'href');
+        if (imageDataUri) {
+            // SVGs desenhados no Inkscape costumam quebrar o base64 em várias
+            // linhas indentadas — espaço/quebra de linha nunca é conteúdo
+            // válido de base64, mas sobrevive na extração via regex (que não
+            // faz normalização de atributo como um parser XML de verdade
+            // faria). Sem remover aqui, esse valor quebra o `url(...)` sem
+            // aspas usado no CSS do editor (background-image) e a imagem some.
+            imageDataUri = imageDataUri.replace(/\s+/g, '');
+        }
         var imageWidth = parseFloat(extractAttr(imageTag, 'width'));
         var imageHeight = parseFloat(extractAttr(imageTag, 'height'));
 
