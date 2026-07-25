@@ -2,6 +2,8 @@
 /* @var $this HostFaceController */
 /* @var $model HostFace */
 /* @var $form CActiveForm */
+
+$hostOptions = Host::model()->findAll();
 ?>
 
 <div class="form">
@@ -29,15 +31,13 @@
 				<label>Host de origem (SNMP):
 					<select id="hfe-host-select">
 						<option value="">-- escolher --</option>
-						<?php foreach (Host::model()->findAll() as $hostOption): ?>
+						<?php foreach ($hostOptions as $hostOption): ?>
 							<option value="<?php echo $hostOption->id; ?>"><?php echo CHtml::encode($hostOption->name); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</label>
-				<label>Tamanho da porta:
-					<input type="number" id="hfe-port-width" value="22" min="1" style="width:60px" /> x
-					<input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /> px
-				</label>
+				<label>Largura da porta (px): <input type="number" id="hfe-port-width" value="22" min="1" style="width:60px" /></label>
+				<label>Altura da porta (px): <input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /></label>
 			</div>
 
 			<div class="host-face-editor-image-source">
@@ -83,7 +83,7 @@
                 <?php echo $form->dropDownList(
                         $model,
                         'hosts', 
-                        CHtml::listData(Host::model()->findAll(), 'id', 'name', 'type'), 
+                        CHtml::listData($hostOptions, 'id', 'name', 'type'),
                         array(
                             'empty'=>'',
                             'multiple'=>'multiple',
