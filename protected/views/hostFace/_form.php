@@ -76,8 +76,12 @@ $hostOptions = Host::model()->findAll();
 	</div>
 
 	<?php
-	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceSvg.js', CClientScript::POS_END);
-	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js', CClientScript::POS_END);
+	// ?v=filemtime evita servir JS cacheado de um deploy anterior — o Apache
+	// não manda Cache-Control pra esses arquivos estáticos, então o navegador
+	// só busca de novo se a URL mudar.
+	$hfeWebroot = dirname(Yii::app()->basePath);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceSvg.js?v=' . filemtime($hfeWebroot . '/js/hostFaceSvg.js'), CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js?v=' . filemtime($hfeWebroot . '/js/hostFaceEditor.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('host-face-editor-init', '
 		HostFaceEditor.init({
 			loadPortInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadPortInfo/99999999')) . ',
