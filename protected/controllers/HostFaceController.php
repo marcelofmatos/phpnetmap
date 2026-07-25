@@ -192,8 +192,12 @@ class HostFaceController extends Controller
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
 		$mimeType = $finfo->buffer($imageData);
 
-		if (strpos($mimeType, 'image/') !== 0) {
-			$this->render('jsonError', array('error' => 'Essa URL não aponta para uma imagem (tipo detectado: ' . $mimeType . ').'));
+		// Allowlist de formatos raster — não image/svg+xml: é a foto do
+		// painel do switch, nunca precisa ser vetorial, e SVG pode conter
+		// conteúdo com script embutido.
+		$allowedMimeTypes = array('image/png', 'image/jpeg', 'image/gif', 'image/webp');
+		if (!in_array($mimeType, $allowedMimeTypes)) {
+			$this->render('jsonError', array('error' => 'Essa URL não aponta para uma imagem PNG/JPEG/GIF/WEBP (tipo detectado: ' . $mimeType . ').'));
 			return;
 		}
 
