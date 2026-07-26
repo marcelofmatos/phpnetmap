@@ -51,10 +51,37 @@
         return typeof n === 'number' && isFinite(n) && n > 0 && Math.floor(n) === n;
     }
 
+    /**
+     * @param {{x:number,y:number,width:number,height:number}} box
+     * @param {number} rows
+     * @param {number} cols
+     * @param {string} order
+     * @returns {Array<{x:number,y:number,width:number,height:number}>|null} um
+     *   retângulo (já arredondado) por porta da sequência, na mesma ordem de
+     *   computeGridPositions, ou null se rows/cols/order forem inválidos.
+     */
+    function computeCellRects(box, rows, cols, order) {
+        var positions = computeGridPositions(rows, cols, order);
+        if (!positions) {
+            return null;
+        }
+        var cellWidth = box.width / cols;
+        var cellHeight = box.height / rows;
+        return positions.map(function (pos) {
+            return {
+                x: Math.round(box.x + pos.col * cellWidth),
+                y: Math.round(box.y + pos.row * cellHeight),
+                width: Math.round(cellWidth),
+                height: Math.round(cellHeight)
+            };
+        });
+    }
+
     var HostFaceGridFill = {
         ROW_MAJOR: ROW_MAJOR,
         COLUMN_MAJOR: COLUMN_MAJOR,
-        computeGridPositions: computeGridPositions
+        computeGridPositions: computeGridPositions,
+        computeCellRects: computeCellRects
     };
 
     if (typeof module !== 'undefined' && module.exports) {

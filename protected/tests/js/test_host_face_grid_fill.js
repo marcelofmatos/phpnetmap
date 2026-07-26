@@ -59,6 +59,25 @@ check('order desconhecida retorna null', function () {
     assert.strictEqual(HostFaceGridFill.computeGridPositions(2, 6, 'diagonal'), null);
 });
 
+check('computeCellRects: column-major 2x6 sobre box conhecido dá um retângulo por porta', function () {
+    var box = {x: 10, y: 20, width: 300, height: 100};
+    var rects = HostFaceGridFill.computeCellRects(box, 2, 6, HostFaceGridFill.COLUMN_MAJOR);
+    assert.strictEqual(rects.length, 12);
+    // cellWidth = 300/6 = 50, cellHeight = 100/2 = 50
+    assert.deepStrictEqual(rects[0], {x: 10, y: 20, width: 50, height: 50}); // porta 1: topo, coluna 1
+    assert.deepStrictEqual(rects[1], {x: 10, y: 70, width: 50, height: 50}); // porta 2: embaixo, mesma coluna
+    assert.deepStrictEqual(rects[2], {x: 60, y: 20, width: 50, height: 50}); // porta 3: topo, próxima coluna
+});
+
+check('computeCellRects: rows/cols/order invalidos retornam null', function () {
+    var box = {x: 0, y: 0, width: 300, height: 100};
+    assert.strictEqual(HostFaceGridFill.computeCellRects(box, 0, 5, HostFaceGridFill.ROW_MAJOR), null);
+    assert.strictEqual(HostFaceGridFill.computeCellRects(box, 5, -1, HostFaceGridFill.ROW_MAJOR), null);
+    assert.strictEqual(HostFaceGridFill.computeCellRects(box, 2.5, 5, HostFaceGridFill.ROW_MAJOR), null);
+    assert.strictEqual(HostFaceGridFill.computeCellRects(box, '2', 5, HostFaceGridFill.ROW_MAJOR), null);
+    assert.strictEqual(HostFaceGridFill.computeCellRects(box, 2, 6, 'diagonal'), null);
+});
+
 console.log('');
 console.log(failures === 0 ? 'Todos os testes passaram.' : failures + ' teste(s) falharam.');
 process.exit(failures > 0 ? 1 : 0);

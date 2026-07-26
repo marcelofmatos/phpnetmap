@@ -356,6 +356,7 @@ var HostFaceEditor = (function () {
         wrapper.style.userSelect = 'none';
         document.addEventListener('mousemove', onFillMouseMove);
         document.addEventListener('mouseup', onFillMouseUp);
+        window.addEventListener('blur', onFillDragCancel);
     }
 
     function onFillMouseMove(e) {
@@ -382,12 +383,25 @@ var HostFaceEditor = (function () {
         fillDrag.wrapper.style.userSelect = '';
         document.removeEventListener('mousemove', onFillMouseMove);
         document.removeEventListener('mouseup', onFillMouseUp);
+        window.removeEventListener('blur', onFillDragCancel);
         clearFillPreview();
         fillDrag = null;
 
         if (box && box.width >= 4 && box.height >= 4) {
             commitFill(box);
         }
+    }
+
+    function onFillDragCancel() {
+        if (!fillDrag) {
+            return;
+        }
+        fillDrag.wrapper.style.userSelect = '';
+        document.removeEventListener('mousemove', onFillMouseMove);
+        document.removeEventListener('mouseup', onFillMouseUp);
+        window.removeEventListener('blur', onFillDragCancel);
+        clearFillPreview();
+        fillDrag = null;
     }
 
     function readFillSettings() {
@@ -415,22 +429,20 @@ var HostFaceEditor = (function () {
         if (!settings.rows || !settings.cols || box.width < 1 || box.height < 1) {
             return;
         }
-        var positions = HostFaceGridFill.computeGridPositions(settings.rows, settings.cols, settings.order);
-        if (!positions) {
+        var rects = HostFaceGridFill.computeCellRects(box, settings.rows, settings.cols, settings.order);
+        if (!rects) {
             return;
         }
         var upcoming = availablePorts();
-        var cellWidth = box.width / settings.cols;
-        var cellHeight = box.height / settings.rows;
 
-        for (var i = 0; i < positions.length && i < upcoming.length; i++) {
-            var pos = positions[i];
+        for (var i = 0; i < rects.length && i < upcoming.length; i++) {
+            var rect = rects[i];
             var cellEl = document.createElement('div');
             cellEl.className = 'host-face-editor-fill-cell';
-            cellEl.style.left = (box.x + pos.col * cellWidth) + 'px';
-            cellEl.style.top = (box.y + pos.row * cellHeight) + 'px';
-            cellEl.style.width = cellWidth + 'px';
-            cellEl.style.height = cellHeight + 'px';
+            cellEl.style.left = rect.x + 'px';
+            cellEl.style.top = rect.y + 'px';
+            cellEl.style.width = rect.width + 'px';
+            cellEl.style.height = rect.height + 'px';
             cellEl.textContent = upcoming[i].ifIndex;
             fillDrag.wrapper.appendChild(cellEl);
             fillDrag.cellEls.push(cellEl);
@@ -451,26 +463,24 @@ var HostFaceEditor = (function () {
     function commitFill(box) {
         setFillStatus('');
         var settings = readFillSettings();
-        var positions = HostFaceGridFill.computeGridPositions(settings.rows, settings.cols, settings.order);
-        if (!positions) {
+        var rects = HostFaceGridFill.computeCellRects(box, settings.rows, settings.cols, settings.order);
+        if (!rects) {
             setFillStatus('Set valid rows/columns and a fill order first.');
             return;
         }
         var upcoming = availablePorts();
-        if (upcoming.length < positions.length) {
-            setFillStatus('Only ' + upcoming.length + ' port(s) left, cannot fill ' + positions.length + '.');
+        if (upcoming.length < rects.length) {
+            setFillStatus('Only ' + upcoming.length + ' port(s) left, cannot fill ' + rects.length + '.');
             return;
         }
 
-        var cellWidth = box.width / settings.cols;
-        var cellHeight = box.height / settings.rows;
-        var newPorts = positions.map(function (pos, i) {
+        var newPorts = rects.map(function (rect, i) {
             return {
                 id: String(upcoming[i].ifIndex),
-                x: Math.round(box.x + pos.col * cellWidth),
-                y: Math.round(box.y + pos.row * cellHeight),
-                width: Math.round(cellWidth),
-                height: Math.round(cellHeight)
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height
             };
         });
 
