@@ -15,6 +15,7 @@ var HostFaceEditor = (function () {
         allPorts: [],       // portas do host escolhido: [{ifIndex, ifDescr, ifAlias}]
         placedPorts: []     // portas já no canvas: [{id, x, y, width, height}]
     };
+    var fillDrag = null;
 
     function $(id) {
         return document.getElementById(id);
@@ -251,6 +252,9 @@ var HostFaceEditor = (function () {
             e.preventDefault();
         });
         wrapper.addEventListener('drop', onCanvasDrop);
+        wrapper.addEventListener('mousedown', function (e) {
+            onFillMouseDown(e, wrapper);
+        });
 
         state.placedPorts.forEach(function (port) {
             wrapper.appendChild(buildPortElement(port));
@@ -333,6 +337,151 @@ var HostFaceEditor = (function () {
         redrawCanvas();
         renderPalette(availablePorts());
         syncHiddenField();
+    }
+
+    function onFillMouseDown(e, wrapper) {
+        if (e.target !== wrapper) {
+            return;
+        }
+        e.preventDefault();
+        var rect = wrapper.getBoundingClientRect();
+        fillDrag = {
+            wrapper: wrapper,
+            startX: e.clientX - rect.left,
+            startY: e.clientY - rect.top,
+            boxEl: null,
+            cellEls: [],
+            lastBox: null
+        };
+        wrapper.style.userSelect = 'none';
+        document.addEventListener('mousemove', onFillMouseMove);
+        document.addEventListener('mouseup', onFillMouseUp);
+    }
+
+    function onFillMouseMove(e) {
+        if (!fillDrag) {
+            return;
+        }
+        var rect = fillDrag.wrapper.getBoundingClientRect();
+        var curX = e.clientX - rect.left;
+        var curY = e.clientY - rect.top;
+        var box = {
+            x: Math.min(fillDrag.startX, curX),
+            y: Math.min(fillDrag.startY, curY),
+            width: Math.abs(curX - fillDrag.startX),
+            height: Math.abs(curY - fillDrag.startY)
+        };
+        renderFillPreview(box);
+    }
+
+    function onFillMouseUp() {
+        if (!fillDrag) {
+            return;
+        }
+        var box = fillDrag.lastBox;
+        fillDrag.wrapper.style.userSelect = '';
+        document.removeEventListener('mousemove', onFillMouseMove);
+        document.removeEventListener('mouseup', onFillMouseUp);
+        clearFillPreview();
+        fillDrag = null;
+
+        if (box && box.width >= 4 && box.height >= 4) {
+            commitFill(box);
+        }
+    }
+
+    function readFillSettings() {
+        return {
+            rows: parseInt($('hfe-fill-rows').value, 10),
+            cols: parseInt($('hfe-fill-cols').value, 10),
+            order: $('hfe-fill-order').value
+        };
+    }
+
+    function renderFillPreview(box) {
+        fillDrag.lastBox = box;
+        clearFillPreview();
+
+        var boxEl = document.createElement('div');
+        boxEl.className = 'host-face-editor-fill-box';
+        boxEl.style.left = box.x + 'px';
+        boxEl.style.top = box.y + 'px';
+        boxEl.style.width = box.width + 'px';
+        boxEl.style.height = box.height + 'px';
+        fillDrag.wrapper.appendChild(boxEl);
+        fillDrag.boxEl = boxEl;
+
+        var settings = readFillSettings();
+        if (!settings.rows || !settings.cols || box.width < 1 || box.height < 1) {
+            return;
+        }
+        var positions = HostFaceGridFill.computeGridPositions(settings.rows, settings.cols, settings.order);
+        if (!positions) {
+            return;
+        }
+        var upcoming = availablePorts();
+        var cellWidth = box.width / settings.cols;
+        var cellHeight = box.height / settings.rows;
+
+        for (var i = 0; i < positions.length && i < upcoming.length; i++) {
+            var pos = positions[i];
+            var cellEl = document.createElement('div');
+            cellEl.className = 'host-face-editor-fill-cell';
+            cellEl.style.left = (box.x + pos.col * cellWidth) + 'px';
+            cellEl.style.top = (box.y + pos.row * cellHeight) + 'px';
+            cellEl.style.width = cellWidth + 'px';
+            cellEl.style.height = cellHeight + 'px';
+            cellEl.textContent = upcoming[i].ifIndex;
+            fillDrag.wrapper.appendChild(cellEl);
+            fillDrag.cellEls.push(cellEl);
+        }
+    }
+
+    function clearFillPreview() {
+        if (!fillDrag) {
+            return;
+        }
+        if (fillDrag.boxEl) {
+            fillDrag.boxEl.remove();
+        }
+        fillDrag.cellEls.forEach(function (el) { el.remove(); });
+        fillDrag.cellEls = [];
+    }
+
+    function commitFill(box) {
+        setFillStatus('');
+        var settings = readFillSettings();
+        var positions = HostFaceGridFill.computeGridPositions(settings.rows, settings.cols, settings.order);
+        if (!positions) {
+            setFillStatus('Set valid rows/columns and a fill order first.');
+            return;
+        }
+        var upcoming = availablePorts();
+        if (upcoming.length < positions.length) {
+            setFillStatus('Only ' + upcoming.length + ' port(s) left, cannot fill ' + positions.length + '.');
+            return;
+        }
+
+        var cellWidth = box.width / settings.cols;
+        var cellHeight = box.height / settings.rows;
+        var newPorts = positions.map(function (pos, i) {
+            return {
+                id: String(upcoming[i].ifIndex),
+                x: Math.round(box.x + pos.col * cellWidth),
+                y: Math.round(box.y + pos.row * cellHeight),
+                width: Math.round(cellWidth),
+                height: Math.round(cellHeight)
+            };
+        });
+
+        state.placedPorts = state.placedPorts.concat(newPorts);
+        redrawCanvas();
+        renderPalette(availablePorts());
+        syncHiddenField();
+    }
+
+    function setFillStatus(message) {
+        $('hfe-fill-status').textContent = message;
     }
 
     function removePort(portId) {

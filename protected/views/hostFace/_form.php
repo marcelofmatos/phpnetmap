@@ -51,7 +51,7 @@ $hostOptions = Host::model()->findAll();
 							<option value="column-major">Column by column</option>
 						</select>
 					</label>
-					<span id="hfe-fill-status" class="host-face-editor-fill-status"></span>
+					<span id="hfe-fill-status" class="host-face-editor-fill-status" aria-live="polite"></span>
 				</div>
 
 				<div id="hfe-host-info" class="host-face-editor-host-info" style="display:none">
