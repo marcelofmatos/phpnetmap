@@ -42,6 +42,18 @@ $hostOptions = Host::model()->findAll();
 					<label>Port height (px): <input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /></label>
 				</div>
 
+				<div class="host-face-editor-toolbar host-face-editor-fill-toolbar">
+					<label>Rows: <input type="number" id="hfe-fill-rows" min="1" placeholder="e.g. 2" style="width:50px" /></label>
+					<label>Columns: <input type="number" id="hfe-fill-cols" min="1" placeholder="e.g. 12" style="width:50px" /></label>
+					<label>Fill order:
+						<select id="hfe-fill-order">
+							<option value="row-major">Row by row</option>
+							<option value="column-major">Column by column</option>
+						</select>
+					</label>
+					<span id="hfe-fill-status" class="host-face-editor-fill-status"></span>
+				</div>
+
 				<div id="hfe-host-info" class="host-face-editor-host-info" style="display:none">
 					<p><strong>System name:</strong> <span id="hfe-host-info-sysname"></span></p>
 					<p><strong>System description:</strong> <span id="hfe-host-info-sysdescr"></span></p>
@@ -88,6 +100,7 @@ $hostOptions = Host::model()->findAll();
 	// só busca de novo se a URL mudar.
 	$hfeWebroot = dirname(Yii::app()->basePath);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceSvg.js?v=' . filemtime($hfeWebroot . '/js/hostFaceSvg.js'), CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceGridFill.js?v=' . filemtime($hfeWebroot . '/js/hostFaceGridFill.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js?v=' . filemtime($hfeWebroot . '/js/hostFaceEditor.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('host-face-editor-init', '
 		HostFaceEditor.init({

@@ -172,6 +172,17 @@ select {
     margin-bottom: 0;
 }
 
+.host-face-editor-fill-toolbar {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+.host-face-editor-fill-status {
+    color: #c0392b;
+    font-size: 12px;
+}
+
 .host-face-editor-host-info {
     margin-top: 10px;
     padding-top: 10px;
@@ -238,4 +249,27 @@ select {
 
 .host-face-editor-fallback {
     margin-top: 12px;
+}
+
+.host-face-editor-fill-box {
+    position: absolute;
+    border: 2px dashed #4a9eff;
+    background-color: rgba(74, 158, 255, 0.06);
+    pointer-events: none;
+}
+
+/* box-sizing: border-box (diferente de .host-face-editor-port) pra a
+   largura/altura inline baterem com a matemática da grade mesmo com a
+   borda de 1px — evita desalinhamento visual acumulado numa grade com
+   muitas células. */
+.host-face-editor-fill-cell {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid rgba(74, 158, 255, 0.6);
+    background-color: rgba(74, 158, 255, 0.12);
+    color: #003366;
+    font-size: 9px;
+    text-align: center;
+    line-height: 1.6;
+    pointer-events: none;
 }
