@@ -34,7 +34,7 @@ class HostController extends Controller {
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('admin', 'delete'),
+                'actions' => array('admin', 'delete', 'fillMacFromArp'),
                 'users' => array('admin'),
             ),
 //			array('deny',  // deny all users
@@ -189,6 +189,57 @@ class HostController extends Controller {
 
         $this->render('admin', array(
             'model' => $model,
+        ));
+    }
+
+    /**
+     * Preenche o mac dos hosts que já têm ip mas não têm mac, buscando na
+     * tabela ARP do gateway configurado (Configuration > Gateway). Mostra
+     * uma prévia do que seria alterado antes de gravar — só grava de fato
+     * quando o formulário de confirmação é enviado (POST).
+     */
+    public function actionFillMacFromArp() {
+        $gateway = Host::model()->findByPk(Yii::app()->params['hostGatewayId']);
+
+        if (!$gateway instanceof Host || !$gateway->snmp_template_id) {
+            $this->render('fillMacFromArpNoGateway');
+            return;
+        }
+
+        $criteria = new CDbCriteria();
+        $criteria->addCondition("(ip IS NOT NULL AND ip <> '') AND (mac IS NULL OR mac = '')");
+        $candidates = Host::model()->findAll($criteria);
+
+        $matches = array();
+        $unmatched = array();
+        foreach ($candidates as $host) {
+            $mac = $gateway->getMacInArpTable($host->ip);
+            if ($mac) {
+                $matches[] = array('host' => $host, 'mac' => $mac);
+            } else {
+                $unmatched[] = $host;
+            }
+        }
+
+        if (Yii::app()->request->isPostRequest && isset($_POST['confirm'])) {
+            $updated = 0;
+            foreach ($matches as $match) {
+                $match['host']->mac = $match['mac'];
+                if ($match['host']->save()) {
+                    $updated++;
+                }
+            }
+            $this->render('fillMacFromArpDone', array(
+                'updated' => $updated,
+                'total' => count($matches),
+            ));
+            return;
+        }
+
+        $this->render('fillMacFromArp', array(
+            'gateway' => $gateway,
+            'matches' => $matches,
+            'unmatched' => $unmatched,
         ));
     }
 

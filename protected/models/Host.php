@@ -510,16 +510,39 @@ class Host extends CActiveRecord {
     }
     
     public function getIpInArpTable($macHost) {
-        
+
         $result = null;
-        
+
         if(!$this->arp_table) {
             $this->loadArpTable();
         }
-        
+
         foreach($this->arp_table as $macArp => $ip) {
             if ($macArp == $macHost) {
-                $result = $ip; 
+                $result = $ip;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Direção inversa de getIpInArpTable(): dado um IP, procura o MAC
+     * correspondente na tabela ARP deste host (tipicamente o gateway da
+     * rede) — usado pra completar o mac de hosts que já têm ip cadastrado.
+     * @param string $ip
+     * @return string|null
+     */
+    public function getMacInArpTable($ip) {
+
+        $result = null;
+
+        if (!$this->arp_table) {
+            $this->loadArpTable();
+        }
+
+        foreach ($this->arp_table as $macArp => $ipArp) {
+            if ($ipArp == $ip) {
+                $result = $macArp;
             }
         }
         return $result;
