@@ -17,6 +17,12 @@ var HostFaceEditor = (function () {
     };
     var fillDrag = null;
 
+    // Campos de configuração do editor (tamanho de porta única + linhas/
+    // colunas/ordem do preenchimento por área) que ficam salvos por modelo
+    // de face no localStorage, pra lembrar a última configuração usada.
+    var SETTINGS_FIELD_IDS = ['hfe-port-width', 'hfe-port-height', 'hfe-fill-rows', 'hfe-fill-cols', 'hfe-fill-order'];
+    var SETTINGS_STORAGE_PREFIX = 'hostFaceEditor:portSettings:';
+
     function $(id) {
         return document.getElementById(id);
     }
@@ -31,9 +37,66 @@ var HostFaceEditor = (function () {
             $('hfe-svg-field').value = e.target.value;
         });
 
+        $('HostFace_name').addEventListener('change', function (e) {
+            loadSettingsForName(e.target.value.trim());
+        });
+        if ($('HostFace_name').value.trim()) {
+            loadSettingsForName($('HostFace_name').value.trim());
+        }
+        SETTINGS_FIELD_IDS.forEach(function (id) {
+            $(id).addEventListener('change', saveSettingsForCurrentName);
+        });
+
         if (config.existingSvg) {
             loadExistingSvg(config.existingSvg);
         }
+    }
+
+    function settingsStorageKey(name) {
+        return SETTINGS_STORAGE_PREFIX + name;
+    }
+
+    function saveSettingsForCurrentName() {
+        var name = $('HostFace_name').value.trim();
+        if (!name) {
+            return;
+        }
+        var settings = {};
+        SETTINGS_FIELD_IDS.forEach(function (id) {
+            settings[id] = $(id).value;
+        });
+        try {
+            localStorage.setItem(settingsStorageKey(name), JSON.stringify(settings));
+        } catch (err) {
+            // localStorage indisponível (modo privado, cota excedida, etc.)
+            // — não é motivo pra travar o editor, só não salva a preferência.
+        }
+    }
+
+    function loadSettingsForName(name) {
+        if (!name) {
+            return;
+        }
+        var raw;
+        try {
+            raw = localStorage.getItem(settingsStorageKey(name));
+        } catch (err) {
+            return;
+        }
+        if (!raw) {
+            return;
+        }
+        var settings;
+        try {
+            settings = JSON.parse(raw);
+        } catch (err) {
+            return;
+        }
+        SETTINGS_FIELD_IDS.forEach(function (id) {
+            if (settings[id] !== undefined) {
+                $(id).value = settings[id];
+            }
+        });
     }
 
     function onHostChange(e) {
