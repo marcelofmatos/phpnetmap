@@ -2,6 +2,6 @@
 /protected/runtime/*
 !/assets/README
 !/protected/runtime/README
-/protected/config/params.ini
+/protected/data/params.ini
 /.superpowers/
 /docs/superpowers/
