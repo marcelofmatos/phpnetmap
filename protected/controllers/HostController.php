@@ -66,12 +66,33 @@ class HostController extends Controller {
             ));
         } catch (CHttpException $e) {
 
+            $params = array();
             if (!is_null($name))
                 $params['name'] = trim($name);
             if (!is_null($ip))
                 $params['ip'] = trim($ip);
             if (!is_null($mac))
                 $params['mac'] = trim($mac);
+
+            // Completa o quanto der pra descobrir via SNMP, pra pré-preencher
+            // o botão "Create Host" desta página com mais do que só o que já
+            // veio na URL (ex.: um clique no mapa só tinha o mac — dá pra
+            // chutar o tipo pelo prefixo do mac e, se faltar, completar o ip
+            // pela tabela ARP do gateway).
+            if (!empty($mac)) {
+                $macGuess = new Host();
+                $macGuess->mac = trim($mac);
+                $macGuess->setTypeByMAC();
+                $params['type'] = $macGuess->type;
+
+                if (empty($ip)) {
+                    $gateway = Host::model()->findByPk(Yii::app()->params['hostGatewayId']);
+                    $guessedIp = ($gateway instanceof Host) ? $gateway->getIpInArpTable(trim($mac)) : null;
+                    if ($guessedIp) {
+                        $params['ip'] = $guessedIp;
+                    }
+                }
+            }
 
             $this->render('addHostNotFound', $params);
         }
@@ -81,7 +102,7 @@ class HostController extends Controller {
      * Creates a new model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      */
-    public function actionCreate($name = null, $ip = null, $mac = null) {
+    public function actionCreate($name = null, $ip = null, $mac = null, $type = null) {
         $model = new Host;
 
         /* Set attributes by _GET */
@@ -93,6 +114,9 @@ class HostController extends Controller {
         }
         if (!is_null($mac) && !isset($_POST['Host'])) {
             $model->mac = (string) trim($mac);
+        }
+        if (!is_null($type) && !isset($_POST['Host'])) {
+            $model->type = (string) trim($type);
         }
 
         // Uncomment the following line if AJAX validation is needed
@@ -193,13 +217,17 @@ class HostController extends Controller {
     public function loadModelByName($name, $ip = null, $mac = null) {
 
         $model = Host::model()->findByAttributes(array('name' => $name));
-        
+
+        // Tenta ip e mac de forma independente (não mais exclusiva): um link
+        // pode trazer os dois, e um host que só bate pelo mac não pode ser
+        // ignorado só porque o ip também veio preenchido e não bateu.
         if ($model == null && !empty($ip)) {
             $model = Host::model()->findByAttributes(array('ip' => $ip));
-        } else if ($model == null && !empty($mac)) {
+        }
+        if ($model == null && !empty($mac)) {
             $model = Host::model()->findByAttributes(array('mac' => $mac));
         }
-        
+
         if ($model == null) {
             throw new CHttpException(404, 'Model name ' . $name . ' does not exist.');
         }
