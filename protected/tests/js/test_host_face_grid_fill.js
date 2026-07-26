@@ -59,6 +59,11 @@ check('order desconhecida retorna null', function () {
     assert.strictEqual(HostFaceGridFill.computeGridPositions(2, 6, 'diagonal'), null);
 });
 
+check('rows*cols acima do limite (MAX_CELLS) retorna null', function () {
+    assert.strictEqual(HostFaceGridFill.computeGridPositions(200, 200, HostFaceGridFill.ROW_MAJOR), null); // 40000 > 10000
+    assert.ok(HostFaceGridFill.computeGridPositions(100, 100, HostFaceGridFill.ROW_MAJOR) !== null); // 10000, no limite, ainda funciona
+});
+
 check('computeCellRects: column-major 2x6 sobre box conhecido dá um retângulo por porta', function () {
     var box = {x: 10, y: 20, width: 300, height: 100};
     var rects = HostFaceGridFill.computeCellRects(box, 2, 6, HostFaceGridFill.COLUMN_MAJOR);

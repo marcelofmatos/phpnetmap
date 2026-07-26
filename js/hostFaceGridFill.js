@@ -11,6 +11,9 @@
 
     var ROW_MAJOR = 'row-major';
     var COLUMN_MAJOR = 'column-major';
+    var MAX_CELLS = 10000; // generoso pra qualquer switch real, mas evita
+    // que um typo (ex.: "9999999999" num campo) trave a aba computando um
+    // array gigante a cada mousemove durante o arraste.
 
     /**
      * @param {number} rows
@@ -27,6 +30,9 @@
             return null;
         }
         if (order !== ROW_MAJOR && order !== COLUMN_MAJOR) {
+            return null;
+        }
+        if (rows * cols > MAX_CELLS) {
             return null;
         }
 
@@ -80,6 +86,7 @@
     var HostFaceGridFill = {
         ROW_MAJOR: ROW_MAJOR,
         COLUMN_MAJOR: COLUMN_MAJOR,
+        MAX_CELLS: MAX_CELLS,
         computeGridPositions: computeGridPositions,
         computeCellRects: computeCellRects
     };
