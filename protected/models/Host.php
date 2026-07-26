@@ -254,6 +254,27 @@ class Host extends CActiveRecord {
 
         try {
 
+            // dot1dBasePortIfIndex: traduz o número de porta do Bridge-MIB
+            // (dot1dBasePort, usado pela tabela CAM abaixo) pro ifIndex real
+            // — o mesmo usado em todo o resto do app (Host Face,
+            // Connection::host_src_port, etc.). Em switches simples (ex.:
+            // HP, 3com) esse mapeamento costuma ser a identidade, o que
+            // mascarava a falta dessa tradução; em switches com numeração
+            // diferente (ex.: Huawei) os dois números divergem, e sem essa
+            // tradução a porta da tabela CAM nunca casa com a porta clicada
+            // na Host Face. Se o equipamento não implementar essa tabela,
+            // cai pro valor cru (comportamento anterior).
+            $bridgePortToIfIndex = array();
+            $resBasePortIfIndex = PNMSnmp::walk($this, '.1.3.6.1.2.1.17.1.4.1.2', Yii::app()->params['cacheTtlCam']);
+            if (is_array($resBasePortIfIndex)) {
+                foreach ($resBasePortIfIndex as $key => $data) {
+                    $dt = str_replace('.1.3.6.1.2.1.17.1.4.1.2.', '', $key);
+                    $bridgePort = (int) $dt;
+                    $ifIndex = (int) str_replace('INTEGER: ', '', $data);
+                    $bridgePortToIfIndex[$bridgePort] = $ifIndex;
+                }
+            }
+
             // Q-BRIDGE-MIB (dot1qTpFdbPort): tabela CAM com VLAN, suportada pela maioria
             // dos switches gerenciáveis.
             $res = PNMSnmp::walk($this, '.1.3.6.1.2.1.17.7.1.2.2.1.2', Yii::app()->params['cacheTtlCam']);
@@ -265,6 +286,7 @@ class Host extends CActiveRecord {
 
                     $vlan_tag = $str[0];
                     $port = (int) str_replace('INTEGER: ', '', $data);
+                    $port = isset($bridgePortToIfIndex[$port]) ? $bridgePortToIfIndex[$port] : $port;
                     $mac = $this->macFromOidSuffix($str, 1);
 
                     @$this->cam_table[] = array('port' => $port, 'vlan_tag' => $vlan_tag, 'mac' => $mac);
@@ -281,6 +303,7 @@ class Host extends CActiveRecord {
                         $str = explode('.', $dt);
 
                         $port = (int) str_replace('INTEGER: ', '', $data);
+                        $port = isset($bridgePortToIfIndex[$port]) ? $bridgePortToIfIndex[$port] : $port;
                         $mac = $this->macFromOidSuffix($str, 0);
 
                         @$this->cam_table[] = array('port' => $port, 'vlan_tag' => null, 'mac' => $mac);
