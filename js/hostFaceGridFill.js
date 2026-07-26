@@ -83,12 +83,42 @@
         });
     }
 
+    var PARITY_ODD = 'odd';
+    var PARITY_EVEN = 'even';
+    var PARITY_ALL = 'all';
+
+    /**
+     * Filtra uma lista de portas (cada uma com .ifIndex) pra manter só as
+     * ímpares ou só as pares, preservando a ordem original — usado quando o
+     * switch numera fileiras físicas separadas por paridade (ex.: Huawei:
+     * fileira de cima só com portas ímpares, fileira de baixo só com pares),
+     * permitindo arrastar cada fileira como uma área 1×N separada.
+     * @param {Array<{ifIndex:(number|string)}>} ports
+     * @param {string} parity PARITY_ODD, PARITY_EVEN ou PARITY_ALL (padrão:
+     *   qualquer valor desconhecido também se comporta como "all", sem
+     *   filtrar nada).
+     * @returns {Array} nova lista filtrada, mesma ordem, mesmos objetos.
+     */
+    function filterPortsByParity(ports, parity) {
+        if (parity !== PARITY_ODD && parity !== PARITY_EVEN) {
+            return ports.slice();
+        }
+        return ports.filter(function (port) {
+            var isOdd = (parseInt(port.ifIndex, 10) % 2) === 1;
+            return parity === PARITY_ODD ? isOdd : !isOdd;
+        });
+    }
+
     var HostFaceGridFill = {
         ROW_MAJOR: ROW_MAJOR,
         COLUMN_MAJOR: COLUMN_MAJOR,
         MAX_CELLS: MAX_CELLS,
+        PARITY_ODD: PARITY_ODD,
+        PARITY_EVEN: PARITY_EVEN,
+        PARITY_ALL: PARITY_ALL,
         computeGridPositions: computeGridPositions,
-        computeCellRects: computeCellRects
+        computeCellRects: computeCellRects,
+        filterPortsByParity: filterPortsByParity
     };
 
     if (typeof module !== 'undefined' && module.exports) {

@@ -83,6 +83,35 @@ check('computeCellRects: rows/cols/order invalidos retornam null', function () {
     assert.strictEqual(HostFaceGridFill.computeCellRects(box, 2, 6, 'diagonal'), null);
 });
 
+check('filterPortsByParity: "all" retorna a lista inteira, na mesma ordem', function () {
+    var ports = [{ifIndex: 1}, {ifIndex: 2}, {ifIndex: 3}, {ifIndex: 4}];
+    var result = HostFaceGridFill.filterPortsByParity(ports, 'all');
+    assert.deepStrictEqual(result, ports);
+});
+
+check('filterPortsByParity: "odd" mantém só ifIndex ímpar, preservando a ordem', function () {
+    var ports = [{ifIndex: 1}, {ifIndex: 2}, {ifIndex: 3}, {ifIndex: 4}, {ifIndex: 5}];
+    var result = HostFaceGridFill.filterPortsByParity(ports, 'odd');
+    assert.deepStrictEqual(result.map(function (p) { return p.ifIndex; }), [1, 3, 5]);
+});
+
+check('filterPortsByParity: "even" mantém só ifIndex par, preservando a ordem', function () {
+    var ports = [{ifIndex: 1}, {ifIndex: 2}, {ifIndex: 3}, {ifIndex: 4}, {ifIndex: 5}];
+    var result = HostFaceGridFill.filterPortsByParity(ports, 'even');
+    assert.deepStrictEqual(result.map(function (p) { return p.ifIndex; }), [2, 4]);
+});
+
+check('filterPortsByParity: ifIndex como string (vindo de SNMP/DOM) também funciona', function () {
+    var ports = [{ifIndex: '1'}, {ifIndex: '2'}, {ifIndex: '3'}];
+    assert.deepStrictEqual(HostFaceGridFill.filterPortsByParity(ports, 'odd').map(function (p) { return p.ifIndex; }), ['1', '3']);
+    assert.deepStrictEqual(HostFaceGridFill.filterPortsByParity(ports, 'even').map(function (p) { return p.ifIndex; }), ['2']);
+});
+
+check('filterPortsByParity: lista vazia ou parity desconhecida não quebram', function () {
+    assert.deepStrictEqual(HostFaceGridFill.filterPortsByParity([], 'odd'), []);
+    assert.deepStrictEqual(HostFaceGridFill.filterPortsByParity([{ifIndex: 1}, {ifIndex: 2}], 'diagonal'), [{ifIndex: 1}, {ifIndex: 2}]);
+});
+
 console.log('');
 console.log(failures === 0 ? 'Todos os testes passaram.' : failures + ' teste(s) falharam.');
 process.exit(failures > 0 ? 1 : 0);

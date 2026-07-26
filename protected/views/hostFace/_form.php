@@ -51,6 +51,13 @@ $hostOptions = Host::model()->findAll();
 							<option value="column-major">Column by column</option>
 						</select>
 					</label>
+					<label>Ports:
+						<select id="hfe-fill-parity">
+							<option value="all">All</option>
+							<option value="odd">Odd only</option>
+							<option value="even">Even only</option>
+						</select>
+					</label>
 					<span id="hfe-fill-status" class="host-face-editor-fill-status" aria-live="polite"></span>
 				</div>
 

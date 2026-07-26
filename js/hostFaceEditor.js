@@ -20,7 +20,7 @@ var HostFaceEditor = (function () {
     // Campos de configuração do editor (tamanho de porta única + linhas/
     // colunas/ordem do preenchimento por área) que ficam salvos por modelo
     // de face no localStorage, pra lembrar a última configuração usada.
-    var SETTINGS_FIELD_IDS = ['hfe-port-width', 'hfe-port-height', 'hfe-fill-rows', 'hfe-fill-cols', 'hfe-fill-order'];
+    var SETTINGS_FIELD_IDS = ['hfe-port-width', 'hfe-port-height', 'hfe-fill-rows', 'hfe-fill-cols', 'hfe-fill-order', 'hfe-fill-parity'];
     var SETTINGS_STORAGE_PREFIX = 'hostFaceEditor:portSettings:';
 
     function $(id) {
@@ -471,7 +471,8 @@ var HostFaceEditor = (function () {
         return {
             rows: parseInt($('hfe-fill-rows').value, 10),
             cols: parseInt($('hfe-fill-cols').value, 10),
-            order: $('hfe-fill-order').value
+            order: $('hfe-fill-order').value,
+            parity: $('hfe-fill-parity').value
         };
     }
 
@@ -496,7 +497,7 @@ var HostFaceEditor = (function () {
         if (!rects) {
             return;
         }
-        var upcoming = availablePorts();
+        var upcoming = HostFaceGridFill.filterPortsByParity(availablePorts(), settings.parity);
 
         for (var i = 0; i < rects.length && i < upcoming.length; i++) {
             var rect = rects[i];
@@ -531,7 +532,7 @@ var HostFaceEditor = (function () {
             setFillStatus('Set valid rows/columns and a fill order first.');
             return;
         }
-        var upcoming = availablePorts();
+        var upcoming = HostFaceGridFill.filterPortsByParity(availablePorts(), settings.parity);
         if (upcoming.length < rects.length) {
             setFillStatus('Only ' + upcoming.length + ' port(s) left, cannot fill ' + rects.length + '.');
             return;
