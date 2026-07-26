@@ -271,7 +271,19 @@ var HostFaceEditor = (function () {
         el.setAttribute('draggable', 'true');
 
         el.addEventListener('dragstart', function (e) {
-            e.dataTransfer.setData('text/plain', 'move:' + port.id);
+            // Guarda o ponto exato onde o usuário clicou dentro da caixa,
+            // pra na hora do drop reposicionar mantendo esse mesmo ponto sob
+            // o mouse — igual ao "fantasma" nativo do navegador mostra
+            // durante o arraste. Sem isso, a caixa "pula" pro centro do
+            // mouse ao soltar, descolando do que a sombra indicava.
+            // offsetX/offsetY são relativos à borda do padding (dentro da
+            // border-box), mas o fantasma do navegador renderiza a
+            // border-box inteira — soma a espessura da borda de volta pra
+            // bater exatamente com o que a sombra mostra.
+            var style = getComputedStyle(el);
+            var grabOffsetX = e.offsetX + (parseFloat(style.borderLeftWidth) || 0);
+            var grabOffsetY = e.offsetY + (parseFloat(style.borderTopWidth) || 0);
+            e.dataTransfer.setData('text/plain', 'move:' + port.id + ':' + grabOffsetX + ':' + grabOffsetY);
         });
 
         el.addEventListener('click', function (e) {
@@ -293,11 +305,17 @@ var HostFaceEditor = (function () {
         var y = e.clientY - rect.top;
 
         if (data.indexOf('move:') === 0) {
-            var movingId = data.substring(5);
+            var parts = data.split(':');
+            var movingId = parts[1];
+            var grabOffsetX = parseFloat(parts[2]);
+            var grabOffsetY = parseFloat(parts[3]);
             var port = state.placedPorts.filter(function (p) { return p.id === movingId; })[0];
             if (port) {
-                port.x = Math.round(x - port.width / 2);
-                port.y = Math.round(y - port.height / 2);
+                // Mantém o mesmo ponto de agarre do dragstart sob o mouse,
+                // em vez de centralizar a caixa — assim a posição final bate
+                // com o que a sombra do arraste mostrou.
+                port.x = Math.round(x - grabOffsetX);
+                port.y = Math.round(y - grabOffsetY);
             }
         } else {
             var portId = data;
