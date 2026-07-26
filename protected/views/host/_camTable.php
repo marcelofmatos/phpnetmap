@@ -26,7 +26,7 @@ if (is_array($cam_table)) {
         'columns' => array(
             array(
                 'name' => 'port',
-                'value' => 'CHtml::link($data[\'port\'], Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host_dst\']->name)), array("title"=>"Link to: {$data[\'host_dst\']}", "name"=>"port_{$data[\'port\']}", "class"=>"portlabel"))',
+                'value' => 'CHtml::link($data[\'port_name\'] ? $data[\'port_name\'] : $data[\'port\'], Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host_dst\']->name)), array("title"=>"Link to: {$data[\'host_dst\']}", "name"=>"port_{$data[\'port\']}", "class"=>"portlabel"))',
                 'type' => 'raw',
             ),
             array(

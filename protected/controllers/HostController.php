@@ -328,10 +328,14 @@ class HostController extends Controller {
             }
 
             $model->loadCamTable();
+            // Nome da interface (ex.: "GigabitEthernet0/0/1") pra exibir na
+            // coluna "port" da tabela CAM em vez do ifIndex cru — mesma
+            // fonte (ifDescr por ifIndex) já usada na Host Face.
+            $model->loadPortsInfo(array('ifDescr'));
 
-            // TODO: associar roteadores aos switches para pegar a 
+            // TODO: associar roteadores aos switches para pegar a
             // tabela ARP dos gateways da rede
-            // 
+            //
             $gateway = Host::model()->findByPk(Yii::app()->params['hostGatewayId']);
 
             $cam_table = array();
@@ -349,6 +353,7 @@ class HostController extends Controller {
                     }
                 }
                 $ctItem['host_dst'] = ($ctItem['host'] instanceof Host) ? $model->getHostOnPort($ctItem['port']) : null;
+                $ctItem['port_name'] = isset($model->ports[$ctItem['port']]['ifDescr']) ? $model->ports[$ctItem['port']]['ifDescr'] : null;
                 $ctItem['vlan'] = Vlan::model()->findByAttributes(array('tag' => $ctItem['vlan_tag']));
                 if (!$ctItem['vlan'] instanceof Vlan) {
                     $ctItem['vlan'] = new Vlan();
