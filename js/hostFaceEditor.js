@@ -25,6 +25,9 @@ var HostFaceEditor = (function () {
     var editPanelEl = null;
     var editingPortId = null;
     var paletteQuery = '';
+    var selectedHostId = ''; // fonte da verdade do host escolhido — o campo
+    // de texto do combobox só mostra o nome, não dá pra usar seu .value
+    // como id (ver setupHostCombobox/loadHostPorts).
 
     // Campos de configuração do editor (tamanho de porta única + linhas/
     // colunas/ordem do preenchimento por área) que ficam salvos por modelo
@@ -39,7 +42,7 @@ var HostFaceEditor = (function () {
     function init(options) {
         config = options;
 
-        $('hfe-host-select').addEventListener('change', onHostChange);
+        setupHostCombobox();
         $('hfe-image-upload').addEventListener('change', onImageUpload);
         $('hfe-image-url-load').addEventListener('click', onImageUrlLoad);
         $('hfe-svg-export').addEventListener('click', onSvgExport);
@@ -182,8 +185,38 @@ var HostFaceEditor = (function () {
         });
     }
 
-    function onHostChange(e) {
-        var hostId = e.target.value;
+    // Combo filtrável do host de referência (texto + lista clicável que
+    // filtra ao digitar, ver js/portCombobox.js) no lugar de um <select>
+    // nativo — útil com muitos hosts cadastrados. O campo de texto só
+    // mostra o nome escolhido; selectedHostId é a fonte da verdade.
+    function setupHostCombobox() {
+        var container = $('hfe-host-select-combobox');
+        var input = $('hfe-host-select');
+        var items = [{id: '', name: '-- clear --', type: ''}].concat(config.hosts || []);
+
+        PortCombobox.attach(container, input, function () { return items; }, function (item) {
+            loadHostPorts(item.id);
+        }, {
+            formatLabel: function (item) {
+                return item.id && item.type ? item.name + ' (' + item.type + ')' : item.name;
+            },
+            selectValue: function (item) {
+                return item.id ? item.name : '';
+            },
+            filterItems: function (allItems, query) {
+                var q = (query || '').trim().toLowerCase();
+                if (!q) {
+                    return allItems;
+                }
+                return allItems.filter(function (item) {
+                    return item.name.toLowerCase().indexOf(q) !== -1;
+                });
+            }
+        });
+    }
+
+    function loadHostPorts(hostId) {
+        selectedHostId = hostId;
         // As portas já colocadas ficam — trocar a referência (ex.: repetir o
         // mesmo layout físico pra um switch parecido) não deve apagar o
         // trabalho já feito. As que não existirem na lista do novo host
@@ -207,7 +240,7 @@ var HostFaceEditor = (function () {
             // Se o usuário já trocou de host de novo antes desta resposta
             // chegar, ela não corresponde mais à seleção atual — descarta,
             // pra não sobrescrever com a lista de portas do host errado.
-            if ($('hfe-host-select').value !== hostId) {
+            if (selectedHostId !== hostId) {
                 return;
             }
 
@@ -232,7 +265,7 @@ var HostFaceEditor = (function () {
             renderPalette();
         };
         xhr.onerror = function () {
-            if ($('hfe-host-select').value !== hostId) {
+            if (selectedHostId !== hostId) {
                 return;
             }
             setStatus('Network error while loading ports for this host.');
@@ -246,7 +279,7 @@ var HostFaceEditor = (function () {
         var infoXhr = new XMLHttpRequest();
         infoXhr.open('GET', infoUrl, true);
         infoXhr.onload = function () {
-            if ($('hfe-host-select').value !== hostId || infoXhr.status !== 200) {
+            if (selectedHostId !== hostId || infoXhr.status !== 200) {
                 return;
             }
             var result;

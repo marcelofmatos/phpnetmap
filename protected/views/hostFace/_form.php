@@ -31,12 +31,9 @@ $hostOptions = Host::model()->findAll();
 				<h3>Ports (via SNMP)</h3>
 				<div class="host-face-editor-toolbar">
 					<label>Source host (SNMP):
-						<select id="hfe-host-select">
-							<option value="">-- select --</option>
-							<?php foreach ($hostOptions as $hostOption): ?>
-								<option value="<?php echo $hostOption->id; ?>"><?php echo CHtml::encode($hostOption->name); ?></option>
-							<?php endforeach; ?>
-						</select>
+						<span class="port-combobox" id="hfe-host-select-combobox">
+							<input type="text" id="hfe-host-select" placeholder="Type to search..." style="width:200px" />
+						</span>
 					</label>
 					<label>Port width (px): <input type="number" id="hfe-port-width" value="22" min="1" style="width:60px" /></label>
 					<label>Port height (px): <input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /></label>
@@ -126,7 +123,10 @@ $hostOptions = Host::model()->findAll();
 			loadPortInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadPortInfo/99999999')) . ',
 			loadSystemInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadSystemInfo/99999999')) . ',
 			fetchImageUrl: ' . CJSON::encode(Yii::app()->createUrl('hostFace/fetchImage')) . ',
-			existingSvg: ' . CJSON::encode($model->svg) . '
+			existingSvg: ' . CJSON::encode($model->svg) . ',
+			hosts: ' . CJSON::encode(array_map(function ($h) {
+				return array('id' => $h->id, 'name' => $h->name, 'type' => $h->type);
+			}, $hostOptions)) . '
 		});
 	', CClientScript::POS_END);
 	?>
