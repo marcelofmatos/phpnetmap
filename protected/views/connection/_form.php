@@ -72,9 +72,14 @@
 $connFormWebroot = dirname(Yii::app()->basePath);
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFacePortFilter.js?v=' . filemtime($connFormWebroot . '/js/hostFacePortFilter.js'), CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/portCombobox.js?v=' . filemtime($connFormWebroot . '/js/portCombobox.js'), CClientScript::POS_END);
-?>
-<script>
 
+// Registrado via registerScript (não uma <script> solta aqui no meio do
+// template) pra só rodar depois dos arquivos acima: POS_END junta tudo no
+// fim do body, mas Yii sempre renderiza os scriptFiles(POS_END) antes dos
+// scripts(POS_END) dessa mesma posição. Uma <script> crua aqui executaria
+// na posição em que aparece no template — bem antes disso — com
+// PortCombobox ainda indefinido (ReferenceError, os dois combos quebrados).
+Yii::app()->clientScript->registerScript('connection-port-combobox-init', '
 // Liga um combo de porta (texto + lista filtrável, ver js/portCombobox.js)
 // no campo de porta já existente (Connection_host_src_port /
 // Connection_host_dst_port) — o próprio campo continua sendo o valor
@@ -90,10 +95,10 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
         if (!hostId) {
             return;
         }
-        var portListURL = '<?php echo Yii::app()->baseUrl; ?>/host/loadPortInfo/' + hostId;
+        var portListURL = ' . CJSON::encode(Yii::app()->baseUrl . '/host/loadPortInfo/') . ' + hostId;
         d3.json(portListURL, function (json) {
             if (!json) {
-                console.warn('lista vazia de ' + portListURL);
+                console.warn("lista vazia de " + portListURL);
                 return;
             }
             ports = d3.values(json).map(function (p) {
@@ -102,7 +107,7 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
                     ifDescr: p.ifDescr,
                     ifAlias: p.ifAlias,
                     disabled: !!p.hasConnection,
-                    disabledTitle: p.hasConnection ? 'Connect to: ' + p.hasConnection.name : ''
+                    disabledTitle: p.hasConnection ? "Connect to: " + p.hasConnection.name : ""
                 };
             });
         });
@@ -110,19 +115,20 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
 
     PortCombobox.attach(combobox, portInput, function () { return ports; }, function () {}, {
         formatLabel: function (p) {
-            return p.ifIndex + ' - ' + (p.ifDescr || '') + (p.ifAlias ? ' (' + p.ifAlias + ')' : '');
+            return p.ifIndex + " - " + (p.ifDescr || "") + (p.ifAlias ? " (" + p.ifAlias + ")" : "");
         },
         selectValue: function (p) {
             return String(p.ifIndex);
         }
     });
 
-    document.getElementById(hostSelectId).addEventListener('change', function () {
+    document.getElementById(hostSelectId).addEventListener("change", function () {
         reload(this.value);
     });
     reload(document.getElementById(hostSelectId).value);
 }
 
-attachConnectionPortCombobox('Connection_host_src_id', 'Connection_host_src_port', 'Connection_host_src_port_combobox');
-attachConnectionPortCombobox('Connection_host_dst_id', 'Connection_host_dst_port', 'Connection_host_dst_port_combobox');
-</script>
+attachConnectionPortCombobox("Connection_host_src_id", "Connection_host_src_port", "Connection_host_src_port_combobox");
+attachConnectionPortCombobox("Connection_host_dst_id", "Connection_host_dst_port", "Connection_host_dst_port_combobox");
+', CClientScript::POS_END);
+?>
