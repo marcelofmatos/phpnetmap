@@ -107,6 +107,14 @@ select {
     margin-bottom: 10px;
 }
 
+.host-header-identity {
+    /* .host-type é display:block (compartilhado com as <option> do combo
+       de tipo de host, que precisam empilhar) — flex aqui força a IP a
+       ficar na mesma linha independente disso. */
+    display: flex;
+    align-items: center;
+}
+
 .host-header-ip {
     color: #999;
     margin-left: 8px;
