@@ -145,7 +145,10 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                 .width(width)
                 .height(height)
                 .tickFormat(function(d) {
-                    return d / 1000000 + " M";
+                    if (d >= 1000000000) {
+                        return (d / 1000000000) + " G";
+                    }
+                    return (d / 1000000) + " M";
                 });
 
         d3.json(portsInfoUrl, function(error, json) {
