@@ -333,8 +333,18 @@ class HostController extends Controller {
 
                 $model = $this->loadModel($id);
 
-//                $model->loadPortsInfo(array('ifHCInOctets', 'ifHCOutOctets', 'ifSpeed'));
-                $model->loadPortsInfo(array('ifInOctets', 'ifOutOctets', 'ifSpeed'));
+                // ifSpeed é um Gauge32 de 32 bits em bps — satura em
+                // ~4.29 Gbps (o equipamento reporta o valor máximo como
+                // sentinela), então mostra escala errada pra porta de 10G/
+                // 40G/100G. ifHighSpeed (Mbps) não tem esse limite. Os
+                // contadores de octeto também têm a mesma limitação — os de
+                // 32 bits (ifInOctets/ifOutOctets) dão a volta em poucos
+                // segundos numa porta rápida saturada; os HC (64 bits)
+                // praticamente nunca dão. Carrega os dois pares — o cliente
+                // (_traffic.php) prefere o de 64 bits/ifHighSpeed quando
+                // disponível, com fallback pro clássico pra equipamento sem
+                // ifXTable.
+                $model->loadPortsInfo(array('ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets', 'ifSpeed', 'ifHighSpeed'));
             }
             $this->render('jsonPortsTraffic', array(
                 'model' => $model,

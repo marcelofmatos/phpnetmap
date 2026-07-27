@@ -392,6 +392,7 @@ class Host extends CActiveRecord {
                         case "INTEGER":
                         case "Gauge32":
                         case "Counter32":
+                        case "Counter64":
                             $this->ports[$portIndex][$key] = (int) $values_match[2];
                             break;
                         default:

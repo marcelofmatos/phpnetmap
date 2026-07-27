@@ -34,6 +34,7 @@ class PNMSnmp {
         'ifOutQLen'         => '.1.3.6.1.2.1.2.2.1.21',
         'ifHCInOctets'      => '.1.3.6.1.2.1.31.1.1.1.6',
         'ifHCOutOctets'     => '.1.3.6.1.2.1.31.1.1.1.10',
+        'ifHighSpeed'       => '.1.3.6.1.2.1.31.1.1.1.15', // Mbps, sem o limite de 32 bits do ifSpeed (~4.29 Gbps)
         'ifSpecific'        => '.1.3.6.1.2.1.2.2.1.22',
         'dot1dStpPortState' => '.1.3.6.1.2.1.17.2.15.1.3', // spanning Tree
         'sysDescr'          => '.1.3.6.1.2.1.1.1.0', // system group (scalar, not a table)

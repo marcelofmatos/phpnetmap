@@ -71,28 +71,50 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                 }
             }
         }
+        // ifSpeed satura em ~4.29 Gbps (Gauge32 de 32 bits) e não representa
+        // direito porta de 10G/40G/100G; ifHighSpeed (Mbps) não tem esse
+        // limite. Mesma história pros contadores de octeto: os de 32 bits
+        // dão a volta rápido demais numa porta veloz, os HC (64 bits) não.
+        // Prefere sempre a versão sem esse limite, caindo pra clássica só se
+        // o equipamento não reportar ifXTable.
+        function octetsIn(p) {
+            return (p.ifHCInOctets !== undefined && p.ifHCInOctets !== null) ? p.ifHCInOctets : p.ifInOctets;
+        }
+        function octetsOut(p) {
+            return (p.ifHCOutOctets !== undefined && p.ifHCOutOctets !== null) ? p.ifHCOutOctets : p.ifOutOctets;
+        }
+        function speedBps(p) {
+            return p.ifHighSpeed ? p.ifHighSpeed * 1000000 : (p.ifSpeed ? p.ifSpeed : 0);
+        }
+
         function setNewData(portData) {
-            
+
             // port info
             portDataNew = getPortTraffic(portData.ifIndex);
-            
+
             if(!portDataNew) {
                 return portData;
             }
 
-            trafficIn = portData.ifInOctets ? (portDataNew.ifInOctets - portData.ifInOctets) * 8 / (portsTraffic.time - portData.time) : 0;
-            trafficOut = portData.ifOutOctets ? (portDataNew.ifOutOctets - portData.ifOutOctets) * 8 / (portsTraffic.time - portData.time) : 0;
-            speed = (portDataNew.ifSpeed) ? portDataNew.ifSpeed : 0;
+            var prevIn = octetsIn(portData);
+            var prevOut = octetsOut(portData);
+
+            trafficIn = prevIn ? (octetsIn(portDataNew) - prevIn) * 8 / (portsTraffic.time - portData.time) : 0;
+            trafficOut = prevOut ? (octetsOut(portDataNew) - prevOut) * 8 / (portsTraffic.time - portData.time) : 0;
+            speed = speedBps(portDataNew);
 
             // bullet chart info
             portData.markers = portData.measures;
             portData.measures = [Math.max(0,trafficIn), Math.max(0,trafficOut)];
             portData.ranges = [0, speed];
             portData.time = portsTraffic.time;
-            
+
             portData.ifInOctets = portDataNew.ifInOctets;
             portData.ifOutOctets = portDataNew.ifOutOctets;
+            portData.ifHCInOctets = portDataNew.ifHCInOctets;
+            portData.ifHCOutOctets = portDataNew.ifHCOutOctets;
             portData.ifSpeed = portDataNew.ifSpeed;
+            portData.ifHighSpeed = portDataNew.ifHighSpeed;
             return portData;
 
         }
