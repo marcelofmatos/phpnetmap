@@ -139,8 +139,14 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                                 showPortInfo(d.ifIndex)
                             })
                             .on("dblclick", function(d) {
-                                if(d.hasConnection) window.location.href = linkToHost(d.hasConnection);
-                                else if(d.unregisteredNeighbor) window.location.href = unregisteredNeighborUrl(d.unregisteredNeighbor);
+                                if (d.hasConnection) {
+                                    window.location.href = linkToHost(d.hasConnection);
+                                    return;
+                                }
+                                var firstUnregistered = (d.discoveredHosts || []).filter(function (n) { return !n.host; })[0];
+                                if (firstUnregistered) {
+                                    window.location.href = unregisteredNeighborUrl(firstUnregistered);
+                                }
                             });
 
                     });
@@ -213,17 +219,36 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                         .attr('class', 'view host-type ' + port.hasConnection.type)
                         .attr('href', linkToHost(port.hasConnection) )
                         .html(port.hasConnection.name);
-            } else if (connOnPort.data().length === 0 && port.unregisteredNeighbor) {
+            } else if (connOnPort.data().length === 0 && port.discoveredHosts && port.discoveredHosts.length > 0) {
                 // Só cai aqui quando o mapa não tem NENHUM host descoberto
-                // pra esta porta (senão a lista abaixo, com vlan e link por
-                // host, já cobre isso) — mostra o vizinho aprendido pela
-                // tabela CAM, sem Host cadastrado ainda, mesmo destino
-                // padronizado usado nas tabelas CAM/ARP.
-                connContainer.append('a')
-                        .attr('class', 'text-warning host-not-registered')
-                        .attr('href', unregisteredNeighborUrl(port.unregisteredNeighbor))
-                        .attr('title', 'Not registered yet — click to create this host')
-                        .html((port.unregisteredNeighbor.ip ? port.unregisteredNeighbor.ip + ' ' : '') + '(' + port.unregisteredNeighbor.mac + ') — not registered');
+                // pra esta porta (senão a lista abaixo, vinda do mapa, já
+                // cobre isso) — mostra direto o(s) host(s) aprendido(s) pela
+                // tabela CAM, cadastrados ou não, cada um com sua vlan; sem
+                // Host cadastrado usa o mesmo destino padronizado das
+                // tabelas CAM/ARP.
+                connContainer.selectAll('div')
+                        .data(port.discoveredHosts)
+                        .enter()
+                        .append('div')
+                        .each(function (d) {
+                            if (d.vlanTag) {
+                                d3.select(this).append('span')
+                                    .attr('class', 'vlan-tag')
+                                    .html('VLAN ' + d.vlanTag + ': ');
+                            }
+                            if (d.host) {
+                                d3.select(this).append('a')
+                                    .attr('class', 'view host-type ' + d.host.type)
+                                    .attr('href', linkToHost(d.host))
+                                    .html(d.host.name);
+                            } else {
+                                d3.select(this).append('a')
+                                    .attr('class', 'text-warning host-not-registered')
+                                    .attr('href', unregisteredNeighborUrl(d))
+                                    .attr('title', 'Not registered yet — click to create this host')
+                                    .html((d.ip ? d.ip + ' ' : '') + '(' + d.mac + ') — not registered');
+                            }
+                        });
             } else {
                 connContainer.selectAll('div')
                         .data(connOnPort.data())

@@ -31,6 +31,7 @@
 			<?php echo $form->textField($model,'host_src_port',array('size'=>4,'maxlength'=>100)); ?>
 		</span>
 		<span id="Connection_host_src_port_label" class="muted"></span>
+		<div id="Connection_host_src_port_discovered" class="discovered-hosts"></div>
 		<?php echo $form->error($model,'host_src_port'); ?>
 	</div>
 
@@ -51,6 +52,7 @@
 			<?php echo $form->textField($model,'host_dst_port',array('size'=>4,'maxlength'=>100)); ?>
 		</span>
 		<span id="Connection_host_dst_port_label" class="muted"></span>
+		<div id="Connection_host_dst_port_discovered" class="discovered-hosts"></div>
 		<?php echo $form->error($model,'host_dst_port'); ?>
 	</div>
 
@@ -87,18 +89,46 @@ Yii::app()->clientScript->registerScript('connection-port-combobox-init', '
 // Connection_host_dst_port) — o próprio campo continua sendo o valor
 // enviado no submit, então digitar um número de porta na mão continua
 // funcionando (ex.: switch offline, sem lista SNMP pra escolher).
-function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, labelId) {
+function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, labelId, discoveredId) {
     var ports = [];
     var portInput = document.getElementById(portInputId);
     var combobox = document.getElementById(comboboxId);
     var label = document.getElementById(labelId);
+    var discoveredEl = document.getElementById(discoveredId);
 
-    // Mostra o nome/alias da porta atualmente digitada/selecionada ao lado
-    // do campo — útil tanto ao escolher pela lista quanto pra reconhecer de
-    // cara a porta já salva ao abrir o form de edição.
+    // Mostra o nome/alias da porta atualmente digitada/selecionada, e quem a
+    // tabela CAM aponta como estando nela agora (cadastrado ou não, com
+    // vlan) — útil tanto ao escolher pela lista quanto pra reconhecer de
+    // cara a porta já salva ao abrir o form de edição, e pra conferir antes
+    // de criar a Connection que a porta certa foi escolhida.
     function updateLabel(portId) {
         var match = ports.filter(function (p) { return String(p.ifIndex) === String(portId); })[0];
         label.textContent = match ? (match.ifDescr || "") + (match.ifAlias ? " (" + match.ifAlias + ")" : "") : "";
+        renderDiscovered(match && match.discoveredHosts ? match.discoveredHosts : []);
+    }
+
+    function renderDiscovered(discoveredHosts) {
+        discoveredEl.innerHTML = "";
+        discoveredHosts.forEach(function (d) {
+            var row = document.createElement("div");
+            if (d.vlanTag) {
+                row.appendChild(document.createTextNode("VLAN " + d.vlanTag + ": "));
+            }
+            var link = document.createElement("a");
+            if (d.host) {
+                link.href = ' . CJSON::encode(Yii::app()->baseUrl . '/host/view/') . ' + encodeURIComponent(d.host.name);
+                link.textContent = d.host.name;
+            } else {
+                var params = [];
+                if (d.ip) { params.push("ip=" + encodeURIComponent(d.ip)); }
+                if (d.mac) { params.push("mac=" + encodeURIComponent(d.mac)); }
+                link.href = ' . CJSON::encode(Yii::app()->createUrl('host/viewByName')) . ' + (params.length ? "?" + params.join("&") : "");
+                link.className = "text-warning";
+                link.textContent = (d.ip ? d.ip + " " : "") + "(" + d.mac + ") — not registered";
+            }
+            row.appendChild(link);
+            discoveredEl.appendChild(row);
+        });
     }
 
     function reload(hostId) {
@@ -107,7 +137,7 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, lab
         if (!hostId) {
             return;
         }
-        var portListURL = ' . CJSON::encode(Yii::app()->baseUrl . '/host/loadPortInfo/') . ' + hostId;
+        var portListURL = ' . CJSON::encode(Yii::app()->baseUrl . '/host/loadPortInfo/') . ' + hostId + "?includeNeighbors=1";
         d3.json(portListURL, function (json) {
             if (!json) {
                 console.warn("lista vazia de " + portListURL);
@@ -119,7 +149,8 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, lab
                     ifDescr: p.ifDescr,
                     ifAlias: p.ifAlias,
                     disabled: !!p.hasConnection,
-                    disabledTitle: p.hasConnection ? "Connect to: " + p.hasConnection.name : ""
+                    disabledTitle: p.hasConnection ? "Connect to: " + p.hasConnection.name : "",
+                    discoveredHosts: p.discoveredHosts || []
                 };
             });
             updateLabel(portInput.value);
@@ -147,7 +178,7 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, lab
     reload(document.getElementById(hostSelectId).value);
 }
 
-attachConnectionPortCombobox("Connection_host_src_id", "Connection_host_src_port", "Connection_host_src_port_combobox", "Connection_host_src_port_label");
-attachConnectionPortCombobox("Connection_host_dst_id", "Connection_host_dst_port", "Connection_host_dst_port_combobox", "Connection_host_dst_port_label");
+attachConnectionPortCombobox("Connection_host_src_id", "Connection_host_src_port", "Connection_host_src_port_combobox", "Connection_host_src_port_label", "Connection_host_src_port_discovered");
+attachConnectionPortCombobox("Connection_host_dst_id", "Connection_host_dst_port", "Connection_host_dst_port_combobox", "Connection_host_dst_port_label", "Connection_host_dst_port_discovered");
 ', CClientScript::POS_END);
 ?>

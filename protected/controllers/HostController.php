@@ -389,13 +389,15 @@ class HostController extends Controller {
 
                 $model->loadPortsInfo(array('ifDescr', 'ifAlias'));
 
-                // Pra porta sem Connection formal (hasConnection), mostra o
-                // vizinho aprendido pela tabela CAM quando o MAC não tem Host
-                // cadastrado — mesmo padrão usado nas tabelas CAM/ARP, aqui
-                // no painel "Link to:" da porta. Só quando pedido
-                // explicitamente ($includeNeighbors) — essa mesma action é
-                // compartilhada com o combo de porta do Connection, o editor
-                // de Host Face e o gráfico de tráfego, que só precisam de
+                // Pra porta sem Connection formal (hasConnection), mostra os
+                // hosts aprendidos pela tabela CAM nessa porta agora —
+                // cadastrados ou não — mesmo padrão usado nas tabelas
+                // CAM/ARP, aqui no painel "Link to:" da porta e no form de
+                // Connection (conferir quem está na porta antes de criar o
+                // link). Só quando pedido explicitamente ($includeNeighbors)
+                // — essa mesma action é compartilhada com o combo de porta
+                // do Connection, o editor de Host Face e o gráfico de
+                // tráfego, que na maioria das vezes só precisam de
                 // ifDescr/ifAlias e não devem pagar o custo de outro walk
                 // SNMP completo pela tabela CAM.
                 if ($includeNeighbors) {
@@ -405,18 +407,21 @@ class HostController extends Controller {
                         if (!empty($port['hasConnection'])) {
                             continue;
                         }
+                        $discoveredHosts = array();
                         foreach ($model->cam_table as $ctItem) {
                             if ($ctItem['port'] != $portIndex || empty($ctItem['mac'])) {
                                 continue;
                             }
-                            if (Host::model()->findByAttributes(array('mac' => $ctItem['mac']))) {
-                                break; // já cadastrado, nada a fazer
-                            }
-                            $port['unregisteredNeighbor'] = array(
+                            $ctHost = Host::model()->findByAttributes(array('mac' => $ctItem['mac']));
+                            $discoveredHosts[] = array(
+                                'vlanTag' => $ctItem['vlan_tag'],
                                 'mac' => $ctItem['mac'],
-                                'ip' => ($gateway instanceof Host) ? $gateway->getIpInArpTable($ctItem['mac']) : null,
+                                'ip' => ($ctHost instanceof Host) ? $ctHost->ip : (($gateway instanceof Host) ? $gateway->getIpInArpTable($ctItem['mac']) : null),
+                                'host' => ($ctHost instanceof Host) ? array('id' => $ctHost->id, 'name' => $ctHost->name, 'type' => $ctHost->type) : null,
                             );
-                            break;
+                        }
+                        if ($discoveredHosts) {
+                            $port['discoveredHosts'] = $discoveredHosts;
                         }
                     }
                     unset($port);
