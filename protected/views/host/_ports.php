@@ -42,6 +42,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         var actionViewHostURL = '<?php echo Yii::app()->baseUrl; ?>/host/view/';
         var currentHostId = <?php echo (int) $model->id; ?>;
         var connectionCreateURL = '<?php echo Yii::app()->createUrl("connection/create"); ?>';
+        var connectionAddIconURL = '<?php echo Yii::app()->baseUrl; ?>/images/connection/add.png';
 
 
         function drawPorts(portsData){
@@ -286,7 +287,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                                         '&host_src_port=' + port.ifIndex +
                                         '&host_dst_id=' + d.target.id)
                                     .attr('title', 'Create a formal connection to this host')
-                                    .html('add connection');
+                                    .html('<img src="' + connectionAddIconURL + '" alt="" /> add connection');
                             }
                         })
             }
