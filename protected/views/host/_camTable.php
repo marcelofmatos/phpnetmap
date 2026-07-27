@@ -59,8 +59,12 @@ if (is_array($cam_table)) {
                     'create_host'=>array(
                         'label' => 'Create Host',
                         'imageUrl' => Yii::app()->request->baseUrl.'/images/host/add.png',
-                        'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[\'host\']->ip, "mac" => $data[\'mac\']))',
-                        'visible' => '! $data[\'host\']->id',
+                        // Vai pra tela de "host não cadastrado" (mostra IP/MAC e o
+                        // botão de criar já preenchido) em vez de pular direto pro
+                        // formulário cru — mesmo destino padronizado usado na
+                        // tabela ARP e no painel "Link to:" da porta.
+                        'url' => '$this->grid->controller->createUrl("host/viewByName", array("ip" => ($data[\'host\'] instanceof Host ? $data[\'host\']->ip : null), "mac" => $data[\'mac\']))',
+                        'visible' => '! ($data[\'host\'] instanceof Host && $data[\'host\']->id)',
                     ),
                 ),
             ),

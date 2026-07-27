@@ -383,6 +383,34 @@ class HostController extends Controller {
                 $model = $this->loadModel($id);
 
                 $model->loadPortsInfo(array('ifDescr', 'ifAlias'));
+
+                // Pra porta sem Connection formal (hasConnection), mostra o
+                // vizinho aprendido pela tabela CAM quando o MAC não tem Host
+                // cadastrado — mesmo padrão usado nas tabelas CAM/ARP, aqui
+                // no painel "Link to:" da porta. Só nesta chamada (carregada
+                // uma vez por página), nunca no polling de status a cada 2s
+                // (loadPortStatus), que seria pesado demais pra repetir.
+                $model->loadCamTable();
+                $gateway = Host::model()->findByPk(Yii::app()->params['hostGatewayId']);
+                foreach ($model->ports as $portIndex => &$port) {
+                    if (!empty($port['hasConnection'])) {
+                        continue;
+                    }
+                    foreach ($model->cam_table as $ctItem) {
+                        if ($ctItem['port'] != $portIndex || empty($ctItem['mac'])) {
+                            continue;
+                        }
+                        if (Host::model()->findByAttributes(array('mac' => $ctItem['mac']))) {
+                            break; // já cadastrado, nada a fazer
+                        }
+                        $port['unregisteredNeighbor'] = array(
+                            'mac' => $ctItem['mac'],
+                            'ip' => ($gateway instanceof Host) ? $gateway->getIpInArpTable($ctItem['mac']) : null,
+                        );
+                        break;
+                    }
+                }
+                unset($port);
             }
             $this->render('jsonPortsInfo', array(
                 'model' => $model,

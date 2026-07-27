@@ -131,6 +131,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                             })
                             .on("dblclick", function(d) {
                                 if(d.hasConnection) window.location.href = linkToHost(d.hasConnection);
+                                else if(d.unregisteredNeighbor) window.location.href = unregisteredNeighborUrl(d.unregisteredNeighbor);
                             });
 
                     });
@@ -203,6 +204,15 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                         .attr('class', 'view host-type ' + port.hasConnection.type)
                         .attr('href', linkToHost(port.hasConnection) )
                         .html(port.hasConnection.name);
+            } else if (port.unregisteredNeighbor) {
+                // MAC aprendido pela tabela CAM nesta porta, sem Host
+                // cadastrado ainda — mesmo destino padronizado usado nas
+                // tabelas CAM/ARP (mostra IP/MAC + botão de criar preenchido).
+                connContainer.append('a')
+                        .attr('class', 'text-warning host-not-registered')
+                        .attr('href', unregisteredNeighborUrl(port.unregisteredNeighbor))
+                        .attr('title', 'Not registered yet — click to create this host')
+                        .html((port.unregisteredNeighbor.ip ? port.unregisteredNeighbor.ip + ' ' : '') + '(' + port.unregisteredNeighbor.mac + ') — not registered');
             } else {
                 connContainer.selectAll('div')
                         .data(connOnPort.data())
@@ -236,6 +246,13 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
             } else if(host.name) {
                 return actionViewHostURL + host.name;
             }
+        }
+
+        function unregisteredNeighborUrl(neighbor) {
+            var params = [];
+            if (neighbor.ip) { params.push('ip=' + encodeURIComponent(neighbor.ip)); }
+            if (neighbor.mac) { params.push('mac=' + encodeURIComponent(neighbor.mac)); }
+            return '<?php echo Yii::app()->createUrl("host/viewByName"); ?>' + (params.length ? '?' + params.join('&') : '');
         }
 
         function setSNMPValue(obj) {
