@@ -3,9 +3,10 @@
 // portas via AJAX, drag-and-drop pro canvas, mover/remover porta já
 // posicionada, upload/URL de imagem, sincroniza o campo escondido com o
 // SVG final. Depende de js/hostFaceSvg.js (funções puras de montar/ler SVG),
-// js/hostFaceHistory.js (pilha de undo/redo, Ctrl+Z / Ctrl+Y) e
+// js/hostFaceHistory.js (pilha de undo/redo, Ctrl+Z / Ctrl+Y),
 // js/hostFacePortFilter.js (filtro de porta por texto, usado na paleta e
-// no combo de porta do modal de editar).
+// no combo do modal de editar) e js/portCombobox.js (o combo em si,
+// compartilhado com o formulário de Connection).
 
 var HostFaceEditor = (function () {
     'use strict';
@@ -545,71 +546,23 @@ var HostFaceEditor = (function () {
         return options;
     }
 
-    // Combobox simples (texto + lista clicável que filtra ao digitar), no
-    // lugar de um <select> nativo — mesma sensação da paleta, mas de escolha
-    // única. mousedown+preventDefault na opção evita que o blur do campo de
-    // texto feche a lista antes do clique registrar.
+    // Combobox de porta (texto + lista clicável que filtra ao digitar), no
+    // lugar de um <select> nativo — usa js/portCombobox.js, compartilhado
+    // com o formulário de Connection (Host Src/Dst Port).
     function buildPortCombobox(portOptions, currentPortId) {
         var wrapper = document.createElement('div');
-        wrapper.className = 'host-face-editor-combobox';
+        wrapper.className = 'port-combobox';
 
         var input = document.createElement('input');
         input.type = 'text';
-
-        var list = document.createElement('div');
-        list.className = 'host-face-editor-combobox-list';
-        list.style.display = 'none';
+        var currentInfo = portOptions.filter(function (p) { return String(p.ifIndex) === currentPortId; })[0];
+        input.value = formatPortLabel(currentInfo || {ifIndex: currentPortId});
+        wrapper.appendChild(input);
 
         var selectedId = currentPortId;
-
-        function findById(id) {
-            return portOptions.filter(function (p) { return String(p.ifIndex) === id; })[0];
-        }
-
-        function renderOptions(query) {
-            list.innerHTML = '';
-            var filtered = HostFacePortFilter.filterPortsByQuery(portOptions, query);
-            if (filtered.length === 0) {
-                var empty = document.createElement('div');
-                empty.className = 'host-face-editor-combobox-empty';
-                empty.textContent = 'No matching ports.';
-                list.appendChild(empty);
-                return;
-            }
-            filtered.forEach(function (p) {
-                var optEl = document.createElement('div');
-                optEl.className = 'host-face-editor-combobox-option';
-                optEl.textContent = formatPortLabel(p);
-                optEl.addEventListener('mousedown', function (e) {
-                    e.preventDefault();
-                    selectedId = String(p.ifIndex);
-                    input.value = formatPortLabel(p);
-                    list.style.display = 'none';
-                });
-                list.appendChild(optEl);
-            });
-        }
-
-        input.value = formatPortLabel(findById(currentPortId) || {ifIndex: currentPortId});
-        input.addEventListener('focus', function () {
-            // Ao abrir, mostra a lista inteira (o texto já preenchido é o
-            // rótulo formatado da porta atual, não uma busca) — filtrar só
-            // conforme o operador digita algo nesse campo.
-            renderOptions('');
-            list.style.display = 'block';
-            input.select();
-        });
-        input.addEventListener('input', function () {
-            renderOptions(input.value);
-            list.style.display = 'block';
-        });
-        input.addEventListener('blur', function () {
-            // Atraso pra dar tempo do mousedown da opção rodar primeiro.
-            setTimeout(function () { list.style.display = 'none'; }, 150);
-        });
-
-        wrapper.appendChild(input);
-        wrapper.appendChild(list);
+        PortCombobox.attach(wrapper, input, function () { return portOptions; }, function (port) {
+            selectedId = String(port.ifIndex);
+        }, {formatLabel: formatPortLabel});
 
         return {
             el: wrapper,

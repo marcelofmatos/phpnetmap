@@ -27,12 +27,10 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'host_src_port'); ?>
-		<?php echo $form->textField($model,'host_src_port',array('size'=>4,'maxlength'=>100)); ?>
+		<span class="port-combobox" id="Connection_host_src_port_combobox">
+			<?php echo $form->textField($model,'host_src_port',array('size'=>4,'maxlength'=>100)); ?>
+		</span>
 		<?php echo $form->error($model,'host_src_port'); ?>
-
-                <select id="Connection_host_src_id_port_list">
-                    <option> -- selecione <?php echo $form->labelEx($model,'host_src_id'); ?> -- </option>
-                </select>
 	</div>
 
 	<div class="row">
@@ -48,12 +46,10 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'host_dst_port'); ?>
-		<?php echo $form->textField($model,'host_dst_port',array('size'=>4,'maxlength'=>100)); ?>
+		<span class="port-combobox" id="Connection_host_dst_port_combobox">
+			<?php echo $form->textField($model,'host_dst_port',array('size'=>4,'maxlength'=>100)); ?>
+		</span>
 		<?php echo $form->error($model,'host_dst_port'); ?>
-            
-                <select id="Connection_host_dst_id_port_list">
-                    <option> -- selecione <?php echo $form->labelEx($model,'host_dst_id'); ?> -- </option>
-                </select>
 	</div>
 
 	<div class="row">
@@ -69,69 +65,64 @@
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+<?php
+// ?v=filemtime evita servir JS cacheado de um deploy anterior — o Apache
+// não manda Cache-Control pra esses arquivos estáticos, então o navegador
+// só busca de novo se a URL mudar.
+$connFormWebroot = dirname(Yii::app()->basePath);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFacePortFilter.js?v=' . filemtime($connFormWebroot . '/js/hostFacePortFilter.js'), CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/portCombobox.js?v=' . filemtime($connFormWebroot . '/js/portCombobox.js'), CClientScript::POS_END);
+?>
 <script>
 
-function getHostPortList(obj,portListId,portInputId) {
-    var selectHostList = d3.select(portListId);
-    var hostPortInput = d3.select(portInputId);
-    var hostId = obj.options[obj.selectedIndex].value;
-    
-    if(hostId) {
-        portListURL = '<?php echo Yii::app()->baseUrl; ?>/host/loadPortInfo/'+ hostId;
-        
-        selectHostList.selectAll("option").remove();
-        selectHostList.append("option").text('-- Carregando... --');
-        
-        
-        d3.json(portListURL, function(json) {
-            
-            if(!json) {
-                console.warn('lista vazia de '+ portListURL);
+// Liga um combo de porta (texto + lista filtrável, ver js/portCombobox.js)
+// no campo de porta já existente (Connection_host_src_port /
+// Connection_host_dst_port) — o próprio campo continua sendo o valor
+// enviado no submit, então digitar um número de porta na mão continua
+// funcionando (ex.: switch offline, sem lista SNMP pra escolher).
+function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
+    var ports = [];
+    var portInput = document.getElementById(portInputId);
+    var combobox = document.getElementById(comboboxId);
+
+    function reload(hostId) {
+        ports = [];
+        if (!hostId) {
+            return;
+        }
+        var portListURL = '<?php echo Yii::app()->baseUrl; ?>/host/loadPortInfo/' + hostId;
+        d3.json(portListURL, function (json) {
+            if (!json) {
+                console.warn('lista vazia de ' + portListURL);
+                return;
             }
-            
-            selectHostList.selectAll("option").remove();
-            //TODO: adicionar option vazia no inicio
-            //selectHostList.append("option").text('-- Selecione: --'); 
-            
-            selectHostList.selectAll("option")
-                .data(d3.values(json))
-                .enter()
-                .append("option")
-                    .text(function (d) {
-                        return d.ifIndex + ' - ' + d.ifDescr + (d.ifAlias ? ' ('+ d.ifAlias +')' : ''); 
-                    })
-                    .attr("value", function (d) { 
-                        return d.ifIndex; 
-                    })
-                    .property("selected", function (d) {
-                        return d.ifIndex == hostPortInput.property('value');
-                    })
-                    .property("disabled", function (d) {
-                        return d.hasOwnProperty('hasConnection');
-                    })
-                    .attr("title", function (d) {
-                        return d.hasConnection ? 'Connect to: '+ d.hasConnection.name : '';
-                    })
+            ports = d3.values(json).map(function (p) {
+                return {
+                    ifIndex: p.ifIndex,
+                    ifDescr: p.ifDescr,
+                    ifAlias: p.ifAlias,
+                    disabled: !!p.hasConnection,
+                    disabledTitle: p.hasConnection ? 'Connect to: ' + p.hasConnection.name : ''
+                };
+            });
         });
     }
+
+    PortCombobox.attach(combobox, portInput, function () { return ports; }, function () {}, {
+        formatLabel: function (p) {
+            return p.ifIndex + ' - ' + (p.ifDescr || '') + (p.ifAlias ? ' (' + p.ifAlias + ')' : '');
+        },
+        selectValue: function (p) {
+            return String(p.ifIndex);
+        }
+    });
+
+    document.getElementById(hostSelectId).addEventListener('change', function () {
+        reload(this.value);
+    });
+    reload(document.getElementById(hostSelectId).value);
 }
 
-function setHostPortField(obj,hostPortId) {
-    if(hostPortId) d3.select(hostPortId).property('value',obj.options[obj.selectedIndex].value);
-}
-
-function setHostPortList(obj,hostPortListId) {
-    if(hostPortListId) d3.select(hostPortListId).property('value',obj.value);
-}
-
-d3.select("#Connection_host_src_id").on("change", function() { getHostPortList(this,'#Connection_host_src_id_port_list','#Connection_host_src_port') });
-d3.select("#Connection_host_src_port").on("keyup", function() { setHostPortList(this,'#Connection_host_src_id_port_list') });
-d3.select("#Connection_host_src_id_port_list").on("change", function() { setHostPortField(this,'#Connection_host_src_port') });
-
-d3.select("#Connection_host_dst_id").on("change", function() { getHostPortList(this,'#Connection_host_dst_id_port_list','#Connection_host_dst_port') });
-d3.select("#Connection_host_dst_port").on("keyup", function() { setHostPortList(this,'#Connection_host_dst_id_port_list') });
-d3.select("#Connection_host_dst_id_port_list").on("change", function() { setHostPortField(this,'#Connection_host_dst_port') });
-
-getHostPortList(document.getElementById('Connection_host_src_id'),'#Connection_host_src_id_port_list','#Connection_host_src_port')
-getHostPortList(document.getElementById('Connection_host_dst_id'),'#Connection_host_dst_id_port_list','#Connection_host_dst_port')
+attachConnectionPortCombobox('Connection_host_src_id', 'Connection_host_src_port', 'Connection_host_src_port_combobox');
+attachConnectionPortCombobox('Connection_host_dst_id', 'Connection_host_dst_port', 'Connection_host_dst_port_combobox');
 </script>

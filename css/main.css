@@ -286,11 +286,13 @@ select {
     gap: 6px;
 }
 
-.host-face-editor-combobox {
+/* js/portCombobox.js — usado no modal de editar porta do Host Face e nos
+   campos de porta do formulário de Connection. */
+.port-combobox {
     position: relative;
 }
 
-.host-face-editor-combobox-list {
+.port-combobox-list {
     position: absolute;
     z-index: 1;
     top: 100%;
@@ -304,16 +306,22 @@ select {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.host-face-editor-combobox-option {
+.port-combobox-option {
     padding: 4px 6px;
     cursor: pointer;
 }
 
-.host-face-editor-combobox-option:hover {
+.port-combobox-option:hover {
     background: #eef4ff;
 }
 
-.host-face-editor-combobox-empty {
+.port-combobox-option-disabled {
+    padding: 4px 6px;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.port-combobox-empty {
     padding: 4px 6px;
     color: #999;
 }
