@@ -40,6 +40,8 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         var selectedPort = null;
         var allPorts = null;
         var actionViewHostURL = '<?php echo Yii::app()->baseUrl; ?>/host/view/';
+        var currentHostId = <?php echo (int) $model->id; ?>;
+        var connectionCreateURL = '<?php echo Yii::app()->createUrl("connection/create"); ?>';
 
 
         function drawPorts(portsData){
@@ -211,10 +213,12 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                         .attr('class', 'view host-type ' + port.hasConnection.type)
                         .attr('href', linkToHost(port.hasConnection) )
                         .html(port.hasConnection.name);
-            } else if (port.unregisteredNeighbor) {
-                // MAC aprendido pela tabela CAM nesta porta, sem Host
-                // cadastrado ainda — mesmo destino padronizado usado nas
-                // tabelas CAM/ARP (mostra IP/MAC + botão de criar preenchido).
+            } else if (connOnPort.data().length === 0 && port.unregisteredNeighbor) {
+                // Só cai aqui quando o mapa não tem NENHUM host descoberto
+                // pra esta porta (senão a lista abaixo, com vlan e link por
+                // host, já cobre isso) — mostra o vizinho aprendido pela
+                // tabela CAM, sem Host cadastrado ainda, mesmo destino
+                // padronizado usado nas tabelas CAM/ARP.
                 connContainer.append('a')
                         .attr('class', 'text-warning host-not-registered')
                         .attr('href', unregisteredNeighborUrl(port.unregisteredNeighbor))
@@ -240,6 +244,25 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                                 .attr('class', 'view host-type ' + d.target.type)
                                 .attr('href', linkToHost(d.target) )
                                 .html(d.target.name);
+
+                            // Host já cadastrado (id real, não hub virtual
+                            // nem vizinho ainda sem cadastro) — oferece criar
+                            // a Connection formal direto daqui. A porta de
+                            // destino não é informada: o próprio
+                            // connection/create tenta detectá-la cruzando as
+                            // tabelas CAM dos dois switches (ver
+                            // Host::detectConnectedPort()).
+                            if (d.target.id) {
+                                d3.select(this).append("a")
+                                    .attr('class', 'add-connection')
+                                    .style('margin-left', '6px')
+                                    .attr('href', connectionCreateURL +
+                                        '?host_src_id=' + currentHostId +
+                                        '&host_src_port=' + port.ifIndex +
+                                        '&host_dst_id=' + d.target.id)
+                                    .attr('title', 'Create a formal connection to this host')
+                                    .html('add connection');
+                            }
                         })
             }
             

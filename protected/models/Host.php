@@ -650,6 +650,59 @@ class Host extends CActiveRecord {
         return $result;
     }
 
+    /**
+     * Tenta descobrir automaticamente em qual porta DESTE switch está o
+     * link físico que liga a $otherHost:$otherPort — cruza a tabela CAM
+     * dos dois lados: pega o conjunto de MACs aprendidos por $otherHost
+     * naquela porta (tipicamente toda a rede a jusante, num link
+     * switch-a-switch) e procura, entre as portas deste host, aquela cujo
+     * conjunto de MACs aprendidos tem a maior interseção com esse
+     * conjunto. Só retorna um palpite quando essa porta vence com folga
+     * (sem empate no topo) — senão devolve null em vez de arriscar uma
+     * porta errada.
+     * @param Host $otherHost
+     * @param int $otherPort ifIndex da porta em $otherHost
+     * @return int|null ifIndex da porta detectada neste host, ou null
+     */
+    public function detectConnectedPort($otherHost, $otherPort) {
+        if ($this->type != Host::TYPE_SWITCH || !$this->snmp_template_id) {
+            return null;
+        }
+        if (!($otherHost instanceof Host) || $otherHost->type != Host::TYPE_SWITCH || !$otherHost->snmp_template_id) {
+            return null;
+        }
+
+        $otherHost->loadCamTable();
+        $otherMacs = array();
+        foreach ($otherHost->cam_table as $ctItem) {
+            if ($ctItem['port'] == $otherPort && !empty($ctItem['mac'])) {
+                $otherMacs[$ctItem['mac']] = true;
+            }
+        }
+        if (!$otherMacs) {
+            return null;
+        }
+
+        $this->loadCamTable();
+        $overlapByPort = array();
+        foreach ($this->cam_table as $ctItem) {
+            if (empty($ctItem['mac']) || !isset($otherMacs[$ctItem['mac']])) {
+                continue;
+            }
+            $overlapByPort[$ctItem['port']] = isset($overlapByPort[$ctItem['port']]) ? $overlapByPort[$ctItem['port']] + 1 : 1;
+        }
+        if (!$overlapByPort) {
+            return null;
+        }
+
+        arsort($overlapByPort);
+        $ports = array_keys($overlapByPort);
+        if (count($ports) > 1 && $overlapByPort[$ports[0]] == $overlapByPort[$ports[1]]) {
+            return null; // empate no topo — não arriscar um palpite errado
+        }
+        return $ports[0];
+    }
+
     public function setSNMPValue($oid, $type, $value) {
         return PNMSnmp::set($this, $oid, $type, $value);
     }

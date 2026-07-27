@@ -25,9 +25,10 @@ foreach ($hosts as $host) {
     }
     
     $array2json['nodes'][$host->name] = array(
+        'id' => $host->id, // null pra host ainda não cadastrado (ou hub virtual) — usado no painel de porta pra só oferecer "add connection" quando já existe um Host real dos dois lados.
         'name' => $host->name,
         'group' => 1, // TODO: criar grupos de hosts
-        'href' => Yii::app()->createUrl('host/viewByName', $params), 
+        'href' => Yii::app()->createUrl('host/viewByName', $params),
         'type' => $host->type,
         'mac' => $host->mac,
         'ip' => $host->ip,

@@ -86,6 +86,19 @@ class ConnectionController extends Controller
                     }
                     if(isset($_GET['host_dst_port'])) {
                             $model->host_dst_port = (int) $_GET['host_dst_port'];
+                    } else if ($model->host_src_id && $model->host_src_port && $model->host_dst_id) {
+                            // Veio do link "add connection" do painel de porta
+                            // (host descoberto via CAM table) sem a porta de
+                            // destino já conhecida — tenta detectar cruzando
+                            // as tabelas CAM dos dois switches.
+                            $hostSrc = Host::model()->findByPk($model->host_src_id);
+                            $hostDst = Host::model()->findByPk($model->host_dst_id);
+                            if ($hostDst instanceof Host && $hostSrc instanceof Host) {
+                                    $detectedPort = $hostDst->detectConnectedPort($hostSrc, $model->host_src_port);
+                                    if ($detectedPort) {
+                                            $model->host_dst_port = $detectedPort;
+                                    }
+                            }
                     }
                 }
                 
