@@ -2,7 +2,8 @@
 // Interação do editor visual de Host Face: escolher host, carregar lista de
 // portas via AJAX, drag-and-drop pro canvas, mover/remover porta já
 // posicionada, upload/URL de imagem, sincroniza o campo escondido com o
-// SVG final. Depende de js/hostFaceSvg.js (funções puras de montar/ler SVG).
+// SVG final. Depende de js/hostFaceSvg.js (funções puras de montar/ler SVG)
+// e js/hostFaceHistory.js (pilha de undo/redo, Ctrl+Z / Ctrl+Y).
 
 var HostFaceEditor = (function () {
     'use strict';
@@ -16,6 +17,7 @@ var HostFaceEditor = (function () {
         placedPorts: []     // portas já no canvas: [{id, x, y, width, height}]
     };
     var fillDrag = null;
+    var history = HostFaceHistory.createHistory();
 
     // Campos de configuração do editor (tamanho de porta única + linhas/
     // colunas/ordem do preenchimento por área) que ficam salvos por modelo
@@ -47,8 +49,76 @@ var HostFaceEditor = (function () {
             $(id).addEventListener('change', saveSettingsForCurrentName);
         });
 
+        document.addEventListener('keydown', onHistoryKeyDown);
+
         if (config.existingSvg) {
             loadExistingSvg(config.existingSvg);
+        }
+    }
+
+    // Snapshot do que o undo/redo restaura: imagem + portas colocadas.
+    // state.allPorts (lista de portas do host escolhido) fica de fora de
+    // propósito — trocar de host não entra no histórico de undo, só as
+    // ações feitas em cima da face (colocar/mover/remover porta, área de
+    // preenchimento, trocar imagem).
+    function clonePlacedPorts(ports) {
+        return ports.map(function (p) {
+            return {id: p.id, x: p.x, y: p.y, width: p.width, height: p.height};
+        });
+    }
+
+    function snapshotState() {
+        return {
+            imageDataUri: state.imageDataUri,
+            imageWidth: state.imageWidth,
+            imageHeight: state.imageHeight,
+            placedPorts: clonePlacedPorts(state.placedPorts)
+        };
+    }
+
+    function applyState(snapshot) {
+        state.imageDataUri = snapshot.imageDataUri;
+        state.imageWidth = snapshot.imageWidth;
+        state.imageHeight = snapshot.imageHeight;
+        state.placedPorts = clonePlacedPorts(snapshot.placedPorts);
+        redrawCanvas();
+        renderPalette(availablePorts());
+        syncHiddenField();
+    }
+
+    function recordHistory() {
+        history.record(snapshotState());
+    }
+
+    function undo() {
+        var previous = history.undo(snapshotState());
+        if (previous) {
+            applyState(previous);
+        }
+    }
+
+    function redo() {
+        var next = history.redo(snapshotState());
+        if (next) {
+            applyState(next);
+        }
+    }
+
+    function onHistoryKeyDown(e) {
+        var tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+            return;
+        }
+        if (!(e.ctrlKey || e.metaKey)) {
+            return;
+        }
+        var key = e.key ? e.key.toLowerCase() : '';
+        if (key === 'z' && !e.shiftKey) {
+            e.preventDefault();
+            undo();
+        } else if (key === 'y' || (key === 'z' && e.shiftKey)) {
+            e.preventDefault();
+            redo();
         }
     }
 
@@ -283,6 +353,7 @@ var HostFaceEditor = (function () {
     }
 
     function setImage(dataUri, width, height) {
+        recordHistory();
         state.imageDataUri = dataUri;
         state.imageWidth = width;
         state.imageHeight = height;
@@ -365,6 +436,7 @@ var HostFaceEditor = (function () {
 
     function onCanvasDrop(e) {
         e.preventDefault();
+        recordHistory();
         var data = e.dataTransfer.getData('text/plain');
         var wrapper = e.currentTarget;
         var rect = wrapper.getBoundingClientRect();
@@ -548,6 +620,7 @@ var HostFaceEditor = (function () {
             };
         });
 
+        recordHistory();
         state.placedPorts = state.placedPorts.concat(newPorts);
         redrawCanvas();
         renderPalette(availablePorts());
@@ -559,6 +632,7 @@ var HostFaceEditor = (function () {
     }
 
     function removePort(portId) {
+        recordHistory();
         state.placedPorts = state.placedPorts.filter(function (p) { return p.id !== portId; });
         redrawCanvas();
         renderPalette(availablePorts());

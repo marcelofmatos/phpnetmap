@@ -81,6 +81,7 @@ $hostOptions = Host::model()->findAll();
 
 			<div class="card host-face-editor-card">
 				<h3>Position the ports</h3>
+				<p class="host-face-editor-empty-hint">Ctrl+Z to undo, Ctrl+Y (or Ctrl+Shift+Z) to redo.</p>
 				<div class="host-face-editor-body">
 					<div id="hfe-canvas" class="host-face-editor-canvas">
 						<p class="host-face-editor-empty-hint">Upload or paste the URL of a switch image to get started.</p>
@@ -108,6 +109,7 @@ $hostOptions = Host::model()->findAll();
 	$hfeWebroot = dirname(Yii::app()->basePath);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceSvg.js?v=' . filemtime($hfeWebroot . '/js/hostFaceSvg.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceGridFill.js?v=' . filemtime($hfeWebroot . '/js/hostFaceGridFill.js'), CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceHistory.js?v=' . filemtime($hfeWebroot . '/js/hostFaceHistory.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js?v=' . filemtime($hfeWebroot . '/js/hostFaceEditor.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('host-face-editor-init', '
 		HostFaceEditor.init({
