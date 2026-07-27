@@ -43,8 +43,8 @@ $hostOptions = Host::model()->findAll();
 				</div>
 
 				<div class="host-face-editor-toolbar host-face-editor-fill-toolbar">
-					<label>Rows: <input type="number" id="hfe-fill-rows" min="1" placeholder="e.g. 2" style="width:50px" /></label>
-					<label>Columns: <input type="number" id="hfe-fill-cols" min="1" placeholder="e.g. 12" style="width:50px" /></label>
+					<label>Rows: <input type="number" id="hfe-fill-rows" value="1" min="1" style="width:50px" /></label>
+					<label>Columns: <input type="number" id="hfe-fill-cols" value="1" min="1" style="width:50px" /></label>
 					<label>Fill order:
 						<select id="hfe-fill-order">
 							<option value="row-major">Row by row</option>
