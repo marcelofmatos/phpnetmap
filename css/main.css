@@ -345,6 +345,24 @@ select {
     border-radius: 3px;
     cursor: grab;
     font-size: 12px;
+    max-height: 40px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease,
+        padding-top 0.3s ease, padding-bottom 0.3s ease, border-width 0.3s ease;
+}
+
+/* Recolhida pelo filtro de texto da paleta (ver applyPaletteFilter em
+   hostFaceEditor.js) — mesmo efeito do filtro de hosts do mapa (lá via
+   jQuery slideUp/slideDown), só que com transição CSS. */
+.host-face-editor-palette-item-hidden {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    pointer-events: none;
 }
 
 .host-face-editor-empty-hint {

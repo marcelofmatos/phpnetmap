@@ -6,19 +6,23 @@
 (function () {
     'use strict';
 
+    function buildSearchText(port) {
+        return ('port' + port.ifIndex + ' ' +
+            (port.ifDescr || '') + ' ' + (port.ifAlias || '')).toLowerCase();
+    }
+
     function filterPortsByQuery(ports, query) {
         var q = (query || '').trim().toLowerCase();
         if (!q) {
             return ports.slice();
         }
         return ports.filter(function (port) {
-            var haystack = ('port' + port.ifIndex + ' ' +
-                (port.ifDescr || '') + ' ' + (port.ifAlias || '')).toLowerCase();
-            return haystack.indexOf(q) !== -1;
+            return buildSearchText(port).indexOf(q) !== -1;
         });
     }
 
     var HostFacePortFilter = {
+        buildSearchText: buildSearchText,
         filterPortsByQuery: filterPortsByQuery
     };
 

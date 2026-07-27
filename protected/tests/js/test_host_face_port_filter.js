@@ -59,6 +59,14 @@ check('porta sem ifDescr/ifAlias não quebra o filtro', function () {
     assert.deepStrictEqual(HostFacePortFilter.filterPortsByQuery(ports, 'nada'), []);
 });
 
+check('buildSearchText: minúsculo e inclui ifIndex/ifDescr/ifAlias', function () {
+    assert.strictEqual(HostFacePortFilter.buildSearchText({ifIndex: 5, ifDescr: 'DSC', ifAlias: 'Uplink'}), 'port5 dsc uplink');
+});
+
+check('buildSearchText: porta sem ifDescr/ifAlias não quebra', function () {
+    assert.strictEqual(HostFacePortFilter.buildSearchText({ifIndex: 7}), 'port7  ');
+});
+
 console.log('');
 console.log(failures === 0 ? 'Todos os testes passaram.' : failures + ' teste(s) falharam.');
 process.exit(failures > 0 ? 1 : 0);

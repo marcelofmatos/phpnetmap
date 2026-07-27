@@ -43,7 +43,7 @@ var HostFaceEditor = (function () {
         $('hfe-image-url-load').addEventListener('click', onImageUrlLoad);
         $('hfe-palette-filter').addEventListener('input', function (e) {
             paletteQuery = e.target.value;
-            renderPalette();
+            applyPaletteFilter();
         });
         $('hfe-fallback-textarea').addEventListener('input', function (e) {
             $('hfe-svg-field').value = e.target.value;
@@ -288,37 +288,72 @@ var HostFaceEditor = (function () {
         return 'port' + port.ifIndex + (port.ifDescr ? ' — ' + port.ifDescr : '');
     }
 
+    // Reconstrói a lista inteira de portas disponíveis — chamado sempre que
+    // esse CONJUNTO muda (troca de host, soltar/mover/remover porta, aplicar
+    // edição, undo/redo). O filtro de texto não passa por aqui: ele só
+    // mostra/esconde os itens já montados (applyPaletteFilter), recolhendo/
+    // expandindo com transição em vez de reconstruir tudo a cada tecla —
+    // mesmo efeito do filtro de hosts do mapa (lá via jQuery slideUp/
+    // slideDown; aqui via classe CSS, já que este arquivo é JS puro).
     function renderPalette() {
         var palette = $('hfe-palette');
         palette.innerHTML = '';
 
         var available = availablePorts();
-        var ports = HostFacePortFilter.filterPortsByQuery(available, paletteQuery);
 
-        if (ports.length === 0) {
+        if (available.length === 0) {
             var hint = document.createElement('p');
             hint.className = 'host-face-editor-empty-hint';
-            if (state.allPorts.length === 0) {
-                hint.textContent = 'Choose a host above to load the port list.';
-            } else if (available.length === 0) {
-                hint.textContent = 'All ports have already been placed.';
-            } else {
-                hint.textContent = 'No ports match your filter.';
-            }
+            hint.textContent = state.allPorts.length === 0
+                ? 'Choose a host above to load the port list.'
+                : 'All ports have already been placed.';
             palette.appendChild(hint);
             return;
         }
 
-        ports.forEach(function (port) {
+        var noMatchHint = document.createElement('p');
+        noMatchHint.className = 'host-face-editor-empty-hint';
+        noMatchHint.id = 'hfe-palette-no-match-hint';
+        noMatchHint.textContent = 'No ports match your filter.';
+        noMatchHint.style.display = 'none';
+        palette.appendChild(noMatchHint);
+
+        available.forEach(function (port) {
             var item = document.createElement('div');
             item.className = 'host-face-editor-palette-item';
             item.setAttribute('draggable', 'true');
+            item.setAttribute('data-search', HostFacePortFilter.buildSearchText(port));
             item.textContent = '⣿ ' + formatPortLabel(port);
             item.addEventListener('dragstart', function (e) {
                 e.dataTransfer.setData('text/plain', String(port.ifIndex));
             });
             palette.appendChild(item);
         });
+
+        applyPaletteFilter();
+    }
+
+    // Só alterna a classe que recolhe/expande cada item já montado (ver
+    // renderPalette) conforme paletteQuery — não toca no resto do DOM, pra
+    // a transição CSS do recolher/expandir aparecer.
+    function applyPaletteFilter() {
+        var items = document.querySelectorAll('#hfe-palette .host-face-editor-palette-item');
+        if (items.length === 0) {
+            return;
+        }
+        var q = paletteQuery.trim().toLowerCase();
+        var visibleCount = 0;
+        items.forEach(function (item) {
+            var matches = !q || item.getAttribute('data-search').indexOf(q) !== -1;
+            item.classList.toggle('host-face-editor-palette-item-hidden', !matches);
+            if (matches) {
+                visibleCount++;
+            }
+        });
+        var noMatchHint = $('hfe-palette-no-match-hint');
+        if (noMatchHint) {
+            noMatchHint.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
     }
 
     function onImageUpload(e) {
