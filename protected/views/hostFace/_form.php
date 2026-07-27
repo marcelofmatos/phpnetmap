@@ -82,6 +82,11 @@ $hostOptions = Host::model()->findAll();
 			<div class="card host-face-editor-card">
 				<h3>Position the ports</h3>
 				<p class="host-face-editor-empty-hint">Ctrl+Z to undo, Ctrl+Y (or Ctrl+Shift+Z) to redo.</p>
+				<div class="host-face-editor-toolbar">
+					<button type="button" id="hfe-svg-export">Export SVG</button>
+					<label>Import SVG (e.g. edited in Inkscape): <input type="file" id="hfe-svg-import" accept=".svg,image/svg+xml" /></label>
+					<span id="hfe-svg-import-status" class="host-face-editor-empty-hint" aria-live="polite"></span>
+				</div>
 				<div class="host-face-editor-body">
 					<div id="hfe-canvas" class="host-face-editor-canvas">
 						<p class="host-face-editor-empty-hint">Upload or paste the URL of a switch image to get started.</p>

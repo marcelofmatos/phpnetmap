@@ -42,6 +42,8 @@ var HostFaceEditor = (function () {
         $('hfe-host-select').addEventListener('change', onHostChange);
         $('hfe-image-upload').addEventListener('change', onImageUpload);
         $('hfe-image-url-load').addEventListener('click', onImageUrlLoad);
+        $('hfe-svg-export').addEventListener('click', onSvgExport);
+        $('hfe-svg-import').addEventListener('change', onSvgImport);
         $('hfe-palette-filter').addEventListener('input', function (e) {
             paletteQuery = e.target.value;
             applyPaletteFilter();
@@ -425,6 +427,69 @@ var HostFaceEditor = (function () {
         redrawCanvas();
         renderPalette();
         syncHiddenField();
+    }
+
+    function setSvgImportStatus(message) {
+        $('hfe-svg-import-status').textContent = message;
+    }
+
+    function sanitizeFilename(name) {
+        var cleaned = name.replace(/[^a-z0-9_-]+/gi, '_').replace(/^_+|_+$/g, '');
+        return cleaned || 'host-face';
+    }
+
+    // Baixa o SVG completo (foto + portas) — o mesmo texto já sincronizado
+    // no campo escondido — pra edição fora daqui (ex.: Inkscape).
+    function onSvgExport() {
+        var svg = $('hfe-svg-field').value;
+        if (!svg) {
+            setSvgImportStatus('Nothing to export yet — upload an image first.');
+            return;
+        }
+        setSvgImportStatus('');
+        var blob = new Blob([svg], {type: 'image/svg+xml'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = sanitizeFilename($('HostFace_name').value.trim()) + '.svg';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    // Reimporta um SVG editado fora daqui — precisa seguir o mesmo formato
+    // que exportamos (uma <image> de fundo + <rect class="port" id="portN">
+    // por porta, ver js/hostFaceSvg.js). Entra no undo/redo como qualquer
+    // outra ação; se não bater o formato, mostra o erro e não mexe no que já
+    // estava editado.
+    function onSvgImport(e) {
+        var file = e.target.files[0];
+        e.target.value = ''; // permite reimportar o mesmo arquivo de novo depois
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            var parsed = HostFaceSvg.parseSvgToPorts(event.target.result);
+            if (!parsed) {
+                setSvgImportStatus('This SVG doesn’t match the expected format (an <image> plus rect.port elements) — could not import.');
+                return;
+            }
+            recordHistory();
+            state.imageDataUri = parsed.imageDataUri;
+            state.imageWidth = parsed.imageWidth;
+            state.imageHeight = parsed.imageHeight;
+            state.placedPorts = parsed.ports;
+            redrawCanvas();
+            renderPalette();
+            syncHiddenField();
+            setSvgImportStatus('');
+        };
+        reader.onerror = function () {
+            setSvgImportStatus('Could not read this file.');
+        };
+        reader.readAsText(file);
     }
 
     function redrawCanvas() {
