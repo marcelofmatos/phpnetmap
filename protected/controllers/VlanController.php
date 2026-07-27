@@ -196,7 +196,7 @@ class VlanController extends Controller
                     'model' => $this->loadModelByTag($tag),
                 ));
             } catch (CHttpException $e) {
-                throw new CHttpException(404,'Vlan does not exist.');
+                $this->render('vlanNotFound', array('tag' => $tag));
             }
         }
         
