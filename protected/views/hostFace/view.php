@@ -29,5 +29,14 @@ $this->menu=array(
                     'type' => 'raw',
                     'name' => 'svg',
                 ),
+		array(
+                    'name' => 'hosts',
+                    'type' => 'raw',
+                    'value' => ($model->hosts)
+                        ? implode(', ', array_map(function ($host) {
+                            return CHtml::link(CHtml::encode($host->name), array('host/viewByName', 'name' => $host->name));
+                        }, $model->hosts))
+                        : '<span class="muted">No hosts using this face.</span>',
+                ),
 	),
 )); ?>
