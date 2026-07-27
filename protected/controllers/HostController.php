@@ -374,7 +374,7 @@ class HostController extends Controller {
     /**
      * Show Port Information
      */
-    public function actionLoadPortInfo($id) {
+    public function actionLoadPortInfo($id, $includeNeighbors = false) {
         $this->layout = '//layouts/json';
 
         try {
@@ -387,30 +387,35 @@ class HostController extends Controller {
                 // Pra porta sem Connection formal (hasConnection), mostra o
                 // vizinho aprendido pela tabela CAM quando o MAC não tem Host
                 // cadastrado — mesmo padrão usado nas tabelas CAM/ARP, aqui
-                // no painel "Link to:" da porta. Só nesta chamada (carregada
-                // uma vez por página), nunca no polling de status a cada 2s
-                // (loadPortStatus), que seria pesado demais pra repetir.
-                $model->loadCamTable();
-                $gateway = Host::model()->findByPk(Yii::app()->params['hostGatewayId']);
-                foreach ($model->ports as $portIndex => &$port) {
-                    if (!empty($port['hasConnection'])) {
-                        continue;
-                    }
-                    foreach ($model->cam_table as $ctItem) {
-                        if ($ctItem['port'] != $portIndex || empty($ctItem['mac'])) {
+                // no painel "Link to:" da porta. Só quando pedido
+                // explicitamente ($includeNeighbors) — essa mesma action é
+                // compartilhada com o combo de porta do Connection, o editor
+                // de Host Face e o gráfico de tráfego, que só precisam de
+                // ifDescr/ifAlias e não devem pagar o custo de outro walk
+                // SNMP completo pela tabela CAM.
+                if ($includeNeighbors) {
+                    $model->loadCamTable();
+                    $gateway = Host::model()->findByPk(Yii::app()->params['hostGatewayId']);
+                    foreach ($model->ports as $portIndex => &$port) {
+                        if (!empty($port['hasConnection'])) {
                             continue;
                         }
-                        if (Host::model()->findByAttributes(array('mac' => $ctItem['mac']))) {
-                            break; // já cadastrado, nada a fazer
+                        foreach ($model->cam_table as $ctItem) {
+                            if ($ctItem['port'] != $portIndex || empty($ctItem['mac'])) {
+                                continue;
+                            }
+                            if (Host::model()->findByAttributes(array('mac' => $ctItem['mac']))) {
+                                break; // já cadastrado, nada a fazer
+                            }
+                            $port['unregisteredNeighbor'] = array(
+                                'mac' => $ctItem['mac'],
+                                'ip' => ($gateway instanceof Host) ? $gateway->getIpInArpTable($ctItem['mac']) : null,
+                            );
+                            break;
                         }
-                        $port['unregisteredNeighbor'] = array(
-                            'mac' => $ctItem['mac'],
-                            'ip' => ($gateway instanceof Host) ? $gateway->getIpInArpTable($ctItem['mac']) : null,
-                        );
-                        break;
                     }
+                    unset($port);
                 }
-                unset($port);
             }
             $this->render('jsonPortsInfo', array(
                 'model' => $model,

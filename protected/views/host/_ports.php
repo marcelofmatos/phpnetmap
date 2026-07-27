@@ -28,7 +28,14 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         var requestInterval = 2000;  // interface status load interval (ms)
         var requestStatus = null;
         var portStatusURL = '<?php echo Yii::app()->createUrl("host/loadPortStatus/" . $model->id); ?>';
-        var portsInfoURL = '<?php echo Yii::app()->createUrl("host/loadPortInfo/" . $model->id); ?>';
+        // includeNeighbors vai como query string literal (não via array de
+        // params do createUrl) — as urlRules deste app (ver config/main.php)
+        // não têm uma regra pra 4+ segmentos de path, então um param extra
+        // ali viraria segmento de path quebrado em vez de "?chave=valor" e
+        // a rota inteira deixaria de casar. Concatenado assim, some antes do
+        // parseUrl (só entra no PATH_INFO o "host/loadPortInfo/<id>") e o
+        // PHP popula $_GET normalmente a partir da query string de verdade.
+        var portsInfoURL = '<?php echo Yii::app()->createUrl("host/loadPortInfo/" . $model->id); ?>?includeNeighbors=1';
         var portInfoBox = null;
         var selectedPort = null;
         var allPorts = null;
