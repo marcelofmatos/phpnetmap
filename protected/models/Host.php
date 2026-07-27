@@ -297,6 +297,23 @@ class Host extends CActiveRecord {
                 // (dot1dTpFdbPort), que não tem VLAN no índice.
                 $res = PNMSnmp::walk($this, '.1.3.6.1.2.1.17.4.3.1.2', Yii::app()->params['cacheTtlCam']);
 
+                // dot1qPvid (VLAN nativa/access configurada em cada porta):
+                // sem a tabela CAM com VLAN por MAC, é a aproximação possível
+                // — certa pra porta de acesso (só uma VLAN), mas pode não
+                // bater em porta trunk com VLANs marcadas, já que aí mostra
+                // sempre a nativa da porta, não a VLAN real de cada MAC.
+                $ifIndexPvid = array();
+                $resPvid = PNMSnmp::walk($this, '.1.3.6.1.2.1.17.7.1.4.5.1.1', Yii::app()->params['cacheTtlCam']);
+                if (is_array($resPvid)) {
+                    foreach ($resPvid as $keyPvid => $dataPvid) {
+                        $bridgePortPvid = (int) str_replace('.1.3.6.1.2.1.17.7.1.4.5.1.1.', '', $keyPvid);
+                        $pvid = (int) str_replace('Gauge32: ', '', $dataPvid);
+                        if (isset($bridgePortToIfIndex[$bridgePortPvid])) {
+                            $ifIndexPvid[$bridgePortToIfIndex[$bridgePortPvid]] = $pvid;
+                        }
+                    }
+                }
+
                 if (is_array($res)) {
                     foreach ($res as $key => $data) {
                         $dt = str_replace('.1.3.6.1.2.1.17.4.3.1.2.', '', $key);
@@ -305,8 +322,9 @@ class Host extends CActiveRecord {
                         $port = (int) str_replace('INTEGER: ', '', $data);
                         $port = isset($bridgePortToIfIndex[$port]) ? $bridgePortToIfIndex[$port] : $port;
                         $mac = $this->macFromOidSuffix($str, 0);
+                        $vlan_tag = isset($ifIndexPvid[$port]) ? $ifIndexPvid[$port] : null;
 
-                        @$this->cam_table[] = array('port' => $port, 'vlan_tag' => null, 'mac' => $mac);
+                        @$this->cam_table[] = array('port' => $port, 'vlan_tag' => $vlan_tag, 'mac' => $mac);
                     }
                 }
             }
