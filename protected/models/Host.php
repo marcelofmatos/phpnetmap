@@ -314,6 +314,14 @@ class Host extends CActiveRecord {
                     }
                 }
 
+                // Alguns equipamentos (ex.: Extreme EXOS) não respondem nem
+                // ao dot1qPvid — a VLAN nativa por porta só sai pelo MIB
+                // proprietário da Extreme (EXTREME-VLAN-MIB). Mesma
+                // aproximação e mesma ressalva de porta trunk do PVID acima.
+                if (empty($ifIndexPvid)) {
+                    $ifIndexPvid = $this->loadExtremeUntaggedVlanByIfIndex($bridgePortToIfIndex);
+                }
+
                 if (is_array($res)) {
                     foreach ($res as $key => $data) {
                         $dt = str_replace('.1.3.6.1.2.1.17.4.3.1.2.', '', $key);
@@ -333,6 +341,78 @@ class Host extends CActiveRecord {
         } catch (Exception $exc) {
             throw new Exception($exc->getMessage());
         }
+    }
+
+    /**
+     * Aproxima a VLAN nativa/sem tag de cada porta em switches Extreme EXOS,
+     * via EXTREME-VLAN-MIB: extremeVlanIfVlanId dá o ID de cada VLAN (indexada
+     * por um ifIndex interno da Extreme, sem relação com o ifIndex real da
+     * porta), e extremeVlanOpaqueUntaggedPorts dá, por VLAN, uma bitmask das
+     * portas nativas/sem tag — confirmado (EXTREME-BASE-MIB) que segue a
+     * mesma convenção PortList do Q-BRIDGE-MIB: bit mais significativo de
+     * cada octeto é a porta mais baixa daquele octeto.
+     * @param array $bridgePortToIfIndex mapa dot1dBasePort => ifIndex
+     * @return array ifIndex => VLAN tag
+     */
+    private function loadExtremeUntaggedVlanByIfIndex($bridgePortToIfIndex) {
+        $ifIndexVlan = array();
+
+        $vlanIdByExtremeIfIndex = array();
+        $resVlanId = PNMSnmp::walk($this, '.1.3.6.1.4.1.1916.1.2.1.2.1.10', Yii::app()->params['cacheTtlCam']);
+        if (is_array($resVlanId)) {
+            foreach ($resVlanId as $key => $data) {
+                $extremeIfIndex = (int) str_replace('.1.3.6.1.4.1.1916.1.2.1.2.1.10.', '', $key);
+                $vlanIdByExtremeIfIndex[$extremeIfIndex] = (int) str_replace('INTEGER: ', '', $data);
+            }
+        }
+        if (empty($vlanIdByExtremeIfIndex)) {
+            return $ifIndexVlan;
+        }
+
+        $resUntagged = PNMSnmp::walk($this, '.1.3.6.1.4.1.1916.1.2.6.1.1.2', Yii::app()->params['cacheTtlCam']);
+        if (!is_array($resUntagged)) {
+            return $ifIndexVlan;
+        }
+        foreach ($resUntagged as $key => $data) {
+            $dt = str_replace('.1.3.6.1.4.1.1916.1.2.6.1.1.2.', '', $key);
+            $extremeIfIndex = (int) explode('.', $dt)[0];
+            if (!isset($vlanIdByExtremeIfIndex[$extremeIfIndex])) {
+                continue;
+            }
+            $vlanTag = $vlanIdByExtremeIfIndex[$extremeIfIndex];
+            foreach ($this->extremePortListToPortNumbers($data) as $portNumber) {
+                if (isset($bridgePortToIfIndex[$portNumber])) {
+                    $ifIndexVlan[$bridgePortToIfIndex[$portNumber]] = $vlanTag;
+                }
+            }
+        }
+
+        return $ifIndexVlan;
+    }
+
+    /**
+     * Decodifica um PortList (Hex-STRING do net-snmp, ex.: "Hex-STRING: 40 00
+     * 09 00 ...") pros números de porta com o bit ligado, na convenção
+     * "bit mais significativo de cada octeto = porta mais baixa daquele
+     * octeto" (octeto 0 = portas 1-8, octeto 1 = portas 9-16, ...).
+     * @param string $hexString valor cru retornado pelo walk do net-snmp
+     * @return array números de porta (1-based)
+     */
+    private function extremePortListToPortNumbers($hexString) {
+        $hex = trim(preg_replace('/^[^:]+:\s*/', '', $hexString));
+        $hex = preg_replace('/\s+/', ' ', $hex);
+        $bytes = array_values(array_filter(explode(' ', $hex), function ($b) { return $b !== ''; }));
+
+        $ports = array();
+        foreach ($bytes as $byteIndex => $byteHex) {
+            $byteVal = hexdec($byteHex);
+            for ($bit = 7; $bit >= 0; $bit--) {
+                if ($byteVal & (1 << $bit)) {
+                    $ports[] = $byteIndex * 8 + (7 - $bit) + 1;
+                }
+            }
+        }
+        return $ports;
     }
 
     /**
