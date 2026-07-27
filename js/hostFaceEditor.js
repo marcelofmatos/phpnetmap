@@ -374,11 +374,10 @@ var HostFaceEditor = (function () {
     }
 
     function redrawCanvas() {
-        // canvas.innerHTML='' abaixo derruba qualquer painel de edição
-        // aberto (ele vive dentro do wrapper) — limpa a referência junto
-        // pra não ficar apontando pra um nó que não existe mais.
-        editPanelEl = null;
-        editingPortId = null;
+        // Fecha qualquer painel de edição aberto — o canvas vai ser
+        // reconstruído do zero, então a porta que ele estava editando pode
+        // nem existir mais nesse novo estado (undo/redo, troca de host, etc.).
+        closeEditPanel();
 
         var canvas = $('hfe-canvas');
         canvas.innerHTML = '';
@@ -405,14 +404,9 @@ var HostFaceEditor = (function () {
         wrapper.addEventListener('mousedown', function (e) {
             onFillMouseDown(e, wrapper);
         });
-        wrapper.addEventListener('click', function (e) {
-            if (e.target === wrapper) {
-                closeEditPanel();
-            }
-        });
 
         state.placedPorts.forEach(function (port) {
-            wrapper.appendChild(buildPortElement(port, wrapper));
+            wrapper.appendChild(buildPortElement(port));
         });
 
         canvas.appendChild(wrapper);
@@ -430,7 +424,7 @@ var HostFaceEditor = (function () {
         return !state.allPorts.some(function (p) { return String(p.ifIndex) === portId; });
     }
 
-    function buildPortElement(port, wrapper) {
+    function buildPortElement(port) {
         var unmatched = isPortUnmatched(port.id);
 
         var el = document.createElement('div');
@@ -465,7 +459,7 @@ var HostFaceEditor = (function () {
             if (e.altKey) {
                 removePort(port.id);
             } else {
-                openEditPanel(port, wrapper);
+                openEditPanel(port);
             }
         });
 
@@ -507,21 +501,28 @@ var HostFaceEditor = (function () {
         editingPortId = null;
     }
 
-    function openEditPanel(port, wrapper) {
+    // Um modal fixo (fora da imagem, com fundo escurecido) em vez de um
+    // painel encaixado perto da porta clicada — numa foto de switch com
+    // portas pequenas e coladas, um painel ali por cima ficava atrás/
+    // misturado com as outras portas.
+    function openEditPanel(port) {
         closeEditPanel();
         editingPortId = port.id;
 
+        var backdrop = document.createElement('div');
+        backdrop.className = 'host-face-editor-edit-modal-backdrop';
+        backdrop.addEventListener('click', function (e) {
+            if (e.target === backdrop) {
+                closeEditPanel();
+            }
+        });
+
         var panel = document.createElement('div');
         panel.className = 'host-face-editor-edit-panel';
-        // Impede que clicar dentro do painel borbulhe pro wrapper e feche
-        // ele mesmo (o wrapper fecha o painel só quando o clique é nele).
-        panel.addEventListener('click', function (e) { e.stopPropagation(); });
-        panel.addEventListener('mousedown', function (e) { e.stopPropagation(); });
 
-        var panelWidth = 190;
-        var panelHeight = 140;
-        panel.style.left = Math.max(0, Math.min(port.x, state.imageWidth - panelWidth)) + 'px';
-        panel.style.top = Math.max(0, Math.min(port.y + port.height + 6, state.imageHeight - panelHeight)) + 'px';
+        var title = document.createElement('h4');
+        title.textContent = 'Edit port';
+        panel.appendChild(title);
 
         var portLabel = document.createElement('label');
         portLabel.textContent = 'Port:';
@@ -576,8 +577,9 @@ var HostFaceEditor = (function () {
         panel.appendChild(heightLabel);
         panel.appendChild(buttonRow);
 
-        wrapper.appendChild(panel);
-        editPanelEl = panel;
+        backdrop.appendChild(panel);
+        document.body.appendChild(backdrop);
+        editPanelEl = backdrop;
     }
 
     function applyPortEdit(originalId, newPortId, newWidthValue, newHeightValue) {
