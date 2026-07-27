@@ -2,6 +2,8 @@
 /* @var $this ConnectionController */
 /* @var $model Connection */
 /* @var $form CActiveForm */
+
+$hostOptions = Host::model()->findAll();
 ?>
 <div class="form">
 
@@ -16,12 +18,10 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'host_src_id'); ?>
-                <?php echo $form->dropDownList(
-                        $model,
-                        'host_src_id', 
-                        CHtml::listData(Host::model()->findAll(), 'id', 'name', 'type'), 
-                        array('empty'=>'')); 
-                ?>
+		<span class="port-combobox" id="Connection_host_src_id_combobox">
+			<input type="text" id="Connection_host_src_id_display" placeholder="Type to search..." style="width:200px" value="<?php echo ($model->hostSrc instanceof Host) ? CHtml::encode($model->hostSrc->name) : ''; ?>" />
+		</span>
+		<?php echo $form->hiddenField($model,'host_src_id'); ?>
 		<?php echo $form->error($model,'host_src_id'); ?>
 	</div>
 
@@ -37,12 +37,10 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'host_dst_id'); ?>
-                <?php echo $form->dropDownList(
-                        $model,
-                        'host_dst_id', 
-                        CHtml::listData(Host::model()->findAll(), 'id', 'name', 'type'), 
-                        array('empty'=>'')); 
-                ?>
+		<span class="port-combobox" id="Connection_host_dst_id_combobox">
+			<input type="text" id="Connection_host_dst_id_display" placeholder="Type to search..." style="width:200px" value="<?php echo ($model->hostDst instanceof Host) ? CHtml::encode($model->hostDst->name) : ''; ?>" />
+		</span>
+		<?php echo $form->hiddenField($model,'host_dst_id'); ?>
 		<?php echo $form->error($model,'host_dst_id'); ?>
 	</div>
 
@@ -84,6 +82,42 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/portComb
 // na posição em que aparece no template — bem antes disso — com
 // PortCombobox ainda indefinido (ReferenceError, os dois combos quebrados).
 Yii::app()->clientScript->registerScript('connection-port-combobox-init', '
+// Liga um combo de host (texto + lista filtrável, mesmo js/portCombobox.js
+// já usado pra porta) no lugar do <select> de Host Src/Dst — o texto
+// visível é só o nome escolhido; quem realmente é enviado no submit é o
+// campo escondido (Connection_host_src_id / Connection_host_dst_id).
+// Disparar um "change" nele mantém o carregamento de portas já ligado por
+// attachConnectionPortCombobox funcionando sem duplicar lógica.
+function attachConnectionHostCombobox(hiddenId, displayId, comboboxId, hosts) {
+    var hidden = document.getElementById(hiddenId);
+    var container = document.getElementById(comboboxId);
+    var input = document.getElementById(displayId);
+    var items = [{id: "", name: "-- clear --", type: ""}].concat(hosts);
+
+    PortCombobox.attach(container, input, function () { return items; }, function (item) {
+        hidden.value = item.id;
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("change", true, false);
+        hidden.dispatchEvent(evt);
+    }, {
+        formatLabel: function (item) {
+            return item.id && item.type ? item.name + " (" + item.type + ")" : item.name;
+        },
+        selectValue: function (item) {
+            return item.id ? item.name : "";
+        },
+        filterItems: function (allItems, query) {
+            var q = (query || "").trim().toLowerCase();
+            if (!q) {
+                return allItems;
+            }
+            return allItems.filter(function (item) {
+                return item.name.toLowerCase().indexOf(q) !== -1;
+            });
+        }
+    });
+}
+
 // Liga um combo de porta (texto + lista filtrável, ver js/portCombobox.js)
 // no campo de porta já existente (Connection_host_src_port /
 // Connection_host_dst_port) — o próprio campo continua sendo o valor
@@ -177,6 +211,13 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, lab
     });
     reload(document.getElementById(hostSelectId).value);
 }
+
+var connectionHosts = ' . CJSON::encode(array_map(function ($h) {
+    return array('id' => $h->id, 'name' => $h->name, 'type' => $h->type);
+}, $hostOptions)) . ';
+
+attachConnectionHostCombobox("Connection_host_src_id", "Connection_host_src_id_display", "Connection_host_src_id_combobox", connectionHosts);
+attachConnectionHostCombobox("Connection_host_dst_id", "Connection_host_dst_id_display", "Connection_host_dst_id_combobox", connectionHosts);
 
 attachConnectionPortCombobox("Connection_host_src_id", "Connection_host_src_port", "Connection_host_src_port_combobox", "Connection_host_src_port_label", "Connection_host_src_port_discovered");
 attachConnectionPortCombobox("Connection_host_dst_id", "Connection_host_dst_port", "Connection_host_dst_port_combobox", "Connection_host_dst_port_label", "Connection_host_dst_port_discovered");
