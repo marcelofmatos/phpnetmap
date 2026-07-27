@@ -59,8 +59,11 @@ class HostFaceController extends Controller
 	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 * @param integer $hostId host sem face ainda (ex.: vindo do link "create new"
+	 *   na aba Overview do host) — pré-seleciona esse host como fonte SNMP do
+	 *   editor e já marca ele na lista de hosts a associar.
 	 */
-	public function actionCreate()
+	public function actionCreate($hostId=null)
 	{
 		$model=new HostFace;
 
@@ -76,8 +79,11 @@ class HostFaceController extends Controller
                         }
 		}
 
+		$preselectedHost = (!isset($_POST['HostFace']) && $hostId) ? Host::model()->findByPk((int) $hostId) : null;
+
 		$this->render('create',array(
 			'model'=>$model,
+			'preselectedHost'=>$preselectedHost,
 		));
 	}
 

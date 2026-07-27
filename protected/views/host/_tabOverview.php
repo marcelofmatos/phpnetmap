@@ -12,6 +12,18 @@
         'ip',
         'snmpTemplate',
         array(
+            'name' => 'hostFace',
+            'type' => 'raw',
+            'value' => function ($data) {
+                if ($data->hostFace instanceof HostFace) {
+                    return CHtml::link(CHtml::encode($data->hostFace->name), array('hostFace/view', 'id' => $data->hostFace->id));
+                }
+                return '<span class="muted">Not configured</span> &mdash; ' .
+                    CHtml::link('associate existing', array('host/update', 'id' => $data->id)) . ' or ' .
+                    CHtml::link('create new', array('hostFace/create', 'hostId' => $data->id));
+            },
+        ),
+        array(
             'name' => 'InfoSerialNumber',
             'value' => function ($data) { return Host::formatSnmpInfo($data->InfoSerialNumber); },
             'type' => 'raw',

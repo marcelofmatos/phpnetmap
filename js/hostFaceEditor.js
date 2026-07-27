@@ -43,6 +43,20 @@ var HostFaceEditor = (function () {
         config = options;
 
         setupHostCombobox();
+
+        // Vindo do link "create new" na aba Overview do host (hostId na URL
+        // de hostFace/create) — já carrega as portas desse host e o painel
+        // de modelo/busca de imagem, sem precisar escolher de novo.
+        if (config.preselectedHostId) {
+            var preselected = (config.hosts || []).filter(function (h) {
+                return String(h.id) === String(config.preselectedHostId);
+            })[0];
+            if (preselected) {
+                $('hfe-host-select').value = preselected.name;
+                loadHostPorts(preselected.id);
+            }
+        }
+
         $('hfe-image-upload').addEventListener('change', onImageUpload);
         $('hfe-image-url-load').addEventListener('click', onImageUrlLoad);
         $('hfe-svg-export').addEventListener('click', onSvgExport);
@@ -304,7 +318,12 @@ var HostFaceEditor = (function () {
 
         var searchLink = $('hfe-host-info-search');
         if (info.sysDescr) {
-            searchLink.href = 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(info.sysDescr);
+            // Termos extras pra puxar foto de produto (não uma tela de
+            // gerenciamento ou diagrama), de frente (o lado com as portas,
+            // que é o que vai virar o fundo da Host Face) e em resolução alta
+            // o bastante pra recortar as portas com nitidez.
+            var searchQuery = info.sysDescr + ' front panel product photo high resolution';
+            searchLink.href = 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(searchQuery);
             searchLink.style.display = '';
         } else {
             searchLink.style.display = 'none';

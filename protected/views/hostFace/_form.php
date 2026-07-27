@@ -2,8 +2,10 @@
 /* @var $this HostFaceController */
 /* @var $model HostFace */
 /* @var $form CActiveForm */
+/* @var $preselectedHost Host|null */
 
 $hostOptions = Host::model()->findAll();
+$preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 ?>
 
 <div class="form">
@@ -126,7 +128,8 @@ $hostOptions = Host::model()->findAll();
 			existingSvg: ' . CJSON::encode($model->svg) . ',
 			hosts: ' . CJSON::encode(array_map(function ($h) {
 				return array('id' => $h->id, 'name' => $h->name, 'type' => $h->type);
-			}, $hostOptions)) . '
+			}, $hostOptions)) . ',
+			preselectedHostId: ' . CJSON::encode($preselectedHost instanceof Host ? (string) $preselectedHost->id : null) . '
 		});
 	', CClientScript::POS_END);
 	?>
@@ -135,14 +138,25 @@ $hostOptions = Host::model()->findAll();
 		<?php echo $form->labelEx($model,'hosts'); ?>
                 <?php echo $form->dropDownList(
                         $model,
-                        'hosts', 
+                        'hosts',
                         CHtml::listData($hostOptions, 'id', 'name', 'type'),
                         array(
                             'empty'=>'',
                             'multiple'=>'multiple',
                             'size' => 15,
-                            )); 
+                            ));
                 ?>
+		<?php if ($preselectedHost instanceof Host): ?>
+			<script>
+				// Marca já o host de origem escolhido (ver hostId em
+				// hostFace/create) na lista de hosts a associar — senão a
+				// face seria criada sem vínculo nenhum com ele.
+				document.addEventListener('DOMContentLoaded', function () {
+					var opt = document.querySelector('#HostFace_hosts option[value="<?php echo (int) $preselectedHost->id; ?>"]');
+					if (opt) { opt.selected = true; }
+				});
+			</script>
+		<?php endif; ?>
 		<?php echo $form->error($model,'hosts'); ?>
 	</div>
 
