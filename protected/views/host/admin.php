@@ -10,7 +10,7 @@ $this->breadcrumbs=array(
 $this->menu=array(
 	array('label'=>'List Host', 'url'=>array('index')),
 	array('label'=>'Create Host', 'url'=>array('create')),
-        array('label'=>'Manage Host Faces', 'url' => array('hostFace/index')),
+        array('label'=>'Manage Host Faces', 'url' => array('hostFace/admin')),
         array('label'=>'Fill Missing MACs', 'url' => array('fillMacFromArp')),
 );
 
