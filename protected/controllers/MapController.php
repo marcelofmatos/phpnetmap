@@ -105,14 +105,21 @@ class MapController extends Controller {
                         // host
                         $host = Host::model()->findByAttributes(array('mac' => $camHost['mac']));
                         if($host instanceof Host){
+                            // Já cadastrado — usa o registro real como está
+                            // (nome, ip, tipo), sem sobrescrever nada. Antes
+                            // disto, o nome/ip eram sempre trocados pelo ip
+                            // resolvido via ARP (ou o mac, se não resolvesse),
+                            // fazendo até um host já cadastrado aparecer no
+                            // mapa/painel "Link to:" pelo ip cru em vez do
+                            // nome cadastrado.
                             $h = $host;
                         } else {
                             $h = new Host();
                             $h->mac = $camHost['mac'];
                             $h->setTypeByMAC();
+                            $h->ip = ($gateway instanceof Host) ? $gateway->getIpInArpTable($camHost['mac']) : null;
+                            $h->name = ($h->ip) ? $h->ip : $h->mac;
                         }
-                        $h->ip = ($gateway instanceof Host) ? $gateway->getIpInArpTable($camHost['mac']) : $h->ip;
-                        $h->name = ($h->ip) ? $h->ip : $h->mac;
                         array_push($hosts, $h);
 
                         // connection
