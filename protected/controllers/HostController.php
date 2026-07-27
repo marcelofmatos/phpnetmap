@@ -344,7 +344,20 @@ class HostController extends Controller {
                 // (_traffic.php) prefere o de 64 bits/ifHighSpeed quando
                 // disponível, com fallback pro clássico pra equipamento sem
                 // ifXTable.
-                $model->loadPortsInfo(array('ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets', 'ifSpeed', 'ifHighSpeed'));
+                //
+                // cacheTtl=0 (sem cache): esses valores alimentam um cálculo
+                // de taxa no cliente (bytes/segundo entre duas leituras) e o
+                // timestamp que ele usa é sempre "agora" — servir uma
+                // leitura de até alguns segundos atrás com timestamp de
+                // agora faz a taxa calculada ficar errada (trava em zero
+                // enquanto serve do cache, depois pula pra um valor inflado
+                // quando a leitura fresca chega). O loadPortsInfo() sempre
+                // cacheou por 2s (desde o commit inicial em 2016) sem essa
+                // ressalva — endurece esse ponto por precaução (ex.: mais de
+                // uma aba/pessoa vendo o tráfego do mesmo host ao mesmo
+                // tempo), mesmo não sendo a causa do problema investigado
+                // no host "sirius" (esse foi corrigido em _traffic.php).
+                $model->loadPortsInfo(array('ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets', 'ifSpeed', 'ifHighSpeed'), 0);
             }
             $this->render('jsonPortsTraffic', array(
                 'model' => $model,

@@ -448,16 +448,19 @@ class Host extends CActiveRecord {
     /**
      *  Get ports information by SNMP
      * @param array $keys
-     * @return array 
+     * @param int $cacheTtl segundos de cache (default 2, igual ao
+     *   comportamento anterior). Passe 0 pra contador usado em cálculo de
+     *   taxa (ex.: tráfego) — ver PNMSnmp::walk().
+     * @return array
      * @throws Exception
      */
-    public function loadPortsInfo($keys) {
+    public function loadPortsInfo($keys, $cacheTtl = 2) {
 
         try {
 
             foreach ($keys as $key) {
-                
-                $resSNMPPorts = PNMSnmp::walk($this, PNMSnmp::getOid($key), 2);
+
+                $resSNMPPorts = PNMSnmp::walk($this, PNMSnmp::getOid($key), $cacheTtl);
 
                 foreach ($resSNMPPorts as $oid => $res) {
 

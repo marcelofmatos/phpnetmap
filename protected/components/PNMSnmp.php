@@ -57,9 +57,20 @@ class PNMSnmp {
     static $oid_format = SNMP_OID_OUTPUT_NUMERIC;
 
 
+    /**
+     * @param int|null $cache_ttl segundos de cache. Passe 0 pra pular o
+     *   cache totalmente (nem lê nem grava) — necessário pra contador usado
+     *   em cálculo de taxa (ex.: tráfego), onde o timestamp reportado ao
+     *   cliente é sempre "agora": servir um valor de até `cache_ttl`
+     *   segundos atrás com um timestamp de "agora" faz o cliente calcular
+     *   a taxa errada (trava em zero enquanto serve do cache, depois pula
+     *   pra um valor inflado quando a amostra fresca finalmente chega).
+     */
     static function walk($host, $object_id, $cache_ttl = null) {
-        
-        if(Yii::app()->params['cache']) {
+
+        $skipCache = ($cache_ttl === 0);
+
+        if(!$skipCache && Yii::app()->params['cache']) {
             $cache_var = str_replace('.','_',$host->ip.$object_id);
             $cache = new CacheAPC();
             $resultCache = $cache->load($cache_var);
@@ -67,7 +78,7 @@ class PNMSnmp {
                 return $resultCache;
             }
         }
-        
+
         snmp_set_oid_output_format(self::$oid_format);
 
         $snmp = $host->snmpTemplate;
@@ -89,7 +100,7 @@ class PNMSnmp {
         }
 
         if (is_array($result)) {
-            if($cache instanceof CacheAPC) {
+            if(!$skipCache && $cache instanceof CacheAPC) {
                 $cache->save($cache_var, $result, $cache_ttl);
             }
             return $result;
