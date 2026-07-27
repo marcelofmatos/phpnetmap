@@ -98,14 +98,39 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
 
             var prevIn = octetsIn(portData);
             var prevOut = octetsOut(portData);
+            var newIn = octetsIn(portDataNew);
+            var newOut = octetsOut(portDataNew);
 
-            trafficIn = prevIn ? (octetsIn(portDataNew) - prevIn) * 8 / (portsTraffic.time - portData.time) : 0;
-            trafficOut = prevOut ? (octetsOut(portDataNew) - prevOut) * 8 / (portsTraffic.time - portData.time) : 0;
+            // Alguns equipamentos (confirmado num roteador Juniper) só
+            // atualizam os próprios contadores de interface a cada ~6s,
+            // mais devagar que o nosso poll de 3s — metade das leituras
+            // chega com o contador exatamente igual à anterior. Calcular a
+            // taxa a cada poll mesmo sem mudança real faz ela oscilar entre
+            // 0 (nada mudou nesses 3s) e o dobro do valor real (quando o
+            // contador salta, o delta de ~6s inteiro é dividido pelos 3s do
+            // último poll). Em vez disso, guarda o timestamp da ÚLTIMA
+            // leitura que realmente mudou (sampleTime) e só recalcula a
+            // taxa quando o contador se move — usando o tempo decorrido
+            // desde essa última mudança de verdade, não desde o poll
+            // anterior. Enquanto não muda, mantém a taxa exibida como
+            // estava, sem zerar.
+            if (portData.sampleTime === undefined) {
+                portData.sampleTime = portData.time;
+            }
+            var changed = (prevIn !== newIn) || (prevOut !== newOut);
+
+            if (changed) {
+                var elapsed = portsTraffic.time - portData.sampleTime;
+                trafficIn = (prevIn && elapsed > 0) ? (newIn - prevIn) * 8 / elapsed : 0;
+                trafficOut = (prevOut && elapsed > 0) ? (newOut - prevOut) * 8 / elapsed : 0;
+                portData.markers = portData.measures;
+                portData.measures = [Math.max(0,trafficIn), Math.max(0,trafficOut)];
+                portData.sampleTime = portsTraffic.time;
+            }
+
             speed = speedBps(portDataNew);
 
             // bullet chart info
-            portData.markers = portData.measures;
-            portData.measures = [Math.max(0,trafficIn), Math.max(0,trafficOut)];
             portData.ranges = [0, speed];
             portData.time = portsTraffic.time;
 
