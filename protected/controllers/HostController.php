@@ -60,9 +60,14 @@ class HostController extends Controller {
      */
     public function actionViewByName($name = null, $ip = null, $mac = null) {
         try {
+            $model = $this->loadModelByName($name, $ip, $mac);
+            // column1 (sem a sidebar "Operations") só faz sentido quando o
+            // host foi encontrado — o fallback addHostNotFound abaixo
+            // depende do column2 padrão pra mostrar o botão "Create Host"
+            // (definido via $this->menu, que column1 nunca renderiza).
             $this->layout = '//layouts/column1';
             $this->render('view', array(
-                'model' => $this->loadModelByName($name, $ip, $mac),
+                'model' => $model,
             ));
         } catch (CHttpException $e) {
 
