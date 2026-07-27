@@ -2,8 +2,10 @@
 // Interação do editor visual de Host Face: escolher host, carregar lista de
 // portas via AJAX, drag-and-drop pro canvas, mover/remover porta já
 // posicionada, upload/URL de imagem, sincroniza o campo escondido com o
-// SVG final. Depende de js/hostFaceSvg.js (funções puras de montar/ler SVG)
-// e js/hostFaceHistory.js (pilha de undo/redo, Ctrl+Z / Ctrl+Y).
+// SVG final. Depende de js/hostFaceSvg.js (funções puras de montar/ler SVG),
+// js/hostFaceHistory.js (pilha de undo/redo, Ctrl+Z / Ctrl+Y) e
+// js/hostFacePortFilter.js (filtro de porta por texto, usado na paleta e
+// no combo de porta do modal de editar).
 
 var HostFaceEditor = (function () {
     'use strict';
@@ -21,6 +23,7 @@ var HostFaceEditor = (function () {
     var history = HostFaceHistory.createHistory();
     var editPanelEl = null;
     var editingPortId = null;
+    var paletteQuery = '';
 
     // Campos de configuração do editor (tamanho de porta única + linhas/
     // colunas/ordem do preenchimento por área) que ficam salvos por modelo
@@ -38,6 +41,10 @@ var HostFaceEditor = (function () {
         $('hfe-host-select').addEventListener('change', onHostChange);
         $('hfe-image-upload').addEventListener('change', onImageUpload);
         $('hfe-image-url-load').addEventListener('click', onImageUrlLoad);
+        $('hfe-palette-filter').addEventListener('input', function (e) {
+            paletteQuery = e.target.value;
+            renderPalette();
+        });
         $('hfe-fallback-textarea').addEventListener('input', function (e) {
             $('hfe-svg-field').value = e.target.value;
         });
@@ -85,7 +92,7 @@ var HostFaceEditor = (function () {
         state.imageHeight = snapshot.imageHeight;
         state.placedPorts = clonePlacedPorts(snapshot.placedPorts);
         redrawCanvas();
-        renderPalette(availablePorts());
+        renderPalette();
         syncHiddenField();
     }
 
@@ -186,7 +193,7 @@ var HostFaceEditor = (function () {
         $('hfe-host-info').style.display = 'none';
 
         if (!hostId) {
-            renderPalette([]);
+            renderPalette();
             return;
         }
 
@@ -219,7 +226,7 @@ var HostFaceEditor = (function () {
             state.allPorts = result;
             state.hostPortsLoaded = true;
             redrawCanvas();
-            renderPalette(availablePorts());
+            renderPalette();
         };
         xhr.onerror = function () {
             if ($('hfe-host-select').value !== hostId) {
@@ -277,16 +284,27 @@ var HostFaceEditor = (function () {
         });
     }
 
-    function renderPalette(ports) {
+    function formatPortLabel(port) {
+        return 'port' + port.ifIndex + (port.ifDescr ? ' — ' + port.ifDescr : '');
+    }
+
+    function renderPalette() {
         var palette = $('hfe-palette');
         palette.innerHTML = '';
+
+        var available = availablePorts();
+        var ports = HostFacePortFilter.filterPortsByQuery(available, paletteQuery);
 
         if (ports.length === 0) {
             var hint = document.createElement('p');
             hint.className = 'host-face-editor-empty-hint';
-            hint.textContent = state.allPorts.length === 0
-                ? 'Choose a host above to load the port list.'
-                : 'All ports have already been placed.';
+            if (state.allPorts.length === 0) {
+                hint.textContent = 'Choose a host above to load the port list.';
+            } else if (available.length === 0) {
+                hint.textContent = 'All ports have already been placed.';
+            } else {
+                hint.textContent = 'No ports match your filter.';
+            }
             palette.appendChild(hint);
             return;
         }
@@ -295,7 +313,7 @@ var HostFaceEditor = (function () {
             var item = document.createElement('div');
             item.className = 'host-face-editor-palette-item';
             item.setAttribute('draggable', 'true');
-            item.textContent = '⣿ port' + port.ifIndex + (port.ifDescr ? ' — ' + port.ifDescr : '');
+            item.textContent = '⣿ ' + formatPortLabel(port);
             item.addEventListener('dragstart', function (e) {
                 e.dataTransfer.setData('text/plain', String(port.ifIndex));
             });
@@ -369,7 +387,7 @@ var HostFaceEditor = (function () {
         state.imageHeight = height;
         state.placedPorts = [];
         redrawCanvas();
-        renderPalette(availablePorts());
+        renderPalette();
         syncHiddenField();
     }
 
@@ -469,15 +487,14 @@ var HostFaceEditor = (function () {
     // Opções do combo de porta ao editar: a porta atual (mesmo que o host
     // escolhido não a reconheça mais) primeiro, depois as ainda disponíveis
     // do host escolhido — nunca lista uma porta já usada por OUTRA caixa.
+    // Devolve porta "crua" ({ifIndex, ifDescr, ...}), mesmo formato usado na
+    // paleta, pra reaproveitar formatPortLabel/HostFacePortFilter.
     function buildPortEditOptions(currentPortId) {
         var options = [];
         var seen = {};
 
         var currentInfo = state.allPorts.filter(function (p) { return String(p.ifIndex) === currentPortId; })[0];
-        options.push({
-            id: currentPortId,
-            label: 'port' + currentPortId + (currentInfo && currentInfo.ifDescr ? ' — ' + currentInfo.ifDescr : '')
-        });
+        options.push(currentInfo || {ifIndex: currentPortId});
         seen[currentPortId] = true;
 
         availablePorts().forEach(function (p) {
@@ -486,11 +503,83 @@ var HostFaceEditor = (function () {
                 return;
             }
             seen[id] = true;
-            options.push({id: id, label: 'port' + p.ifIndex + (p.ifDescr ? ' — ' + p.ifDescr : '')});
+            options.push(p);
         });
 
-        options.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });
+        options.sort(function (a, b) { return parseInt(a.ifIndex, 10) - parseInt(b.ifIndex, 10); });
         return options;
+    }
+
+    // Combobox simples (texto + lista clicável que filtra ao digitar), no
+    // lugar de um <select> nativo — mesma sensação da paleta, mas de escolha
+    // única. mousedown+preventDefault na opção evita que o blur do campo de
+    // texto feche a lista antes do clique registrar.
+    function buildPortCombobox(portOptions, currentPortId) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'host-face-editor-combobox';
+
+        var input = document.createElement('input');
+        input.type = 'text';
+
+        var list = document.createElement('div');
+        list.className = 'host-face-editor-combobox-list';
+        list.style.display = 'none';
+
+        var selectedId = currentPortId;
+
+        function findById(id) {
+            return portOptions.filter(function (p) { return String(p.ifIndex) === id; })[0];
+        }
+
+        function renderOptions(query) {
+            list.innerHTML = '';
+            var filtered = HostFacePortFilter.filterPortsByQuery(portOptions, query);
+            if (filtered.length === 0) {
+                var empty = document.createElement('div');
+                empty.className = 'host-face-editor-combobox-empty';
+                empty.textContent = 'No matching ports.';
+                list.appendChild(empty);
+                return;
+            }
+            filtered.forEach(function (p) {
+                var optEl = document.createElement('div');
+                optEl.className = 'host-face-editor-combobox-option';
+                optEl.textContent = formatPortLabel(p);
+                optEl.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    selectedId = String(p.ifIndex);
+                    input.value = formatPortLabel(p);
+                    list.style.display = 'none';
+                });
+                list.appendChild(optEl);
+            });
+        }
+
+        input.value = formatPortLabel(findById(currentPortId) || {ifIndex: currentPortId});
+        input.addEventListener('focus', function () {
+            // Ao abrir, mostra a lista inteira (o texto já preenchido é o
+            // rótulo formatado da porta atual, não uma busca) — filtrar só
+            // conforme o operador digita algo nesse campo.
+            renderOptions('');
+            list.style.display = 'block';
+            input.select();
+        });
+        input.addEventListener('input', function () {
+            renderOptions(input.value);
+            list.style.display = 'block';
+        });
+        input.addEventListener('blur', function () {
+            // Atraso pra dar tempo do mousedown da opção rodar primeiro.
+            setTimeout(function () { list.style.display = 'none'; }, 150);
+        });
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(list);
+
+        return {
+            el: wrapper,
+            getSelectedId: function () { return selectedId; }
+        };
     }
 
     function closeEditPanel() {
@@ -526,17 +615,8 @@ var HostFaceEditor = (function () {
 
         var portLabel = document.createElement('label');
         portLabel.textContent = 'Port:';
-        var portSelect = document.createElement('select');
-        buildPortEditOptions(port.id).forEach(function (opt) {
-            var optionEl = document.createElement('option');
-            optionEl.value = opt.id;
-            optionEl.textContent = opt.label;
-            if (opt.id === port.id) {
-                optionEl.selected = true;
-            }
-            portSelect.appendChild(optionEl);
-        });
-        portLabel.appendChild(portSelect);
+        var portCombobox = buildPortCombobox(buildPortEditOptions(port.id), port.id);
+        portLabel.appendChild(portCombobox.el);
 
         var widthLabel = document.createElement('label');
         widthLabel.textContent = 'Width (px):';
@@ -561,7 +641,7 @@ var HostFaceEditor = (function () {
         applyBtn.type = 'button';
         applyBtn.textContent = 'Apply';
         applyBtn.addEventListener('click', function () {
-            applyPortEdit(port.id, portSelect.value, widthInput.value, heightInput.value);
+            applyPortEdit(port.id, portCombobox.getSelectedId(), widthInput.value, heightInput.value);
         });
 
         var cancelBtn = document.createElement('button');
@@ -600,7 +680,7 @@ var HostFaceEditor = (function () {
         port.height = height;
 
         redrawCanvas();
-        renderPalette(availablePorts());
+        renderPalette();
         syncHiddenField();
     }
 
@@ -640,7 +720,7 @@ var HostFaceEditor = (function () {
         }
 
         redrawCanvas();
-        renderPalette(availablePorts());
+        renderPalette();
         syncHiddenField();
     }
 
@@ -793,7 +873,7 @@ var HostFaceEditor = (function () {
         recordHistory();
         state.placedPorts = state.placedPorts.concat(newPorts);
         redrawCanvas();
-        renderPalette(availablePorts());
+        renderPalette();
         syncHiddenField();
     }
 
@@ -805,7 +885,7 @@ var HostFaceEditor = (function () {
         recordHistory();
         state.placedPorts = state.placedPorts.filter(function (p) { return p.id !== portId; });
         redrawCanvas();
-        renderPalette(availablePorts());
+        renderPalette();
         syncHiddenField();
     }
 

@@ -86,8 +86,11 @@ $hostOptions = Host::model()->findAll();
 					<div id="hfe-canvas" class="host-face-editor-canvas">
 						<p class="host-face-editor-empty-hint">Upload or paste the URL of a switch image to get started.</p>
 					</div>
-					<div id="hfe-palette" class="host-face-editor-palette">
-						<p class="host-face-editor-empty-hint">Choose a host above to load the port list.</p>
+					<div class="host-face-editor-palette-wrapper">
+						<input type="text" id="hfe-palette-filter" class="host-face-editor-palette-filter" placeholder="Filter by name..." />
+						<div id="hfe-palette" class="host-face-editor-palette">
+							<p class="host-face-editor-empty-hint">Choose a host above to load the port list.</p>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -110,6 +113,7 @@ $hostOptions = Host::model()->findAll();
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceSvg.js?v=' . filemtime($hfeWebroot . '/js/hostFaceSvg.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceGridFill.js?v=' . filemtime($hfeWebroot . '/js/hostFaceGridFill.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceHistory.js?v=' . filemtime($hfeWebroot . '/js/hostFaceHistory.js'), CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFacePortFilter.js?v=' . filemtime($hfeWebroot . '/js/hostFacePortFilter.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js?v=' . filemtime($hfeWebroot . '/js/hostFaceEditor.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('host-face-editor-init', '
 		HostFaceEditor.init({

@@ -252,7 +252,7 @@ select {
 }
 
 .host-face-editor-edit-panel {
-    width: 220px;
+    width: 240px;
     padding: 12px;
     background: #fff;
     border: 1px solid #ccc;
@@ -286,9 +286,52 @@ select {
     gap: 6px;
 }
 
-.host-face-editor-palette {
+.host-face-editor-combobox {
+    position: relative;
+}
+
+.host-face-editor-combobox-list {
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 160px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.host-face-editor-combobox-option {
+    padding: 4px 6px;
+    cursor: pointer;
+}
+
+.host-face-editor-combobox-option:hover {
+    background: #eef4ff;
+}
+
+.host-face-editor-combobox-empty {
+    padding: 4px 6px;
+    color: #999;
+}
+
+.host-face-editor-palette-wrapper {
     flex: 1;
     min-width: 160px;
+}
+
+.host-face-editor-palette-filter {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 6px;
+    padding: 4px 6px;
+    font-size: 12px;
+}
+
+.host-face-editor-palette {
     border: 1px solid #ddd;
     padding: 10px;
     max-height: 400px;
