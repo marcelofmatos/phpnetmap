@@ -30,6 +30,7 @@
 		<span class="port-combobox" id="Connection_host_src_port_combobox">
 			<?php echo $form->textField($model,'host_src_port',array('size'=>4,'maxlength'=>100)); ?>
 		</span>
+		<span id="Connection_host_src_port_label" class="muted"></span>
 		<?php echo $form->error($model,'host_src_port'); ?>
 	</div>
 
@@ -49,6 +50,7 @@
 		<span class="port-combobox" id="Connection_host_dst_port_combobox">
 			<?php echo $form->textField($model,'host_dst_port',array('size'=>4,'maxlength'=>100)); ?>
 		</span>
+		<span id="Connection_host_dst_port_label" class="muted"></span>
 		<?php echo $form->error($model,'host_dst_port'); ?>
 	</div>
 
@@ -85,13 +87,23 @@ Yii::app()->clientScript->registerScript('connection-port-combobox-init', '
 // Connection_host_dst_port) — o próprio campo continua sendo o valor
 // enviado no submit, então digitar um número de porta na mão continua
 // funcionando (ex.: switch offline, sem lista SNMP pra escolher).
-function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
+function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId, labelId) {
     var ports = [];
     var portInput = document.getElementById(portInputId);
     var combobox = document.getElementById(comboboxId);
+    var label = document.getElementById(labelId);
+
+    // Mostra o nome/alias da porta atualmente digitada/selecionada ao lado
+    // do campo — útil tanto ao escolher pela lista quanto pra reconhecer de
+    // cara a porta já salva ao abrir o form de edição.
+    function updateLabel(portId) {
+        var match = ports.filter(function (p) { return String(p.ifIndex) === String(portId); })[0];
+        label.textContent = match ? (match.ifDescr || "") + (match.ifAlias ? " (" + match.ifAlias + ")" : "") : "";
+    }
 
     function reload(hostId) {
         ports = [];
+        updateLabel(portInput.value);
         if (!hostId) {
             return;
         }
@@ -110,10 +122,13 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
                     disabledTitle: p.hasConnection ? "Connect to: " + p.hasConnection.name : ""
                 };
             });
+            updateLabel(portInput.value);
         });
     }
 
-    PortCombobox.attach(combobox, portInput, function () { return ports; }, function () {}, {
+    PortCombobox.attach(combobox, portInput, function () { return ports; }, function (p) {
+        updateLabel(p.ifIndex);
+    }, {
         formatLabel: function (p) {
             return p.ifIndex + " - " + (p.ifDescr || "") + (p.ifAlias ? " (" + p.ifAlias + ")" : "");
         },
@@ -122,13 +137,17 @@ function attachConnectionPortCombobox(hostSelectId, portInputId, comboboxId) {
         }
     });
 
+    portInput.addEventListener("input", function () {
+        updateLabel(portInput.value);
+    });
+
     document.getElementById(hostSelectId).addEventListener("change", function () {
         reload(this.value);
     });
     reload(document.getElementById(hostSelectId).value);
 }
 
-attachConnectionPortCombobox("Connection_host_src_id", "Connection_host_src_port", "Connection_host_src_port_combobox");
-attachConnectionPortCombobox("Connection_host_dst_id", "Connection_host_dst_port", "Connection_host_dst_port_combobox");
+attachConnectionPortCombobox("Connection_host_src_id", "Connection_host_src_port", "Connection_host_src_port_combobox", "Connection_host_src_port_label");
+attachConnectionPortCombobox("Connection_host_dst_id", "Connection_host_dst_port", "Connection_host_dst_port_combobox", "Connection_host_dst_port_label");
 ', CClientScript::POS_END);
 ?>
