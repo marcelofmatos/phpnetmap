@@ -232,6 +232,44 @@ select {
     color: #003366;
 }
 
+.host-face-editor-port-unmatched {
+    border-color: #d9534f;
+    background-color: rgba(217, 83, 79, 0.15);
+    color: #a94442;
+}
+
+.host-face-editor-edit-panel {
+    position: absolute;
+    z-index: 10;
+    width: 190px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+    cursor: default;
+}
+
+.host-face-editor-edit-panel label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.host-face-editor-edit-panel select,
+.host-face-editor-edit-panel input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 2px;
+}
+
+.host-face-editor-edit-panel-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
 .host-face-editor-palette {
     flex: 1;
     min-width: 160px;

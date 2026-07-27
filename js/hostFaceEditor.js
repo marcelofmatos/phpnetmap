@@ -14,10 +14,13 @@ var HostFaceEditor = (function () {
         imageWidth: 0,
         imageHeight: 0,
         allPorts: [],       // portas do host escolhido: [{ifIndex, ifDescr, ifAlias}]
-        placedPorts: []     // portas já no canvas: [{id, x, y, width, height}]
+        placedPorts: [],    // portas já no canvas: [{id, x, y, width, height}]
+        hostPortsLoaded: false // true só depois de allPorts vir com sucesso de um host escolhido
     };
     var fillDrag = null;
     var history = HostFaceHistory.createHistory();
+    var editPanelEl = null;
+    var editingPortId = null;
 
     // Campos de configuração do editor (tamanho de porta única + linhas/
     // colunas/ordem do preenchimento por área) que ficam salvos por modelo
@@ -171,8 +174,13 @@ var HostFaceEditor = (function () {
 
     function onHostChange(e) {
         var hostId = e.target.value;
+        // As portas já colocadas ficam — trocar a referência (ex.: repetir o
+        // mesmo layout físico pra um switch parecido) não deve apagar o
+        // trabalho já feito. As que não existirem na lista do novo host
+        // ficam marcadas com borda vermelha (ver isPortUnmatched), pra dar
+        // pra corrigir uma a uma clicando pra editar.
         state.allPorts = [];
-        state.placedPorts = [];
+        state.hostPortsLoaded = false;
         redrawCanvas();
         syncHiddenField();
         $('hfe-host-info').style.display = 'none';
@@ -209,6 +217,8 @@ var HostFaceEditor = (function () {
                 return;
             }
             state.allPorts = result;
+            state.hostPortsLoaded = true;
+            redrawCanvas();
             renderPalette(availablePorts());
         };
         xhr.onerror = function () {
@@ -364,6 +374,12 @@ var HostFaceEditor = (function () {
     }
 
     function redrawCanvas() {
+        // canvas.innerHTML='' abaixo derruba qualquer painel de edição
+        // aberto (ele vive dentro do wrapper) — limpa a referência junto
+        // pra não ficar apontando pra um nó que não existe mais.
+        editPanelEl = null;
+        editingPortId = null;
+
         var canvas = $('hfe-canvas');
         canvas.innerHTML = '';
 
@@ -389,22 +405,42 @@ var HostFaceEditor = (function () {
         wrapper.addEventListener('mousedown', function (e) {
             onFillMouseDown(e, wrapper);
         });
+        wrapper.addEventListener('click', function (e) {
+            if (e.target === wrapper) {
+                closeEditPanel();
+            }
+        });
 
         state.placedPorts.forEach(function (port) {
-            wrapper.appendChild(buildPortElement(port));
+            wrapper.appendChild(buildPortElement(port, wrapper));
         });
 
         canvas.appendChild(wrapper);
     }
 
-    function buildPortElement(port) {
+    // Uma porta colocada é "sem referência" quando já sabemos as portas reais
+    // do host escolhido (hostPortsLoaded) e o ifIndex dela não está mais
+    // nessa lista — ex.: trocou a referência pra outro switch com menos
+    // portas, ou a numeração mudou. Sem host escolhido ainda, não dá pra
+    // afirmar nada, então nenhuma porta é marcada.
+    function isPortUnmatched(portId) {
+        if (!state.hostPortsLoaded) {
+            return false;
+        }
+        return !state.allPorts.some(function (p) { return String(p.ifIndex) === portId; });
+    }
+
+    function buildPortElement(port, wrapper) {
+        var unmatched = isPortUnmatched(port.id);
+
         var el = document.createElement('div');
-        el.className = 'host-face-editor-port';
+        el.className = 'host-face-editor-port' + (unmatched ? ' host-face-editor-port-unmatched' : '');
         el.style.left = port.x + 'px';
         el.style.top = port.y + 'px';
         el.style.width = port.width + 'px';
         el.style.height = port.height + 'px';
-        el.title = 'port' + port.id + ' (drag to move, Alt+click to remove)';
+        el.title = 'port' + port.id + ' (drag to move, click to edit, Alt+click to remove)' +
+            (unmatched ? ' — no port with this ifIndex on the selected switch' : '');
         el.textContent = port.id;
         el.setAttribute('draggable', 'true');
 
@@ -425,13 +461,145 @@ var HostFaceEditor = (function () {
         });
 
         el.addEventListener('click', function (e) {
+            e.stopPropagation();
             if (e.altKey) {
-                e.stopPropagation();
                 removePort(port.id);
+            } else {
+                openEditPanel(port, wrapper);
             }
         });
 
         return el;
+    }
+
+    // Opções do combo de porta ao editar: a porta atual (mesmo que o host
+    // escolhido não a reconheça mais) primeiro, depois as ainda disponíveis
+    // do host escolhido — nunca lista uma porta já usada por OUTRA caixa.
+    function buildPortEditOptions(currentPortId) {
+        var options = [];
+        var seen = {};
+
+        var currentInfo = state.allPorts.filter(function (p) { return String(p.ifIndex) === currentPortId; })[0];
+        options.push({
+            id: currentPortId,
+            label: 'port' + currentPortId + (currentInfo && currentInfo.ifDescr ? ' — ' + currentInfo.ifDescr : '')
+        });
+        seen[currentPortId] = true;
+
+        availablePorts().forEach(function (p) {
+            var id = String(p.ifIndex);
+            if (seen[id]) {
+                return;
+            }
+            seen[id] = true;
+            options.push({id: id, label: 'port' + p.ifIndex + (p.ifDescr ? ' — ' + p.ifDescr : '')});
+        });
+
+        options.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });
+        return options;
+    }
+
+    function closeEditPanel() {
+        if (editPanelEl) {
+            editPanelEl.remove();
+        }
+        editPanelEl = null;
+        editingPortId = null;
+    }
+
+    function openEditPanel(port, wrapper) {
+        closeEditPanel();
+        editingPortId = port.id;
+
+        var panel = document.createElement('div');
+        panel.className = 'host-face-editor-edit-panel';
+        // Impede que clicar dentro do painel borbulhe pro wrapper e feche
+        // ele mesmo (o wrapper fecha o painel só quando o clique é nele).
+        panel.addEventListener('click', function (e) { e.stopPropagation(); });
+        panel.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+
+        var panelWidth = 190;
+        var panelHeight = 140;
+        panel.style.left = Math.max(0, Math.min(port.x, state.imageWidth - panelWidth)) + 'px';
+        panel.style.top = Math.max(0, Math.min(port.y + port.height + 6, state.imageHeight - panelHeight)) + 'px';
+
+        var portLabel = document.createElement('label');
+        portLabel.textContent = 'Port:';
+        var portSelect = document.createElement('select');
+        buildPortEditOptions(port.id).forEach(function (opt) {
+            var optionEl = document.createElement('option');
+            optionEl.value = opt.id;
+            optionEl.textContent = opt.label;
+            if (opt.id === port.id) {
+                optionEl.selected = true;
+            }
+            portSelect.appendChild(optionEl);
+        });
+        portLabel.appendChild(portSelect);
+
+        var widthLabel = document.createElement('label');
+        widthLabel.textContent = 'Width (px):';
+        var widthInput = document.createElement('input');
+        widthInput.type = 'number';
+        widthInput.min = '1';
+        widthInput.value = port.width;
+        widthLabel.appendChild(widthInput);
+
+        var heightLabel = document.createElement('label');
+        heightLabel.textContent = 'Height (px):';
+        var heightInput = document.createElement('input');
+        heightInput.type = 'number';
+        heightInput.min = '1';
+        heightInput.value = port.height;
+        heightLabel.appendChild(heightInput);
+
+        var buttonRow = document.createElement('div');
+        buttonRow.className = 'host-face-editor-edit-panel-buttons';
+
+        var applyBtn = document.createElement('button');
+        applyBtn.type = 'button';
+        applyBtn.textContent = 'Apply';
+        applyBtn.addEventListener('click', function () {
+            applyPortEdit(port.id, portSelect.value, widthInput.value, heightInput.value);
+        });
+
+        var cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', closeEditPanel);
+
+        buttonRow.appendChild(applyBtn);
+        buttonRow.appendChild(cancelBtn);
+
+        panel.appendChild(portLabel);
+        panel.appendChild(widthLabel);
+        panel.appendChild(heightLabel);
+        panel.appendChild(buttonRow);
+
+        wrapper.appendChild(panel);
+        editPanelEl = panel;
+    }
+
+    function applyPortEdit(originalId, newPortId, newWidthValue, newHeightValue) {
+        var width = parseInt(newWidthValue, 10);
+        var height = parseInt(newHeightValue, 10);
+        if (!width || width < 1 || !height || height < 1) {
+            return;
+        }
+        var port = state.placedPorts.filter(function (p) { return p.id === originalId; })[0];
+        if (!port) {
+            closeEditPanel();
+            return;
+        }
+
+        recordHistory();
+        port.id = newPortId;
+        port.width = width;
+        port.height = height;
+
+        redrawCanvas();
+        renderPalette(availablePorts());
+        syncHiddenField();
     }
 
     function onCanvasDrop(e) {
