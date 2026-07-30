@@ -30,70 +30,103 @@ $preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 
 		<div id="host-face-editor">
 			<div class="card host-face-editor-card">
-				<h3>Ports (via SNMP)</h3>
-				<div class="host-face-editor-toolbar">
-					<label>Source host (SNMP):
-						<span class="port-combobox" id="hfe-host-select-combobox">
-							<input type="text" id="hfe-host-select" placeholder="Type to search..." style="width:200px" />
-						</span>
-					</label>
-					<label>Port width (px): <input type="number" id="hfe-port-width" value="22" min="1" style="width:60px" /></label>
-					<label>Port height (px): <input type="number" id="hfe-port-height" value="18" min="1" style="width:60px" /></label>
-				</div>
-
-				<div class="host-face-editor-toolbar host-face-editor-fill-toolbar">
-					<label>Rows: <input type="number" id="hfe-fill-rows" value="1" min="1" style="width:50px" /></label>
-					<label>Columns: <input type="number" id="hfe-fill-cols" value="1" min="1" style="width:50px" /></label>
-					<label>Fill order:
-						<select id="hfe-fill-order">
-							<option value="row-major">Row by row</option>
-							<option value="column-major">Column by column</option>
-						</select>
-					</label>
-					<label>Ports:
-						<select id="hfe-fill-parity">
-							<option value="all">All</option>
-							<option value="odd">Odd only</option>
-							<option value="even">Even only</option>
-						</select>
-					</label>
-					<span id="hfe-fill-status" class="host-face-editor-fill-status" aria-live="polite"></span>
-				</div>
-
-				<div id="hfe-host-info" class="host-face-editor-host-info" style="display:none">
-					<p><strong>System name:</strong> <span id="hfe-host-info-sysname"></span></p>
-					<p><strong>System description:</strong> <span id="hfe-host-info-sysdescr"></span></p>
-					<p><strong>IP:</strong> <span id="hfe-host-info-ip"></span></p>
-					<a id="hfe-host-info-search" href="#" target="_blank" rel="noopener">Search images for this model</a>
-				</div>
-			</div>
-
-			<div class="card host-face-editor-card">
 				<h3>Equipment photo</h3>
 				<div class="host-face-editor-image-source">
-					<label>Upload image: <input type="file" id="hfe-image-upload" accept="image/*" /></label>
-					<label>or image URL: <input type="text" id="hfe-image-url" style="width:300px" placeholder="https://..." /></label>
-					<button type="button" id="hfe-image-url-load">Load</button>
+					<span class="host-face-editor-file-btn">
+						<input type="file" id="hfe-image-upload" accept="image/*" />
+						<label for="hfe-image-upload" class="btn btn-default btn-sm">🖼️ Upload image</label>
+					</span>
+					<label class="host-face-editor-field host-face-editor-field-wide">
+						<span class="host-face-editor-field-label">or image URL</span>
+						<input type="text" id="hfe-image-url" class="form-control input-sm" style="width:300px" placeholder="https://..." />
+					</label>
+					<button type="button" id="hfe-image-url-load" class="btn btn-default btn-sm">🔗 Load</button>
 					<span id="hfe-image-status"></span>
 				</div>
 			</div>
 
 			<div class="card host-face-editor-card">
-				<h3>Position the ports</h3>
+				<h3>Ports &amp; Positioning</h3>
 				<p class="host-face-editor-empty-hint">Ctrl+Z to undo, Ctrl+Y (or Ctrl+Shift+Z) to redo.</p>
-				<div class="host-face-editor-toolbar">
-					<button type="button" id="hfe-svg-export">Export SVG</button>
-					<label>Import SVG (e.g. edited in Inkscape): <input type="file" id="hfe-svg-import" accept=".svg,image/svg+xml" /></label>
-					<span id="hfe-svg-import-status" class="host-face-editor-empty-hint" aria-live="polite"></span>
-				</div>
-				<div class="host-face-editor-body">
-					<div id="hfe-canvas" class="host-face-editor-canvas">
-						<p class="host-face-editor-empty-hint">Upload or paste the URL of a switch image to get started.</p>
+
+				<div class="host-face-editor-workspace">
+					<div class="host-face-editor-workspace-canvas-col">
+						<div class="host-face-editor-toolbar host-face-editor-svg-toolbar">
+							<button type="button" id="hfe-svg-export" class="btn btn-default btn-sm">⬇️ Export SVG</button>
+							<span class="host-face-editor-file-btn">
+								<input type="file" id="hfe-svg-import" accept=".svg,image/svg+xml" />
+								<label for="hfe-svg-import" class="btn btn-default btn-sm">⬆️ Import SVG</label>
+							</span>
+							<span id="hfe-svg-import-status" class="host-face-editor-empty-hint" aria-live="polite"></span>
+						</div>
+						<div id="hfe-canvas" class="host-face-editor-canvas">
+							<p class="host-face-editor-empty-hint">Upload or paste the URL of a switch image to get started.</p>
+						</div>
 					</div>
-					<div class="host-face-editor-palette-wrapper">
-						<input type="text" id="hfe-palette-filter" class="host-face-editor-palette-filter" placeholder="Filter by name..." />
-						<div id="hfe-palette" class="host-face-editor-palette">
-							<p class="host-face-editor-empty-hint">Choose a host above to load the port list.</p>
+
+					<div class="host-face-editor-workspace-sidebar">
+						<div class="host-face-editor-toolbar">
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Source host (SNMP)</span>
+								<span class="port-combobox" id="hfe-host-select-combobox">
+									<input type="text" id="hfe-host-select" class="form-control input-sm" placeholder="Type to search..." />
+								</span>
+							</label>
+							<div class="host-face-editor-field-row">
+								<label class="host-face-editor-field">
+									<span class="host-face-editor-field-label">Port width (px)</span>
+									<input type="number" id="hfe-port-width" class="form-control input-sm" value="22" min="1" />
+								</label>
+								<label class="host-face-editor-field">
+									<span class="host-face-editor-field-label">Port height (px)</span>
+									<input type="number" id="hfe-port-height" class="form-control input-sm" value="18" min="1" />
+								</label>
+							</div>
+						</div>
+
+						<div class="host-face-editor-toolbar host-face-editor-fill-toolbar">
+							<div class="host-face-editor-field-row">
+								<label class="host-face-editor-field">
+									<span class="host-face-editor-field-label">Rows</span>
+									<input type="number" id="hfe-fill-rows" class="form-control input-sm" value="1" min="1" />
+								</label>
+								<label class="host-face-editor-field">
+									<span class="host-face-editor-field-label">Columns</span>
+									<input type="number" id="hfe-fill-cols" class="form-control input-sm" value="1" min="1" />
+								</label>
+							</div>
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Fill order</span>
+								<select id="hfe-fill-order" class="form-control input-sm">
+									<option value="row-major">Row by row</option>
+									<option value="column-major">Column by column</option>
+								</select>
+							</label>
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Ports</span>
+								<select id="hfe-fill-parity" class="form-control input-sm">
+									<option value="all">All</option>
+									<option value="odd">Odd only</option>
+									<option value="even">Even only</option>
+								</select>
+							</label>
+							<span id="hfe-fill-status" class="host-face-editor-fill-status" aria-live="polite"></span>
+						</div>
+
+						<div id="hfe-host-info" class="host-face-editor-host-info" style="display:none">
+							<div class="host-face-editor-host-info-row">
+								<span class="host-face-editor-host-info-item"><span class="host-face-editor-field-label">System name</span> <span id="hfe-host-info-sysname"></span></span>
+								<span class="host-face-editor-host-info-item"><span class="host-face-editor-field-label">IP</span> <span id="hfe-host-info-ip"></span></span>
+							</div>
+							<p class="host-face-editor-host-info-sysdescr"><span class="host-face-editor-field-label">System description</span> <span id="hfe-host-info-sysdescr"></span></p>
+							<a id="hfe-host-info-search" href="#" target="_blank" rel="noopener">Search images for this model</a>
+						</div>
+
+						<div class="host-face-editor-palette-wrapper">
+							<input type="text" id="hfe-palette-filter" class="host-face-editor-palette-filter" placeholder="Filter by name..." />
+							<div id="hfe-palette" class="host-face-editor-palette">
+								<p class="host-face-editor-empty-hint">Choose a host above to load the port list.</p>
+							</div>
 						</div>
 					</div>
 				</div>

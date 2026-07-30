@@ -314,6 +314,7 @@ var HostFaceEditor = (function () {
         var fallback = 'not reported via SNMP';
         $('hfe-host-info-sysname').textContent = info.sysName || fallback;
         $('hfe-host-info-sysdescr').textContent = info.sysDescr || fallback;
+        $('hfe-host-info-sysdescr').title = info.sysDescr || '';
         $('hfe-host-info-ip').textContent = info.ip || fallback;
 
         var searchLink = $('hfe-host-info-search');
