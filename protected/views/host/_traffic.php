@@ -2,20 +2,6 @@
 if ($model instanceof Host && !empty($model->snmpTemplate)):
 
     ?>
-    <style type="text/css">
-        .bullet { font: 10px sans-serif; }
-        .bullet .marker { stroke-width: 2px; }
-        .bullet .marker.s0 { stroke: #274902; background-color: #274902; }
-        .bullet .marker.s1 { stroke: #12125B; background-color: #12125B; }
-        .bullet .tick line { stroke: #666; stroke-width: .5px; }
-        .bullet .range.s0 { fill: #ddd; }
-        .bullet .range.s1 { fill: #ccc; }
-        .bullet .range.s2 { fill: #bbb; }
-        .bullet .measure.s0 { fill: #5FB404; background-color: #5FB404; }
-        .bullet .measure.s1 { fill: #2E2EFE; background-color: #2E2EFE; }
-        .bullet .title { font-size: 12px; font-weight: bold; }
-        .bullet .subtitle { font-size: 12px; fill: #333; }
-    </style>
     <div style="float:right">
         <input id="ckbxRefreshTraffic" type="checkbox" onclick="ajaxLoadStatus = this.checked" checked="checked" /> 
         <label for="ckbxRefreshTraffic" class="inline">refresh</label>
@@ -32,6 +18,8 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
     <div id="trafficmap" class="well" style="width: 800px; margin-top: 20px;"></div>
 
     <script type="text/javascript" src="<?php echo Yii::app()->createUrl("/js/d3/bullet.js") ?>">
+    </script>
+    <script type="text/javascript" src="<?php echo Yii::app()->createUrl("/js/portTraffic.js") ?>">
     </script>
     <script type="text/javascript">
 
@@ -71,77 +59,9 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                 }
             }
         }
-        // ifSpeed satura em ~4.29 Gbps (Gauge32 de 32 bits) e não representa
-        // direito porta de 10G/40G/100G; ifHighSpeed (Mbps) não tem esse
-        // limite. Mesma história pros contadores de octeto: os de 32 bits
-        // dão a volta rápido demais numa porta veloz, os HC (64 bits) não.
-        // Prefere sempre a versão sem esse limite, caindo pra clássica só se
-        // o equipamento não reportar ifXTable.
-        function octetsIn(p) {
-            return (p.ifHCInOctets !== undefined && p.ifHCInOctets !== null) ? p.ifHCInOctets : p.ifInOctets;
-        }
-        function octetsOut(p) {
-            return (p.ifHCOutOctets !== undefined && p.ifHCOutOctets !== null) ? p.ifHCOutOctets : p.ifOutOctets;
-        }
-        function speedBps(p) {
-            return p.ifHighSpeed ? p.ifHighSpeed * 1000000 : (p.ifSpeed ? p.ifSpeed : 0);
-        }
-
         function setNewData(portData) {
-
-            // port info
-            portDataNew = getPortTraffic(portData.ifIndex);
-
-            if(!portDataNew) {
-                return portData;
-            }
-
-            var prevIn = octetsIn(portData);
-            var prevOut = octetsOut(portData);
-            var newIn = octetsIn(portDataNew);
-            var newOut = octetsOut(portDataNew);
-
-            // Alguns equipamentos (confirmado num roteador Juniper) só
-            // atualizam os próprios contadores de interface a cada ~6s,
-            // mais devagar que o nosso poll de 3s — metade das leituras
-            // chega com o contador exatamente igual à anterior. Calcular a
-            // taxa a cada poll mesmo sem mudança real faz ela oscilar entre
-            // 0 (nada mudou nesses 3s) e o dobro do valor real (quando o
-            // contador salta, o delta de ~6s inteiro é dividido pelos 3s do
-            // último poll). Em vez disso, guarda o timestamp da ÚLTIMA
-            // leitura que realmente mudou (sampleTime) e só recalcula a
-            // taxa quando o contador se move — usando o tempo decorrido
-            // desde essa última mudança de verdade, não desde o poll
-            // anterior. Enquanto não muda, mantém a taxa exibida como
-            // estava, sem zerar.
-            if (portData.sampleTime === undefined) {
-                portData.sampleTime = portData.time;
-            }
-            var changed = (prevIn !== newIn) || (prevOut !== newOut);
-
-            if (changed) {
-                var elapsed = portsTraffic.time - portData.sampleTime;
-                trafficIn = (prevIn && elapsed > 0) ? (newIn - prevIn) * 8 / elapsed : 0;
-                trafficOut = (prevOut && elapsed > 0) ? (newOut - prevOut) * 8 / elapsed : 0;
-                portData.markers = portData.measures;
-                portData.measures = [Math.max(0,trafficIn), Math.max(0,trafficOut)];
-                portData.sampleTime = portsTraffic.time;
-            }
-
-            speed = speedBps(portDataNew);
-
-            // bullet chart info
-            portData.ranges = [0, speed];
-            portData.time = portsTraffic.time;
-
-            portData.ifInOctets = portDataNew.ifInOctets;
-            portData.ifOutOctets = portDataNew.ifOutOctets;
-            portData.ifHCInOctets = portDataNew.ifHCInOctets;
-            portData.ifHCOutOctets = portDataNew.ifHCOutOctets;
-            portData.ifSpeed = portDataNew.ifSpeed;
-            portData.ifHighSpeed = portDataNew.ifHighSpeed;
-            return portData;
-
+            var portDataNew = getPortTraffic(portData.ifIndex);
+            return PortTraffic.updateSample(portData, portDataNew, portsTraffic.time);
         }
 
         function setIfAliasSNMP(d) {

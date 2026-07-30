@@ -552,6 +552,29 @@ table.items th:first-child
     float: left;
 }
 
+/* .btn/.btn-mini (Bootstrap) já dão a aparência de botão — restaura só o que
+   a regra genérica "#connections a" acima (display/padding/font-size) tem
+   especificidade suficiente pra sobrescrever. */
+#connections a.add-connection {
+    display: inline-block;
+    padding: 0 6px;
+    font-size: 10.5px;
+}
+
+/* traffic bullet chart (host Traffic page + port panel graph) */
+.bullet { font: 10px sans-serif; }
+.bullet .marker { stroke-width: 2px; }
+.bullet .marker.s0 { stroke: #274902; background-color: #274902; }
+.bullet .marker.s1 { stroke: #12125B; background-color: #12125B; }
+.bullet .tick line { stroke: #666; stroke-width: .5px; }
+.bullet .range.s0 { fill: #ddd; }
+.bullet .range.s1 { fill: #ccc; }
+.bullet .range.s2 { fill: #bbb; }
+.bullet .measure.s0 { fill: #5FB404; background-color: #5FB404; }
+.bullet .measure.s1 { fill: #2E2EFE; background-color: #2E2EFE; }
+.bullet .title { font-size: 12px; font-weight: bold; }
+.bullet .subtitle { font-size: 12px; fill: #333; }
+
 #portInfoBox {
     display: none;
     width: 100%;

@@ -21,6 +21,9 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
     </div>
 
 
+    <script type="text/javascript" src="<?php echo Yii::app()->createUrl("/js/d3/bullet.js") ?>"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->createUrl("/js/portTraffic.js") ?>"></script>
+
     <script type="text/javascript">
         // load interfaces status
         var ajaxLoadStatus = true; // load status by ajax
@@ -43,6 +46,25 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         var currentHostId = <?php echo (int) $model->id; ?>;
         var connectionCreateURL = '<?php echo Yii::app()->createUrl("connection/create"); ?>';
         var connectionAddIconURL = '<?php echo Yii::app()->baseUrl; ?>/images/connection/add.png';
+
+        // traffic graph (bullet chart) for the port currently shown in portInfoBox
+        var portTrafficURL = '<?php echo Yii::app()->createUrl("host/loadPortTraffic/" . $model->id); ?>';
+        var portTrafficInterval = 3000; // same poll cadence as the full Traffic page (host/_traffic.php)
+        var portTrafficMargin = {top: 2, right: 20, bottom: 20, left: 180};
+        var portTrafficWidth = 300;
+        var portTrafficHeight = 18;
+        var portTrafficChart = d3.bullet()
+                .width(portTrafficWidth)
+                .height(portTrafficHeight)
+                .tickFormat(function (d) {
+                    if (d >= 1000000000) {
+                        return (d / 1000000000) + " G";
+                    }
+                    return (d / 1000000) + " M";
+                });
+        var portTrafficSvg = null;
+        var portTrafficDatum = null;
+        var requestPortTraffic = null;
 
 
         function drawPorts(portsData){
@@ -200,11 +222,32 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                 $('#dot1dStpPortState').val(portData.dot1dStpPortState ? portData.dot1dStpPortState : 0);
 
                 showPortConnections(portData);
+                drawPortTraffic(portData);
 
                 portInfoBox.slideDown(300);
 
             }
 
+        }
+
+        // Botão "add connection" oferecido nos dois lugares onde a lista
+        // "Link to:" pode revelar um vizinho já cadastrado sem Connection
+        // formal ainda (mapa/CAM na função abaixo): via link de mapa
+        // (connOnPort) ou via CAM table sem link de mapa (discoveredHosts).
+        // A porta de destino não é informada: o próprio connection/create
+        // tenta detectá-la cruzando as tabelas CAM dos dois switches (ver
+        // Host::detectConnectedPort()).
+        function appendAddConnectionLink(container, ifIndex, hostDstId) {
+            if (!hostDstId) return;
+            container.append('a')
+                    .attr('class', 'add-connection btn btn-mini')
+                    .style('margin-left', '6px')
+                    .attr('href', connectionCreateURL +
+                        '?host_src_id=' + currentHostId +
+                        '&host_src_port=' + ifIndex +
+                        '&host_dst_id=' + hostDstId)
+                    .attr('title', 'Create a formal connection to this host')
+                    .html('<img src="' + connectionAddIconURL + '" alt="" /> add connection');
         }
 
         // get host info on port from netmap
@@ -242,6 +285,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                                     .attr('class', 'view host-type ' + d.host.type)
                                     .attr('href', linkToHost(d.host))
                                     .html(d.host.name);
+                                appendAddConnectionLink(d3.select(this), port.ifIndex, d.host.id);
                             } else {
                                 d3.select(this).append('a')
                                     .attr('class', 'text-warning host-not-registered')
@@ -271,29 +315,99 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                                 .attr('href', linkToHost(d.target) )
                                 .html(d.target.name);
 
-                            // Host já cadastrado (id real, não hub virtual
-                            // nem vizinho ainda sem cadastro) — oferece criar
-                            // a Connection formal direto daqui. A porta de
-                            // destino não é informada: o próprio
-                            // connection/create tenta detectá-la cruzando as
-                            // tabelas CAM dos dois switches (ver
-                            // Host::detectConnectedPort()).
-                            if (d.target.id) {
-                                d3.select(this).append("a")
-                                    .attr('class', 'add-connection')
-                                    .style('margin-left', '6px')
-                                    .attr('href', connectionCreateURL +
-                                        '?host_src_id=' + currentHostId +
-                                        '&host_src_port=' + port.ifIndex +
-                                        '&host_dst_id=' + d.target.id)
-                                    .attr('title', 'Create a formal connection to this host')
-                                    .html('<img src="' + connectionAddIconURL + '" alt="" /> add connection');
-                            }
+                            appendAddConnectionLink(d3.select(this), port.ifIndex, d.target.id);
                         })
             }
-            
+
         }
-        
+
+        // traffic graph (bullet chart) for the selected port, shown above "Link to:"
+        function getPortTrafficSample(json, ifIndex) {
+            for (var i = 0; i < json.ports.length; i++) {
+                if (json.ports[i].ifIndex == ifIndex) {
+                    return json.ports[i];
+                }
+            }
+        }
+
+        function drawPortTraffic(port) {
+
+            clearTimeout(requestPortTraffic);
+            d3.select('#portTraffic').html('');
+
+            portTrafficDatum = {
+                ifIndex: port.ifIndex,
+                title: port.ifDescr,
+                subtitle: port.ifAlias ? port.ifAlias : '""',
+                ranges: [0, 0],
+                measures: [0, 0],
+                markers: [0, 0],
+                time: 0
+            };
+
+            portTrafficSvg = d3.select('#portTraffic').append('svg')
+                    .attr('class', 'bullet')
+                    .attr('width', portTrafficWidth + portTrafficMargin.left + portTrafficMargin.right)
+                    .attr('height', portTrafficHeight + portTrafficMargin.top + portTrafficMargin.bottom)
+                    .append('g')
+                    .attr('transform', 'translate(' + portTrafficMargin.left + ',' + portTrafficMargin.top + ')')
+                    .datum(portTrafficDatum)
+                    .call(portTrafficChart);
+
+            var title = portTrafficSvg.append('g')
+                    .style('text-anchor', 'end')
+                    .attr('transform', 'translate(-6,' + portTrafficHeight / 2 + ')');
+
+            title.append('text')
+                    .attr('class', 'title')
+                    .text(portTrafficDatum.title);
+
+            title.append('text')
+                    .attr('class', 'subtitle')
+                    .attr('dy', '1em')
+                    .text(portTrafficDatum.subtitle);
+
+            loadPortTraffic();
+        }
+
+        function loadPortTraffic() {
+
+            clearTimeout(requestPortTraffic);
+
+            if (!portTrafficDatum) return;
+
+            var requestedIfIndex = portTrafficDatum.ifIndex;
+
+            d3.json(portTrafficURL, function (error, json) {
+                // A resposta pode chegar depois que o usuário já trocou de
+                // porta ou fechou a caixa — nesse caso a porta atual (se
+                // houver) já tem seu próprio polling rodando; descarta esta
+                // resposta atrasada em vez de aplicá-la sobre o datum errado
+                // ou disparar um segundo loop de polling em paralelo.
+                if (!portTrafficDatum || portTrafficDatum.ifIndex !== requestedIfIndex) {
+                    return;
+                }
+
+                if (error) {
+                    console.warn(error);
+                } else {
+                    var sample = getPortTrafficSample(json, portTrafficDatum.ifIndex);
+                    portTrafficDatum = PortTraffic.updateSample(portTrafficDatum, sample, json.time);
+                    if (portTrafficSvg) {
+                        portTrafficSvg.datum(portTrafficDatum).call(portTrafficChart.duration(1000));
+                    }
+                }
+
+                requestPortTraffic = setTimeout(loadPortTraffic, portTrafficInterval);
+            });
+        }
+
+        function stopPortTraffic() {
+            clearTimeout(requestPortTraffic);
+            portTrafficDatum = null;
+            d3.select('#portTraffic').html('');
+        }
+
         function linkToHost(host) {
             if(host.href) {
                 return host.href;
@@ -338,7 +452,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
     <div id="portInfoBox" class="well well-small" style="display:none">
         <div class="nav nav-pills">
             Port <label id="ifDescr" class="inline"></label>
-            <input id="btnClosePortBox" class="btn btn-mini" type="button" title="Close this box" onclick="$('#portInfoBox').slideUp();" value="close">
+            <input id="btnClosePortBox" class="btn btn-mini" type="button" title="Close this box" onclick="stopPortTraffic(); $('#portInfoBox').slideUp();" value="close">
         </div>
         <table width="97%">
             <tr>
@@ -419,6 +533,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
                 </td>
 
                 <td style="vertical-align: top">
+                    <div id="portTraffic"></div>
                     Link to:
                     <div id="connections"></div>
                 </td>
