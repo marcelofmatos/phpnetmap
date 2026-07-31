@@ -3,5 +3,6 @@
 !/assets/README
 !/protected/runtime/README
 /protected/data/params.ini
+/VERSION
 /.superpowers/
 /docs/superpowers/

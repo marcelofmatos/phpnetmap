@@ -2,6 +2,13 @@
 # Base oficial multi-arch (linux/amd64 + linux/arm64) com Apache + mod_php.
 FROM php:7.4-apache
 
+# Preenchido pelo workflow de release (--build-arg VERSION=x.y.z) com a
+# mesma tag git criada pro release — não vem do .git (excluído do build
+# context via .dockerignore), por isso é passado de fora. Sem esse build
+# arg (build local, docker build .), fica "dev" e a página About mostra
+# "development" — ver protected/views/site/pages/about.php.
+ARG VERSION=dev
+
 LABEL maintainer="Marcelo Matos <marcelo.matos@ufrr.br>"
 
 # Dependências de runtime (SNMP CLI + daemon, SQLite, htpasswd) e as libs de
@@ -45,6 +52,10 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Código da aplicação a partir do checkout (respeita o .dockerignore).
 COPY . /app
 WORKDIR /app
+
+# Grava a versão buildada — depois do COPY pra não invalidar o cache das
+# camadas de apt/pecl acima a cada release.
+RUN echo "$VERSION" > /app/VERSION
 
 # Diretórios que precisam de escrita pelo Apache (SQLite e runtime do Yii).
 RUN chmod +x /app/set_htpasswd.sh \

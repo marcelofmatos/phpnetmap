@@ -5,10 +5,20 @@ $this->pageTitle=Yii::app()->name . ' - About';
 $this->breadcrumbs=array(
 	'About',
 );
+
+// Gravado no build da imagem Docker (Dockerfile ARG VERSION, preenchido
+// pelo workflow de release com a tag criada) — não vem do .git, que o
+// .dockerignore exclui do build context. Sem esse arquivo (build local
+// sem o build-arg, ou instalação standalone sem Docker), mostra
+// "development" em vez de quebrar.
+$versionFile = Yii::app()->basePath . '/../VERSION';
+$version = is_file($versionFile) ? trim(file_get_contents($versionFile)) : '';
 ?>
 <h1>About</h1>
 
 <h3>PHPNetMap</h3>
+
+<p class="muted">Version <?php echo CHtml::encode($version !== '' ? $version : 'development'); ?></p>
 
 <p>Software for monitoring Layer 2 and Layer 3 network equipment with SNMP v(1/2c/3) protocol</p>
 

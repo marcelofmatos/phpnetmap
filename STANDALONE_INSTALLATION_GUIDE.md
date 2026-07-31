@@ -222,6 +222,16 @@ From there:
    community string (v1/v2c) or v3 credentials your devices use, before
    attaching one to a host.
 
+**About page version.** The Docker image bakes the release tag into a
+`VERSION` file at the project root at build time, shown on the **About**
+page. A standalone checkout has no such file, so it shows "development"
+instead — optionally create one yourself if you want a specific tag to
+show there:
+
+```bash
+echo "1.26.0" | sudo tee /var/www/phpnetmap/VERSION
+```
+
 ## 10. Updating
 
 ```bash
