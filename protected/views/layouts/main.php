@@ -1,5 +1,15 @@
 <?php /* @var $this Controller */ ?>
 <?php Yii::app()->bootstrap->register(); ?>
+<?php
+	// ?v=filemtime evita servir CSS cacheado de um deploy anterior — Apache
+	// não manda Cache-Control pra esses arquivos estáticos, então o navegador
+	// só busca de novo se a URL mudar (mesmo esquema já usado pros JS, ver
+	// hostFace/_form.php).
+	$layoutWebroot = dirname(Yii::app()->basePath);
+	$cssVersion = function ($file) use ($layoutWebroot) {
+		return '?v=' . filemtime($layoutWebroot . '/css/' . $file);
+	};
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,16 +17,16 @@
 	<meta name="language" content="en">
 
 	<!-- blueprint CSS framework -->
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css" media="screen, projection">
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/print.css" media="print">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css<?php echo $cssVersion('screen.css'); ?>" media="screen, projection">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/print.css<?php echo $cssVersion('print.css'); ?>" media="print">
 	<!--[if lt IE 8]>
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css" media="screen, projection">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css<?php echo $cssVersion('ie.css'); ?>" media="screen, projection">
 	<![endif]-->
 
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css">
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css<?php echo $cssVersion('main.css'); ?>">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css<?php echo $cssVersion('form.css'); ?>">
 
-        <link rel="stylesheet" href="<?php echo Yii::app()->baseUrl; ?>/css/map.css" type="text/css" />
+        <link rel="stylesheet" href="<?php echo Yii::app()->baseUrl; ?>/css/map.css<?php echo $cssVersion('map.css'); ?>" type="text/css" />
         <script type="text/javascript" src="<?php echo Yii::app()->baseUrl; ?>/js/d3/d3.min.js"></script>
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
