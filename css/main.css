@@ -228,8 +228,24 @@ select {
 
 .host-face-editor-field select.form-control,
 .host-face-editor-field input.form-control {
+    box-sizing: border-box;
     padding: 3px 6px !important;
     height: 28px;
+}
+
+/* Bootstrap nesse app é 2.3.2 (sem .btn-sm/.btn-default reais) — sem isso
+   os botões da toolbar (inclusive os <label> usados como botão de file
+   input) caem no tamanho padrão do .btn, maior e inconsistente com os
+   inputs/selects de 28px acima (via box-sizing diferente e <label> vs
+   <button> tendo métricas nativas distintas). */
+.host-face-editor-card .btn {
+    box-sizing: border-box;
+    height: 28px;
+    padding: 3px 10px;
+    font-size: 12px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 .host-face-editor-card > p.host-face-editor-empty-hint {
@@ -277,54 +293,35 @@ select {
 /* Card único "Ports & Positioning": canvas domina a largura (o objetivo é
    dar o máximo de espaço pra visualização do equipamento), a coluna da
    direita concentra os controles/dados que alimentam o canvas. */
-.host-face-editor-workspace {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-}
-
-.host-face-editor-workspace-canvas-col {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
 .host-face-editor-svg-toolbar {
     margin-bottom: 10px;
 }
 
-.host-face-editor-workspace-sidebar {
-    flex: 0 0 260px;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+/* Os toolbars de configuração (source host/tamanho, rows/columns/fill)
+   ficam acima do canvas, em toda a largura do card — o canvas fica livre
+   pra usar o máximo de espaço possível pra mostrar a foto do equipamento
+   (era dividido com uma sidebar de 260px antes). */
+#hfe-host-select {
+    width: 190px;
 }
 
-/* Nessa coluna estreita os campos usam a mesma linha com wrap do resto do
-   editor (.host-face-editor-toolbar), só que com larguras menores — cada
-   campo fica lado a lado com o próximo até não caber mais, aí quebra a
-   linha (ex.: Rows+Columns juntos, Fill order quebra pra linha de baixo). */
-.host-face-editor-workspace-sidebar .host-face-editor-toolbar {
-    row-gap: 10px;
-}
-
-.host-face-editor-workspace-sidebar input.form-control {
+.host-face-editor-toolbar input[type="number"].form-control {
     width: 70px;
 }
 
-.host-face-editor-workspace-sidebar select.form-control {
-    width: 150px;
-}
-
-.host-face-editor-workspace-sidebar #hfe-host-select {
-    width: 190px;
+.host-face-editor-toolbar select.form-control {
+    width: 160px;
 }
 
 .host-face-editor-canvas {
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 10px;
-    min-height: 420px;
+    /* Baixo o bastante só pra dar presença ao hint do estado vazio — agora
+       que o canvas usa a largura toda do card, um mínimo alto sobra como
+       espaço em branco embaixo de fotos de equipamento (tipicamente bem
+       mais largas que altas). */
+    min-height: 200px;
     overflow: auto;
 }
 
