@@ -6,7 +6,7 @@ class McpController extends Controller
 
     public function filters()
     {
-        return array();
+        return array('accessControl');
     }
 
     public function accessRules()
@@ -61,7 +61,7 @@ class McpController extends Controller
             case 'tools/list':
                 return McpJsonRpc::result($id, McpToolRegistry::listTools($config->mcpMode));
             case 'tools/call':
-                return McpJsonRpc::result($id, $this->callTool($rpcRequest['params'], $config, $token));
+                return $this->callTool($id, $rpcRequest['params'], $config, $token);
             default:
                 return McpJsonRpc::error($id, -32601, 'Method not found');
         }
@@ -79,28 +79,31 @@ class McpController extends Controller
         );
     }
 
-    private function callTool($params, $config, $token)
+    private function callTool($id, $params, $config, $token)
     {
         $toolName = isset($params['name']) ? $params['name'] : null;
         $arguments = isset($params['arguments']) ? $params['arguments'] : array();
 
         try {
             $result = McpToolRegistry::call($toolName, $arguments, $config->mcpMode, $token);
-            return array('content' => array(array('type' => 'text', 'text' => json_encode($result))));
+            return McpJsonRpc::result($id, array('content' => array(array('type' => 'text', 'text' => json_encode($result)))));
+        } catch (McpUnknownToolException $e) {
+            return McpJsonRpc::error($id, -32601, $e->getMessage());
         } catch (McpToolException $e) {
-            return array(
+            return McpJsonRpc::result($id, array(
                 'isError' => true,
                 'content' => array(array('type' => 'text', 'text' => $e->getMessage())),
-            );
+            ));
         }
     }
 
     private function resolveToken()
     {
         $header = isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : '';
-        if (stripos($header, 'Bearer ') !== 0) {
+        $raw = McpJsonRpc::extractBearerToken($header);
+        if ($raw === null) {
             return null;
         }
-        return McpToken::findValidByRawToken(substr($header, 7));
+        return McpToken::findValidByRawToken($raw);
     }
 }

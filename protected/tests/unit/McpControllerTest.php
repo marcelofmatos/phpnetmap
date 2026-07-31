@@ -67,4 +67,77 @@ class McpControllerTest extends TestCase
 
         $this->assertSame(-32601, $response['error']['code']);
     }
+
+    public function testDispatchReturnsProtocolErrorForUnknownTool()
+    {
+        $controller = new McpController('mcp');
+        $response = $controller->dispatch(
+            array('id' => 4, 'method' => 'tools/call', 'params' => array('name' => 'does_not_exist', 'arguments' => array())),
+            $this->config(true, 'readwrite'),
+            null
+        );
+
+        $this->assertSame(-32601, $response['error']['code']);
+        $this->assertArrayNotHasKey('result', $response);
+    }
+
+    public function testDispatchReturnsInBandToolErrorForModeRejection()
+    {
+        McpToolRegistry::$classes = array('McpControllerFakeReadwriteTool');
+
+        $controller = new McpController('mcp');
+        $response = $controller->dispatch(
+            array('id' => 5, 'method' => 'tools/call', 'params' => array('name' => 'fake_write', 'arguments' => array())),
+            $this->config(true, 'readonly'),
+            null
+        );
+
+        $this->assertArrayNotHasKey('error', $response);
+        $this->assertTrue($response['result']['isError']);
+    }
+
+    public function testExtractBearerTokenReturnsTokenForWellFormedHeader()
+    {
+        $this->assertSame('abc123', McpJsonRpc::extractBearerToken('Bearer abc123'));
+    }
+
+    public function testExtractBearerTokenReturnsNullForMissingHeader()
+    {
+        $this->assertNull(McpJsonRpc::extractBearerToken(''));
+    }
+
+    public function testExtractBearerTokenIsCaseInsensitiveOnScheme()
+    {
+        $this->assertSame('abc123', McpJsonRpc::extractBearerToken('bearer abc123'));
+    }
+
+    public function testExtractBearerTokenReturnsNullForBareSchemeWithNoToken()
+    {
+        $this->assertNull(McpJsonRpc::extractBearerToken('Bearer'));
+    }
+
+    public function testExtractBearerTokenReturnsNullForSchemeWithTrailingSpaceAndNoToken()
+    {
+        $this->assertNull(McpJsonRpc::extractBearerToken('Bearer '));
+    }
+}
+
+class McpControllerFakeReadwriteTool
+{
+    public static function definitions()
+    {
+        return array(
+            'fake_write' => array(
+                'mode' => 'readwrite',
+                'description' => 'Fake readwrite tool for tests',
+                'inputSchema' => array('type' => 'object', 'properties' => new stdClass()),
+                'handler' => array(__CLASS__, 'write'),
+            ),
+        );
+    }
+
+    public static function write($arguments)
+    {
+        return array('written' => true);
+    }
 }

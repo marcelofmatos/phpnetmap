@@ -28,4 +28,18 @@ class McpJsonRpc
     {
         return array('jsonrpc' => '2.0', 'id' => $id, 'error' => array('code' => $code, 'message' => $message));
     }
+
+    /**
+     * @param string $authorizationHeader
+     * @return string|null the raw token, or null if the header isn't a
+     *  well-formed "Bearer <token>" value
+     */
+    public static function extractBearerToken($authorizationHeader)
+    {
+        if (stripos($authorizationHeader, 'Bearer ') !== 0) {
+            return null;
+        }
+        $token = substr($authorizationHeader, 7);
+        return $token !== '' ? $token : null;
+    }
 }

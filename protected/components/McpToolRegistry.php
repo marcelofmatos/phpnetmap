@@ -30,7 +30,7 @@ class McpToolRegistry
         $definitions = self::allDefinitions();
 
         if (!isset($definitions[$name])) {
-            throw new McpToolException('Unknown tool: ' . $name);
+            throw new McpUnknownToolException('Unknown tool: ' . $name);
         }
 
         $def = $definitions[$name];
