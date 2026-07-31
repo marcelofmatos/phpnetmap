@@ -54,4 +54,16 @@ class McpHostToolsTest extends TestCase
         $this->expectException(McpToolException::class);
         McpHostTools::getHost(array('id' => 999999));
     }
+
+    public function testGetHostThrowsForNonScalarId()
+    {
+        $this->expectException(McpToolException::class);
+        McpHostTools::getHost(array('id' => array('unexpected' => 'shape')));
+    }
+
+    public function testDeleteHostThrowsForNonScalarId()
+    {
+        $this->expectException(McpToolException::class);
+        McpHostTools::deleteHost(array('id' => array('unexpected' => 'shape')));
+    }
 }

@@ -49,11 +49,6 @@ class McpHostTools
         );
     }
 
-    private static function idSchema()
-    {
-        return array('type' => 'object', 'properties' => array('id' => array('type' => 'integer')), 'required' => array('id'));
-    }
-
     public static function listHosts($arguments)
     {
         $result = array();
@@ -97,7 +92,7 @@ class McpHostTools
 
     private static function loadOr404($arguments)
     {
-        $id = isset($arguments['id']) ? (int) $arguments['id'] : null;
+        $id = self::extractId($arguments);
         $host = $id ? Host::model()->findByPk($id) : null;
         if ($host === null) {
             throw new McpToolException('Host not found: ' . $id);
