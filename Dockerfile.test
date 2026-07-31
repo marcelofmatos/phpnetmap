@@ -1,0 +1,30 @@
+# Test-only image — never pushed, never used in production. Reuses the same
+# php:7.4-apache base as the main Dockerfile (already pulled locally in most
+# cases) so layers are shared, but adds Composer/PHPUnit, which the shipped
+# image intentionally does not carry.
+FROM php:7.4-apache
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        sqlite3 libsqlite3-dev git unzip curl \
+    && docker-php-ext-install pdo_sqlite \
+    && apt-get purge -y --auto-remove libsqlite3-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN { \
+        echo 'error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_NOTICE'; \
+    } > /usr/local/etc/php/conf.d/custom.ini
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+WORKDIR /app
+
+COPY composer.json /app/composer.json
+RUN composer install --no-interaction --prefer-dist
+
+COPY . /app
+
+RUN mkdir -p protected/runtime && cp protected/data/phpnetmap.db protected/runtime/test.db
+
+CMD ["vendor/bin/phpunit", "-c", "protected/tests/phpunit.xml"]

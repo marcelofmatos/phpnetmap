@@ -1,0 +1,12 @@
+{
+    "name": "phpnetmap/phpnetmap",
+    "description": "Dev dependencies for running the PHPUnit test suite. The application itself has no Composer dependencies — Yii 1.1 is vendored directly under yii/.",
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    }
+}
