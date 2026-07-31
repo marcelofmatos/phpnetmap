@@ -26,7 +26,7 @@
         'buttons' => array(
                 'submit' => array(
                 'type' => 'submit',
-                'value' => Yii::t('default', 'Search'),
+                'value' => '🔍 ' . Yii::t('default', 'Search'),
                 'class' => 'span3 btn btn-primary'
                 )
         )

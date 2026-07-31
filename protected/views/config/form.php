@@ -30,6 +30,7 @@ return array(
     ),
     'buttons' => array(
         'submit' => array('type' => 'submit',
-            'value' => Yii::t('default', 'Save'))
+            'value' => '💾 ' . Yii::t('default', 'Save'),
+            'class' => 'btn btn-primary')
     )
 );

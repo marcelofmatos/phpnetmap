@@ -75,7 +75,7 @@ Se você tem alguma dúvida ou sugestão, por favor preencha o formulário abaix
 	<?php endif; ?>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Submit'); ?>
+		<?php echo CHtml::submitButton('📨 Submit', array('class' => 'btn btn-primary')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

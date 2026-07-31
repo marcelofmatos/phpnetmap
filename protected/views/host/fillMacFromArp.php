@@ -39,7 +39,7 @@ $this->menu = array(
 		</table>
 
 		<?php echo CHtml::form($this->createUrl('fillMacFromArp'), 'post'); ?>
-			<?php echo CHtml::submitButton('Confirm and fill ' . count($matches) . ' host(s)', array('name' => 'confirm')); ?>
+			<?php echo CHtml::submitButton('✅ Confirm and fill ' . count($matches) . ' host(s)', array('name' => 'confirm', 'class' => 'btn btn-primary')); ?>
 		<?php echo CHtml::endForm(); ?>
 	<?php endif; ?>
 
