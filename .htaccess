@@ -7,10 +7,19 @@ RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
 
 # Auth
 #
-AuthType Basic
-AuthName "Authentication Required"
-AuthUserFile "/app/.htpasswd"
-Require valid-user
+# /mcp is excluded from Basic Auth — MCP clients can't complete an
+# interactive login prompt. It authenticates itself via bearer token
+# instead (see McpController); every other path keeps requiring the
+# site-wide login.
+<If "%{REQUEST_URI} =~ m#^/mcp#">
+    Require all granted
+</If>
+<Else>
+    AuthType Basic
+    AuthName "Authentication Required"
+    AuthUserFile "/app/.htpasswd"
+    Require valid-user
+</Else>
 
 
 # LDAP Auth
