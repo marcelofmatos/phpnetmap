@@ -155,6 +155,9 @@ $preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 			hosts: ' . CJSON::encode(array_map(function ($h) {
 				return array('id' => $h->id, 'name' => $h->name, 'type' => $h->type);
 			}, $hostOptions)) . ',
+			associatedHostIds: ' . CJSON::encode(array_map(function ($h) {
+				return (string) $h->id;
+			}, $model->hosts)) . ',
 			preselectedHostId: ' . CJSON::encode($preselectedHost instanceof Host ? (string) $preselectedHost->id : null) . '
 		});
 	', CClientScript::POS_END);

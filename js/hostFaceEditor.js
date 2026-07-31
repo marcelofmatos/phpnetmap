@@ -211,7 +211,20 @@ var HostFaceEditor = (function () {
     function setupHostCombobox() {
         var container = $('hfe-host-select-combobox');
         var input = $('hfe-host-select');
-        var items = [{id: '', name: '-- clear --', type: ''}].concat(config.hosts || []);
+
+        // Hosts já associados a esta face (config.associatedHostIds, vindo
+        // do $model->hosts na edição) sobem pro topo da lista, num grupo
+        // separado — normalmente é um desses que o operador quer escolher
+        // como referência SNMP, sem precisar procurar no meio de todos os
+        // hosts cadastrados.
+        var associatedIds = {};
+        (config.associatedHostIds || []).forEach(function (id) {
+            associatedIds[String(id)] = true;
+        });
+        var allHosts = config.hosts || [];
+        var associatedHosts = allHosts.filter(function (h) { return associatedIds[String(h.id)]; });
+        var otherHosts = allHosts.filter(function (h) { return !associatedIds[String(h.id)]; });
+        var items = [{id: '', name: '-- clear --', type: ''}].concat(associatedHosts, otherHosts);
 
         PortCombobox.attach(container, input, function () { return items; }, function (item) {
             loadHostPorts(item.id);
@@ -230,6 +243,9 @@ var HostFaceEditor = (function () {
                 return allItems.filter(function (item) {
                     return item.name.toLowerCase().indexOf(q) !== -1;
                 });
+            },
+            groupOf: function (item) {
+                return item.id && associatedIds[String(item.id)] ? 'Associated with this face' : null;
             }
         });
     }

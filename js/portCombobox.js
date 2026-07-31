@@ -16,6 +16,34 @@
     }
 
     /**
+     * Intercala headers de grupo na lista a exibir — função pura (sem DOM),
+     * pra poder testar a lógica de agrupamento isolada da renderização.
+     * Um header aparece toda vez que o grupo muda pra um valor "truthy";
+     * itens sem grupo (groupOf devolve null/undefined/'') nunca ganham
+     * header. O caller decide a ORDEM dos itens — aqui só decide onde
+     * entra cada header, então itens do mesmo grupo precisam estar
+     * contíguos na lista de entrada pra não duplicar o header.
+     * @param {Array} items já filtrados, na ordem desejada de exibição.
+     * @param {function(Object): (string|null|undefined)} [groupOf] sem essa
+     *   função (ou se ela sempre devolve algo falso), nenhum header é gerado
+     *   — mesmo comportamento de antes dessa opção existir.
+     * @returns {Array<{type:'header',label:string}|{type:'item',item:Object}>}
+     */
+    function buildGroupedList(items, groupOf) {
+        var result = [];
+        var previousGroup = null;
+        items.forEach(function (item) {
+            var group = groupOf ? groupOf(item) : null;
+            if (group && group !== previousGroup) {
+                result.push({ type: 'header', label: group });
+            }
+            previousGroup = group;
+            result.push({ type: 'item', item: item });
+        });
+        return result;
+    }
+
+    /**
      * @param {HTMLElement} container elemento já no DOM com a classe
      *   "port-combobox" (position:relative) e o input já dentro dele — a
      *   lista dropdown é ancorada nesse container, não direto no body, pra
@@ -27,7 +55,7 @@
      *   filtrar outro tipo de item (ex.: hosts), passe opts.filterItems.
      * @param {function(Object)} onSelect chamado ao clicar numa opção
      *   habilitada, depois do valor já escrito no input.
-     * @param {{formatLabel: function=, selectValue: function=, filterItems: function=}} [opts]
+     * @param {{formatLabel: function=, selectValue: function=, filterItems: function=, groupOf: function=}} [opts]
      *   formatLabel(item): texto de cada opção (default "port5 — dsc").
      *   selectValue(item): valor escrito no input ao clicar (default: o
      *   próprio label formatado — passe algo como `String(port.ifIndex)`
@@ -35,6 +63,11 @@
      *   filterItems(items, query): filtra a lista pela busca digitada
      *   (default: HostFacePortFilter.filterPortsByQuery, assume formato de
      *   porta — obrigatório informar pra qualquer outro tipo de item).
+     *   groupOf(item): devolve o rótulo do grupo de um item, ou
+     *   null/undefined pra "sem grupo" (default: nenhum agrupamento). Os
+     *   itens já devem chegar ordenados com cada grupo contíguo (ver
+     *   buildGroupedList) — normalmente via getItems() já retornando na
+     *   ordem certa, não via filterItems.
      */
     function attach(container, input, getItems, onSelect, opts) {
         opts = opts || {};
@@ -58,7 +91,15 @@
                 list.appendChild(empty);
                 return;
             }
-            items.forEach(function (item) {
+            buildGroupedList(items, opts.groupOf).forEach(function (entry) {
+                if (entry.type === 'header') {
+                    var header = document.createElement('div');
+                    header.className = 'port-combobox-group-header';
+                    header.textContent = entry.label;
+                    list.appendChild(header);
+                    return;
+                }
+                var item = entry.item;
                 var optEl = document.createElement('div');
                 optEl.className = 'port-combobox-option' + (item.disabled ? ' port-combobox-option-disabled' : '');
                 optEl.textContent = formatLabel(item);
@@ -97,7 +138,8 @@
     }
 
     var PortCombobox = {
-        attach: attach
+        attach: attach,
+        buildGroupedList: buildGroupedList
     };
 
     if (typeof module !== 'undefined' && module.exports) {

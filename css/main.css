@@ -467,6 +467,17 @@ select {
     color: #999;
 }
 
+.port-combobox-group-header {
+    padding: 4px 6px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #8a8f98;
+    background: #f7f8fa;
+    border-bottom: 1px solid #eee;
+}
+
 .host-face-editor-palette-wrapper {
     flex: 1;
     min-width: 160px;
