@@ -16,26 +16,34 @@
     }
 
     /**
-     * Intercala headers de grupo na lista a exibir — função pura (sem DOM),
-     * pra poder testar a lógica de agrupamento isolada da renderização.
-     * Um header aparece toda vez que o grupo muda pra um valor "truthy";
-     * itens sem grupo (groupOf devolve null/undefined/'') nunca ganham
-     * header. O caller decide a ORDEM dos itens — aqui só decide onde
-     * entra cada header, então itens do mesmo grupo precisam estar
-     * contíguos na lista de entrada pra não duplicar o header.
+     * Intercala headers/divisores de grupo na lista a exibir — função pura
+     * (sem DOM), pra poder testar a lógica de agrupamento isolada da
+     * renderização. Toda vez que o grupo muda pra um valor "truthy" ganha um
+     * header antes; toda vez que SAI de um grupo truthy (pro próximo item
+     * sem grupo, ou de outro grupo) ganha um divisor antes, marcando onde a
+     * lista agrupada termina. Itens sem grupo (groupOf devolve
+     * null/undefined/'') nunca ganham header. O caller decide a ORDEM dos
+     * itens — aqui só decide onde entram header/divisor, então itens do
+     * mesmo grupo precisam estar contíguos na lista de entrada pra não
+     * duplicar o header.
      * @param {Array} items já filtrados, na ordem desejada de exibição.
      * @param {function(Object): (string|null|undefined)} [groupOf] sem essa
-     *   função (ou se ela sempre devolve algo falso), nenhum header é gerado
-     *   — mesmo comportamento de antes dessa opção existir.
-     * @returns {Array<{type:'header',label:string}|{type:'item',item:Object}>}
+     *   função (ou se ela sempre devolve algo falso), nenhum header/divisor
+     *   é gerado — mesmo comportamento de antes dessa opção existir.
+     * @returns {Array<{type:'header',label:string}|{type:'divider'}|{type:'item',item:Object}>}
      */
     function buildGroupedList(items, groupOf) {
         var result = [];
         var previousGroup = null;
         items.forEach(function (item) {
             var group = groupOf ? groupOf(item) : null;
-            if (group && group !== previousGroup) {
-                result.push({ type: 'header', label: group });
+            if (group !== previousGroup) {
+                if (previousGroup) {
+                    result.push({ type: 'divider' });
+                }
+                if (group) {
+                    result.push({ type: 'header', label: group });
+                }
             }
             previousGroup = group;
             result.push({ type: 'item', item: item });
@@ -97,6 +105,12 @@
                     header.className = 'port-combobox-group-header';
                     header.textContent = entry.label;
                     list.appendChild(header);
+                    return;
+                }
+                if (entry.type === 'divider') {
+                    var divider = document.createElement('div');
+                    divider.className = 'port-combobox-divider';
+                    list.appendChild(divider);
                     return;
                 }
                 var item = entry.item;

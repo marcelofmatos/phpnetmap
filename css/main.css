@@ -438,7 +438,13 @@ select {
     z-index: 1;
     top: 100%;
     left: 0;
-    right: 0;
+    /* Não trava mais na largura do campo (removido o "right: 0") — os itens
+       costumam ter texto mais longo que o input (ex.: "Nome (switch)"),
+       então a lista pode crescer além dele pra ficar mais legível, nunca
+       menor (min-width) nem maior demais (max-width). */
+    min-width: 100%;
+    width: max-content;
+    max-width: 340px;
     max-height: 160px;
     overflow: auto;
     background: #fff;
@@ -476,6 +482,14 @@ select {
     color: #8a8f98;
     background: #f7f8fa;
     border-bottom: 1px solid #eee;
+}
+
+/* Marca onde a lista agrupada termina e a lista normal (sem grupo) volta —
+   ver buildGroupedList em js/portCombobox.js. */
+.port-combobox-divider {
+    height: 0;
+    margin: 4px 0;
+    border-top: 1px solid #ddd;
 }
 
 .host-face-editor-palette-wrapper {
