@@ -27,6 +27,13 @@ return array(
         'cacheTtlDefault' => array(
             'type' => 'text'
         ),
+        'mcpEnabled' => array(
+            'type' => 'checkbox'
+        ),
+        'mcpMode' => array(
+            'type' => 'dropdownlist',
+            'items' => array('readonly' => 'Read-only', 'readwrite' => 'Read-write'),
+        ),
     ),
     'buttons' => array(
         'submit' => array('type' => 'submit',

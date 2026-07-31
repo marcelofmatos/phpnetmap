@@ -18,6 +18,8 @@ class ConfigForm extends CFormModel {
     public $cacheTtlArp = 20;
     public $cacheTtlGetSnmp = 10;
     public $showErrorSummary = true;
+    public $mcpEnabled = false;
+    public $mcpMode = 'readonly';
 
 
     /**
@@ -28,7 +30,7 @@ class ConfigForm extends CFormModel {
     public function rules() {
         return array(
             // type and query are required
-            array('adminEmail, translateCamTable, hostGatewayId, cache, cacheTtlDefault, cacheTtlCam, cacheTtlArp, cacheTtlGetSnmp', 'required'),
+            array('adminEmail, translateCamTable, hostGatewayId, cache, cacheTtlDefault, cacheTtlCam, cacheTtlArp, cacheTtlGetSnmp, mcpEnabled, mcpMode', 'required'),
         );
     }
 
@@ -43,6 +45,8 @@ class ConfigForm extends CFormModel {
             'cacheTtlArp' => 'TTL for ARP table Cache (seconds)',
             'cacheTtlGetSnmp' => 'TTL for SNMP Get Cache (seconds)',
             'cacheTtlDefault' => 'TTL Default Cache (seconds)',
+            'mcpEnabled' => 'Enable MCP Server (/mcp)',
+            'mcpMode' => 'MCP Mode',
         );
     }
 
@@ -58,6 +62,9 @@ class ConfigForm extends CFormModel {
         foreach(@parse_ini_file(PARAMS_INI_FILE_PATH) as $key => $val) {
             $this->$key = $val;
         }
+        // parse_ini_file always returns quoted values as strings, so coerce
+        // back to a real bool (mirrors the (bool) cast already applied in save()).
+        $this->mcpEnabled = (bool) $this->mcpEnabled;
     }
     
     public function save() {
@@ -74,6 +81,8 @@ class ConfigForm extends CFormModel {
             'cacheTtlCam' => (int) $this->cacheTtlCam,
             'cacheTtlArp' => (int) $this->cacheTtlArp,
             'cacheTtlGetSnmp' => (int) $this->cacheTtlGetSnmp,
+            'mcpEnabled' => (bool) $this->mcpEnabled,
+            'mcpMode' => (string) $this->mcpMode,
         );
         
         foreach($res as $key => $val) {
