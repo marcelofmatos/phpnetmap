@@ -57,11 +57,30 @@ class McpConnectionToolsTest extends TestCase
         ));
         $result = McpConnectionTools::deleteConnection(array('id' => $created['id']));
         $this->assertTrue($result['deleted']);
+
+        $this->expectException(McpToolException::class);
+        McpConnectionTools::getConnection(array('id' => $created['id']));
     }
 
     public function testGetConnectionThrowsForNonScalarId()
     {
         $this->expectException(McpToolException::class);
         McpConnectionTools::getConnection(array('id' => array('unexpected' => 'shape')));
+    }
+
+    public function testListConnectionsIncludesCreatedConnection()
+    {
+        $created = McpConnectionTools::createConnection(array(
+            'host_src_id' => $this->hostAId, 'host_src_port' => 1,
+            'host_dst_id' => $this->hostBId, 'host_dst_port' => 2,
+        ));
+        $ids = array_column(McpConnectionTools::listConnections(array()), 'id');
+        $this->assertContains($created['id'], $ids);
+    }
+
+    public function testGetConnectionThrowsForUnknownId()
+    {
+        $this->expectException(McpToolException::class);
+        McpConnectionTools::getConnection(array('id' => 999999));
     }
 }
