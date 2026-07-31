@@ -10,10 +10,11 @@ return array(
     'defaultController' => 'map/index',
     // preloading 'log' component
     'preload' => array('log'),
-    // autoloading model and component classes
+    // autoloading model, component and controller classes
     'import' => array(
         'application.models.*',
         'application.components.*',
+        'application.controllers.*',
         'bootstrap.helpers.*',
         'bootstrap.behaviors.*',
         'bootstrap.widgets.*',
