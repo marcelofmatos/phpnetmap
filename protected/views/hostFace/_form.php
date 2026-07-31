@@ -142,11 +142,13 @@ $preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceGridFill.js?v=' . filemtime($hfeWebroot . '/js/hostFaceGridFill.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceHistory.js?v=' . filemtime($hfeWebroot . '/js/hostFaceHistory.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFacePortFilter.js?v=' . filemtime($hfeWebroot . '/js/hostFacePortFilter.js'), CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFacePortStatus.js?v=' . filemtime($hfeWebroot . '/js/hostFacePortStatus.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/portCombobox.js?v=' . filemtime($hfeWebroot . '/js/portCombobox.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . '/js/hostFaceEditor.js?v=' . filemtime($hfeWebroot . '/js/hostFaceEditor.js'), CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('host-face-editor-init', '
 		HostFaceEditor.init({
 			loadPortInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadPortInfo/99999999')) . ',
+			loadPortStatusUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadPortStatus/99999999')) . ',
 			loadSystemInfoUrlTemplate: ' . CJSON::encode(Yii::app()->createUrl('host/loadSystemInfo/99999999')) . ',
 			fetchImageUrl: ' . CJSON::encode(Yii::app()->createUrl('hostFace/fetchImage')) . ',
 			existingSvg: ' . CJSON::encode($model->svg) . ',

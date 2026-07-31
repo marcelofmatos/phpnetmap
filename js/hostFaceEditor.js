@@ -5,8 +5,9 @@
 // SVG final. Depende de js/hostFaceSvg.js (funções puras de montar/ler SVG),
 // js/hostFaceHistory.js (pilha de undo/redo, Ctrl+Z / Ctrl+Y),
 // js/hostFacePortFilter.js (filtro de porta por texto, usado na paleta e
-// no combo do modal de editar) e js/portCombobox.js (o combo em si,
-// compartilhado com o formulário de Connection).
+// no combo do modal de editar), js/hostFacePortStatus.js (classes de status
+// ao vivo, mesmo padrão de host/_ports.php) e js/portCombobox.js (o combo em
+// si, compartilhado com o formulário de Connection).
 
 var HostFaceEditor = (function () {
     'use strict';
@@ -18,9 +19,13 @@ var HostFaceEditor = (function () {
         imageHeight: 0,
         allPorts: [],       // portas do host escolhido: [{ifIndex, ifDescr, ifAlias}]
         placedPorts: [],    // portas já no canvas: [{id, x, y, width, height}]
-        hostPortsLoaded: false // true só depois de allPorts vir com sucesso de um host escolhido
+        hostPortsLoaded: false, // true só depois de allPorts vir com sucesso de um host escolhido
+        portStatusById: {}  // status ao vivo por ifIndex (string): {ifOperStatus, ifAdminStatus, dot1dStpPortState}
     };
     var fillDrag = null;
+    var portStatusTimer = null;
+    var portStatusRequestRunning = false;
+    var PORT_STATUS_POLL_INTERVAL = 5000; // menos agressivo que host/_ports.php (2s) — aqui é edição, não monitoramento
     var history = HostFaceHistory.createHistory();
     var editPanelEl = null;
     var editingPortId = null;
@@ -238,6 +243,8 @@ var HostFaceEditor = (function () {
         // pra corrigir uma a uma clicando pra editar.
         state.allPorts = [];
         state.hostPortsLoaded = false;
+        state.portStatusById = {};
+        stopPortStatusPoll();
         redrawCanvas();
         syncHiddenField();
         $('hfe-host-info').style.display = 'none';
@@ -246,6 +253,8 @@ var HostFaceEditor = (function () {
             renderPalette();
             return;
         }
+
+        schedulePortStatusPoll(0);
 
         var url = config.loadPortInfoUrlTemplate.replace('99999999', hostId);
         var xhr = new XMLHttpRequest();
@@ -310,6 +319,87 @@ var HostFaceEditor = (function () {
         infoXhr.send();
     }
 
+    // Status ao vivo (ifOperStatus/ifAdminStatus/dot1dStpPortState) das
+    // portas do host escolhido, reaproveitando host/loadPortStatus (mesmo
+    // endpoint usado em host/_ports.php) — só pra dar um retrato visual de
+    // qual porta está ativa enquanto posiciona; não bloqueia nem valida nada.
+    function stopPortStatusPoll() {
+        clearTimeout(portStatusTimer);
+        portStatusTimer = null;
+    }
+
+    function schedulePortStatusPoll(delay) {
+        clearTimeout(portStatusTimer);
+        portStatusTimer = setTimeout(loadPortStatus, delay === undefined ? PORT_STATUS_POLL_INTERVAL : delay);
+    }
+
+    function loadPortStatus() {
+        var hostId = selectedHostId;
+        if (!hostId || portStatusRequestRunning) {
+            schedulePortStatusPoll();
+            return;
+        }
+
+        portStatusRequestRunning = true;
+        var url = config.loadPortStatusUrlTemplate.replace('99999999', hostId);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.onload = function () {
+            portStatusRequestRunning = false;
+            // Host já trocou de novo — descarta, mesma lógica de loadHostPorts.
+            if (selectedHostId !== hostId) {
+                return;
+            }
+            if (xhr.status === 200) {
+                try {
+                    var result = JSON.parse(xhr.responseText);
+                    if (Array.isArray(result)) {
+                        var byId = {};
+                        result.forEach(function (p) {
+                            byId[String(p.ifIndex)] = p;
+                        });
+                        state.portStatusById = byId;
+                        applyPortStatusToCanvas();
+                    }
+                } catch (err) {
+                    // resposta malformada — tenta de novo no próximo ciclo, sem travar o polling
+                }
+            }
+            schedulePortStatusPoll();
+        };
+        xhr.onerror = function () {
+            portStatusRequestRunning = false;
+            if (selectedHostId === hostId) {
+                schedulePortStatusPoll();
+            }
+        };
+        xhr.send();
+    }
+
+    // Atualiza as classes de status das caixas já no canvas sem redesenhar
+    // (redrawCanvas recriaria os elementos e perderia estado de drag em
+    // andamento) — buildPortElement já aplica o status conhecido na criação.
+    function applyPortStatusToCanvas() {
+        var els = document.querySelectorAll('#hfe-canvas .host-face-editor-port');
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            var status = state.portStatusById[el.getAttribute('data-ifindex')];
+            el.className = HostFacePortStatus.withStatusClasses(el.className, status);
+        }
+    }
+
+    // Porta "crua" (ifDescr/ifAlias) do host escolhido, casada por ifIndex —
+    // usada pra enriquecer o tooltip da caixa colocada no canvas (ver
+    // buildPortElement). Sem host escolhido ou porta não reconhecida, null.
+    function findPortInfo(portId) {
+        for (var i = 0; i < state.allPorts.length; i++) {
+            if (String(state.allPorts[i].ifIndex) === portId) {
+                return state.allPorts[i];
+            }
+        }
+        return null;
+    }
+
     function renderHostInfo(info) {
         var fallback = 'not reported via SNMP';
         $('hfe-host-info-sysname').textContent = info.sysName || fallback;
@@ -341,7 +431,9 @@ var HostFaceEditor = (function () {
     }
 
     function formatPortLabel(port) {
-        return 'port' + port.ifIndex + (port.ifDescr ? ' — ' + port.ifDescr : '');
+        return 'port' + port.ifIndex +
+            (port.ifDescr ? ' — ' + port.ifDescr : '') +
+            (port.ifAlias ? ' — ' + port.ifAlias : '');
     }
 
     // Reconstrói a lista inteira de portas disponíveis — chamado sempre que
@@ -598,14 +690,23 @@ var HostFaceEditor = (function () {
 
     function buildPortElement(port) {
         var unmatched = isPortUnmatched(port.id);
+        var info = findPortInfo(port.id);
 
         var el = document.createElement('div');
         el.className = 'host-face-editor-port' + (unmatched ? ' host-face-editor-port-unmatched' : '');
+        el.className = HostFacePortStatus.withStatusClasses(el.className, state.portStatusById[port.id]);
+        el.setAttribute('data-ifindex', port.id);
         el.style.left = port.x + 'px';
         el.style.top = port.y + 'px';
         el.style.width = port.width + 'px';
         el.style.height = port.height + 'px';
-        el.title = 'port' + port.id + ' (drag to move, click to edit, Alt+click to remove)' +
+        // Caixa é pequena demais pro ifAlias caber no texto visível (só o
+        // número da porta) — fica no tooltip, junto com ifDescr, no mesmo
+        // formato usado na paleta (ver formatPortLabel).
+        el.title = 'port' + port.id +
+            (info && info.ifDescr ? ' — ' + info.ifDescr : '') +
+            (info && info.ifAlias ? ' — ' + info.ifAlias : '') +
+            ' (drag to move, click to edit, Alt+click to remove)' +
             (unmatched ? ' — no port with this ifIndex on the selected switch' : '');
         el.textContent = port.id;
         el.setAttribute('draggable', 'true');

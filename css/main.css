@@ -347,6 +347,15 @@ select {
     color: #a94442;
 }
 
+/* Status ao vivo (ifOperStatus/ifAdminStatus/dot1dStpPortState) reaproveita
+   as classes/cores já definidas em css/map.css (mesmo padrão de
+   host/_ports.php) — só ifOperStatus2 (porta down, fundo preto) não define
+   uma cor de texto lá (naquela página a herda de a.port); aqui garante
+   contraste no texto branco sobre o fundo preto. */
+.host-face-editor-port.ifOperStatus2 {
+    color: #fff;
+}
+
 .host-face-editor-edit-modal-backdrop {
     position: fixed;
     top: 0;
