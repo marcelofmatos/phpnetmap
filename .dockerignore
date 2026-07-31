@@ -4,3 +4,4 @@
 /protected/runtime/*
 !/protected/runtime/README
 /protected/data/params.ini
+/vendor

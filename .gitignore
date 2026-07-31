@@ -1,5 +1,6 @@
 /assets/*
 /protected/runtime/*
+/vendor
 !/assets/README
 !/protected/runtime/README
 /protected/data/params.ini
