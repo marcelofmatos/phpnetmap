@@ -204,16 +204,6 @@ select {
     flex: 0 1 auto;
 }
 
-.host-face-editor-field-row {
-    display: flex;
-    gap: 10px;
-}
-
-.host-face-editor-field-row .host-face-editor-field {
-    flex: 1;
-    min-width: 0;
-}
-
 /* Input file nativo (\"Escolher arquivo... Nenhum arquivo selecionado\") não
    dá pra estilizar direto — escondemos ele e usamos o <label for> como botão
    (dispara o seletor de arquivo nativamente, sem precisar de JS extra). */
@@ -310,16 +300,24 @@ select {
     gap: 14px;
 }
 
-/* Nessa coluna estreita, empilha os campos em vez da linha com wrap usada
-   no resto do editor (ver .host-face-editor-toolbar acima). */
+/* Nessa coluna estreita os campos usam a mesma linha com wrap do resto do
+   editor (.host-face-editor-toolbar), só que com larguras menores — cada
+   campo fica lado a lado com o próximo até não caber mais, aí quebra a
+   linha (ex.: Rows+Columns juntos, Fill order quebra pra linha de baixo). */
 .host-face-editor-workspace-sidebar .host-face-editor-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
+    row-gap: 10px;
 }
 
-.host-face-editor-workspace-sidebar .form-control {
-    width: 100%;
+.host-face-editor-workspace-sidebar input.form-control {
+    width: 70px;
+}
+
+.host-face-editor-workspace-sidebar select.form-control {
+    width: 150px;
+}
+
+.host-face-editor-workspace-sidebar #hfe-host-select {
+    width: 190px;
 }
 
 .host-face-editor-canvas {

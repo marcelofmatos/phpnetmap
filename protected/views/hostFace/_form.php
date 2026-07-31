@@ -72,29 +72,25 @@ $preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 									<input type="text" id="hfe-host-select" class="form-control input-sm" placeholder="Type to search..." />
 								</span>
 							</label>
-							<div class="host-face-editor-field-row">
-								<label class="host-face-editor-field">
-									<span class="host-face-editor-field-label">Port width (px)</span>
-									<input type="number" id="hfe-port-width" class="form-control input-sm" value="22" min="1" />
-								</label>
-								<label class="host-face-editor-field">
-									<span class="host-face-editor-field-label">Port height (px)</span>
-									<input type="number" id="hfe-port-height" class="form-control input-sm" value="18" min="1" />
-								</label>
-							</div>
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Port width (px)</span>
+								<input type="number" id="hfe-port-width" class="form-control input-sm" value="22" min="1" />
+							</label>
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Port height (px)</span>
+								<input type="number" id="hfe-port-height" class="form-control input-sm" value="18" min="1" />
+							</label>
 						</div>
 
 						<div class="host-face-editor-toolbar host-face-editor-fill-toolbar">
-							<div class="host-face-editor-field-row">
-								<label class="host-face-editor-field">
-									<span class="host-face-editor-field-label">Rows</span>
-									<input type="number" id="hfe-fill-rows" class="form-control input-sm" value="1" min="1" />
-								</label>
-								<label class="host-face-editor-field">
-									<span class="host-face-editor-field-label">Columns</span>
-									<input type="number" id="hfe-fill-cols" class="form-control input-sm" value="1" min="1" />
-								</label>
-							</div>
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Rows</span>
+								<input type="number" id="hfe-fill-rows" class="form-control input-sm" value="1" min="1" />
+							</label>
+							<label class="host-face-editor-field">
+								<span class="host-face-editor-field-label">Columns</span>
+								<input type="number" id="hfe-fill-cols" class="form-control input-sm" value="1" min="1" />
+							</label>
 							<label class="host-face-editor-field">
 								<span class="host-face-editor-field-label">Fill order</span>
 								<select id="hfe-fill-order" class="form-control input-sm">
@@ -119,7 +115,7 @@ $preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 								<span class="host-face-editor-host-info-item"><span class="host-face-editor-field-label">IP</span> <span id="hfe-host-info-ip"></span></span>
 							</div>
 							<p class="host-face-editor-host-info-sysdescr"><span class="host-face-editor-field-label">System description</span> <span id="hfe-host-info-sysdescr"></span></p>
-							<a id="hfe-host-info-search" href="#" target="_blank" rel="noopener">Search images for this model</a>
+							<a id="hfe-host-info-search" href="#" target="_blank" rel="noopener" class="btn btn-default btn-sm host-face-editor-host-info-search">🔍 Search images for this model</a>
 						</div>
 
 						<div class="host-face-editor-palette-wrapper">
