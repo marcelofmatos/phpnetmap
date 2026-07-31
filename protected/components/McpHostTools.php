@@ -102,7 +102,7 @@ class McpHostTools
 
     private static function toArray($host)
     {
-        return array(
+        return self::castIntFields(array(
             'id' => $host->id,
             'name' => $host->name,
             'type' => $host->type,
@@ -110,6 +110,6 @@ class McpHostTools
             'mac' => $host->mac,
             'snmp_template_id' => $host->snmp_template_id,
             'host_face_id' => $host->host_face_id,
-        );
+        ), array('id', 'snmp_template_id', 'host_face_id'));
     }
 }

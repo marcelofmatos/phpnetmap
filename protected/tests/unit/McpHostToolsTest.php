@@ -66,4 +66,11 @@ class McpHostToolsTest extends TestCase
         $this->expectException(McpToolException::class);
         McpHostTools::deleteHost(array('id' => array('unexpected' => 'shape')));
     }
+
+    public function testGetHostReturnsIntegerIdAfterFreshRoundTrip()
+    {
+        $created = McpHostTools::createHost(array('name' => 'mcp-test-int-check', 'type' => 'switch'));
+        $fetched = McpHostTools::getHost(array('id' => $created['id']));
+        $this->assertIsInt($fetched['id']);
+    }
 }

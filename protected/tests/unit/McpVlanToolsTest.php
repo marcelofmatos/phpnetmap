@@ -58,4 +58,11 @@ class McpVlanToolsTest extends TestCase
         $this->expectException(McpToolException::class);
         McpVlanTools::getVlan(array('id' => array('unexpected' => 'shape')));
     }
+
+    public function testGetVlanReturnsIntegerIdAfterFreshRoundTrip()
+    {
+        $created = McpVlanTools::createVlan(array('tag' => 995, 'name' => 'mcp-test-vlan-int'));
+        $fetched = McpVlanTools::getVlan(array('id' => $created['id']));
+        $this->assertIsInt($fetched['id']);
+    }
 }

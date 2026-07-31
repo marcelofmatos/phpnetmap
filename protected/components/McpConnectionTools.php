@@ -101,13 +101,13 @@ class McpConnectionTools
 
     private static function toArray($connection)
     {
-        return array(
+        return self::castIntFields(array(
             'id' => $connection->id,
             'host_src_id' => $connection->host_src_id,
             'host_src_port' => $connection->host_src_port,
             'host_dst_id' => $connection->host_dst_id,
             'host_dst_port' => $connection->host_dst_port,
             'type' => $connection->type,
-        );
+        ), array('id', 'host_src_id', 'host_src_port', 'host_dst_id', 'host_dst_port'));
     }
 }

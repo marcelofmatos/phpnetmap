@@ -83,4 +83,16 @@ class McpConnectionToolsTest extends TestCase
         $this->expectException(McpToolException::class);
         McpConnectionTools::getConnection(array('id' => 999999));
     }
+
+    public function testGetConnectionReturnsIntegerFieldsAfterFreshRoundTrip()
+    {
+        $created = McpConnectionTools::createConnection(array(
+            'host_src_id' => $this->hostAId, 'host_src_port' => 1,
+            'host_dst_id' => $this->hostBId, 'host_dst_port' => 2,
+        ));
+        $fetched = McpConnectionTools::getConnection(array('id' => $created['id']));
+        $this->assertIsInt($fetched['id']);
+        $this->assertIsInt($fetched['host_src_id']);
+        $this->assertIsInt($fetched['host_src_port']);
+    }
 }

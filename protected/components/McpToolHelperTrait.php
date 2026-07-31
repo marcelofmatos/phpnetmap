@@ -29,4 +29,21 @@ trait McpToolHelperTrait
         }
         return (int) $arguments[$key];
     }
+
+    /**
+     * Casts the given keys of $row to int, if present and non-null.
+     * PDO SQLite returns every column as a string on a genuine DB round
+     * trip, even for INTEGER-affinity columns — this keeps a tool's
+     * response consistent with its own 'type' => 'integer' JSON schema.
+     * Leaves null values (nullable foreign keys) untouched.
+     */
+    private static function castIntFields($row, $fields)
+    {
+        foreach ($fields as $field) {
+            if (isset($row[$field])) {
+                $row[$field] = (int) $row[$field];
+            }
+        }
+        return $row;
+    }
 }

@@ -101,13 +101,13 @@ class McpVlanTools
 
     private static function toArray($vlan)
     {
-        return array(
+        return self::castIntFields(array(
             'id' => $vlan->id,
-            'tag' => (int) $vlan->tag,
+            'tag' => $vlan->tag,
             'name' => $vlan->name,
             'description' => $vlan->description,
             'background_color' => $vlan->background_color,
             'font_color' => $vlan->font_color,
-        );
+        ), array('id', 'tag'));
     }
 }
