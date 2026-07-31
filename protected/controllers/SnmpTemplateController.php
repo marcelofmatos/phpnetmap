@@ -72,6 +72,23 @@ class SnmpTemplateController extends Controller
 			$model->attributes=$_POST['SnmpTemplate'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
+		} else {
+			// Prefill via GET (botão "Copy" no admin) — só os campos não
+			// sensíveis; community/auth_passphrase/priv_passphrase ficam
+			// de fora de propósito pra não vazar credencial na URL
+			// (histórico do navegador, log do servidor).
+			$intFields = array('timeout', 'retries');
+			$stringFields = array('version', 'security_name', 'security_level', 'auth_protocol', 'priv_protocol');
+			foreach ($intFields as $field) {
+				if (isset($_GET[$field]) && is_scalar($_GET[$field])) {
+					$model->$field = (int) $_GET[$field];
+				}
+			}
+			foreach ($stringFields as $field) {
+				if (isset($_GET[$field]) && is_scalar($_GET[$field])) {
+					$model->$field = (string) trim($_GET[$field]);
+				}
+			}
 		}
 
 		$this->render('create',array(

@@ -104,7 +104,7 @@ class HostController extends Controller {
      * Creates a new model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      */
-    public function actionCreate($name = null, $ip = null, $mac = null, $type = null) {
+    public function actionCreate($name = null, $ip = null, $mac = null, $type = null, $snmp_template_id = null) {
         $model = new Host;
 
         /* Set attributes by _GET */
@@ -119,6 +119,9 @@ class HostController extends Controller {
         }
         if (!is_null($type) && !isset($_POST['Host'])) {
             $model->type = (string) trim($type);
+        }
+        if (!is_null($snmp_template_id) && !isset($_POST['Host'])) {
+            $model->snmp_template_id = (int) $snmp_template_id;
         }
 
         // Uncomment the following line if AJAX validation is needed

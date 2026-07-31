@@ -99,6 +99,20 @@ select {
     white-space: nowrap;
 }
 
+/* hostFace/admin — miniatura do svg na grade (senão renderiza no tamanho
+   nativo da imagem, que pode passar de 1000px e quebrar a listagem). Sem
+   viewBox no svg gerado, o navegador ainda respeita a proporção original a
+   partir dos atributos width/height ao escalar via max-width + height:auto. */
+.host-face-admin-thumb {
+    max-width: 240px;
+}
+
+.host-face-admin-thumb svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
 /* host/view header */
 .host-header {
     display: flex;

@@ -63,9 +63,20 @@ class HostFaceController extends Controller
 	 *   na aba Overview do host) — pré-seleciona esse host como fonte SNMP do
 	 *   editor e já marca ele na lista de hosts a associar.
 	 */
-	public function actionCreate($hostId=null)
+	public function actionCreate($hostId=null, $copyFromId=null)
 	{
 		$model=new HostFace;
+
+		// Botão "Copy" no admin — carrega name/svg do modelo de origem
+		// pelo id (não dá pra mandar o svg, que costuma ter uma foto em
+		// base64, via query string de um link GET comum).
+		if ($copyFromId && !isset($_POST['HostFace'])) {
+			$source = HostFace::model()->findByPk((int) $copyFromId);
+			if ($source instanceof HostFace) {
+				$model->name = $source->name;
+				$model->svg = $source->svg;
+			}
+		}
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);

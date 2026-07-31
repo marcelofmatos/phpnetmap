@@ -72,6 +72,13 @@ class SnmpFieldController extends Controller
 			$model->attributes=$_POST['SnmpField'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
+		} else {
+			/* Set attributes by _GET (botão "Copy" no admin) */
+			foreach (array('snmp_oid', 'key', 'label') as $field) {
+				if (isset($_GET[$field]) && is_scalar($_GET[$field])) {
+					$model->$field = (string) trim($_GET[$field]);
+				}
+			}
 		}
 
 		$this->render('create',array(

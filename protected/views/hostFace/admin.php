@@ -45,11 +45,26 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		'id',
 		'name',
 		array(
-                    'type' => 'raw', 
-                    'name' =>  'svg'
+                    'type' => 'raw',
+                    'name' =>  'svg',
+                    // Sem isso o SVG renderiza no tamanho nativo da
+                    // imagem (pode passar de 1000px) e quebra a grade —
+                    // limita a largura e deixa a altura proporcional
+                    // (ver .host-face-admin-thumb em css/main.css).
+                    'value' => '\'<div class="host-face-admin-thumb">\'.$data->svg.\'</div>\'',
                 ),
 		array(
 			'class'=>'CButtonColumn',
+			'template' => '<span style="white-space:nowrap">{view} {update} {delete} {copy}</span>',
+			'buttons' => array(
+				// Só o id vai na URL — o svg (com a foto em base64) é
+				// grande demais pra passar por query string.
+				'copy' => array(
+					'label' => 'Copy HostFace',
+					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
+					'url' => '$this->grid->controller->createUrl("hostFace/create", array("copyFromId" => $data->id))',
+				),
+			),
 		),
 	),
 )); ?>

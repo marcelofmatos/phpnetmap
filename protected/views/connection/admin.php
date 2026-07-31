@@ -67,6 +67,16 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
                 
 		array(
 			'class'=>'CButtonColumn',
+			'template' => '<span style="white-space:nowrap">{view} {update} {delete} {copy}</span>',
+			'buttons' => array(
+				// Só copia o type (cabo) — host_src/dst id/port ficam de
+				// fora, copiar um link físico inteiro não faz sentido.
+				'copy' => array(
+					'label' => 'Copy Connection',
+					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
+					'url' => '$this->grid->controller->createUrl("connection/create", array("type" => $data->type))',
+				),
+			),
 		),
 	),
 )); ?>

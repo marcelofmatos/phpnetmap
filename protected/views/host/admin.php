@@ -56,11 +56,16 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
                 'snmpTemplate',
 		array(
                     'class' => 'CButtonColumn',
-                    'template' => '{view} {update} {delete}',
+                    'template' => '<span style="white-space:nowrap">{view} {update} {delete} {copy}</span>',
                     'buttons' => array(
                         'view' => array(
                             'url' => 'Yii::app()->controller->createUrl("host/viewByName",array("name"=>$data->name))',
                             ),
+                        'copy' => array(
+                            'label' => 'Copy Host',
+                            'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
+                            'url' => '$this->grid->controller->createUrl("host/create", array("type" => $data->type, "snmp_template_id" => $data->snmp_template_id))',
+                        ),
                     ),
                 ),
         ),

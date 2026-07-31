@@ -84,6 +84,9 @@ class ConnectionController extends Controller
                     if(isset($_GET['host_dst_id'])) {
                             $model->host_dst_id = (int) $_GET['host_dst_id'];
                     }
+                    if(isset($_GET['type'])) {
+                            $model->type = (string) trim($_GET['type']);
+                    }
                     if(isset($_GET['host_dst_port'])) {
                             $model->host_dst_port = (int) $_GET['host_dst_port'];
                     } else if ($model->host_src_id && $model->host_src_port && $model->host_dst_id) {

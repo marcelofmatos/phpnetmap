@@ -59,6 +59,16 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		*/
 		array(
 			'class'=>'CButtonColumn',
+			'template' => '<span style="white-space:nowrap">{view} {update} {delete} {copy}</span>',
+			'buttons' => array(
+				// Não copia community/auth_passphrase/priv_passphrase
+				// (credenciais) nem name — só config não sensível.
+				'copy' => array(
+					'label' => 'Copy SnmpTemplate',
+					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
+					'url' => '$this->grid->controller->createUrl("snmpTemplate/create", array("version" => $data->version, "security_name" => $data->security_name, "security_level" => $data->security_level, "auth_protocol" => $data->auth_protocol, "priv_protocol" => $data->priv_protocol, "timeout" => $data->timeout, "retries" => $data->retries))',
+				),
+			),
 		),
 	),
 )); ?>
