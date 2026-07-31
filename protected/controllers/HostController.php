@@ -48,8 +48,10 @@ class HostController extends Controller {
      * @param integer $id the ID of the model to be displayed
      */
     public function actionView($id) {
+        $model = $this->loadModel($id);
+        $this->menu = $this->buildOperationsMenu($model);
         $this->render('view', array(
-            'model' => $this->loadModel($id),
+            'model' => $model,
         ));
     }
 
@@ -60,6 +62,7 @@ class HostController extends Controller {
     public function actionViewByName($name = null, $ip = null, $mac = null) {
         try {
             $model = $this->loadModelByName($name, $ip, $mac);
+            $this->menu = $this->buildOperationsMenu($model);
             $this->render('view', array(
                 'model' => $model,
             ));
@@ -240,6 +243,25 @@ class HostController extends Controller {
             'matches' => $matches,
             'unmatched' => $unmatched,
         ));
+    }
+
+    /**
+     * Itens da sidebar "Operations" (layout column2) pra host/view — mesmas
+     * ações que estavam no dropdown "Actions" do cabeçalho fixo (ver
+     * host/_header.php), só que no padrão de menu das outras views.
+     * @param Host $model
+     * @return array
+     */
+    protected function buildOperationsMenu($model) {
+        return array(
+            array('label' => 'Web Config', 'url' => 'http://' . $model->ip, 'linkOptions' => array('target' => '_blank')),
+            array('label' => 'Update Host', 'url' => array('update', 'id' => $model->id)),
+            '<li class="divider"></li>',
+            array('label' => 'Delete Host', 'url' => '#', 'linkOptions' => array(
+                'submit' => array('delete', 'id' => $model->id),
+                'confirm' => 'Are you sure you want to delete this item?',
+            )),
+        );
     }
 
     /**
