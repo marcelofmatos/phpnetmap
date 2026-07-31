@@ -414,6 +414,36 @@ a.ifOperStatus2:focus{
     border: 3px solid #FF000 !important;
 }
 
+/* host/_ports.php — indicador de carregamento inicial (some assim que a
+   primeira resposta de host/loadPortInfo chega, ver hideHostFaceLoading). */
+.host-face-loading {
+    color: #999;
+    font-size: 12px;
+    margin-right: 12px;
+}
+
+.host-face-loading-spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    vertical-align: middle;
+    border: 2px solid #ddd;
+    border-top-color: #4a9eff;
+    border-radius: 50%;
+    animation: host-face-loading-spin 0.8s linear infinite;
+}
+
+@keyframes host-face-loading-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .host-face-loading-spinner {
+        animation: none;
+    }
+}
+
 .portbox {
     border: 1px solid #808080;
     padding: 5px 10px;

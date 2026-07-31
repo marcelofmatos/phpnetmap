@@ -2,7 +2,10 @@
 if ($model instanceof Host && !empty($model->snmpTemplate)):
     ?>
     <div id="info" style="float:right">
-        <input id="ckbxRefreshStatus" type="checkbox" onclick="ajaxLoadStatus = this.checked" checked="checked" /> 
+        <span id="hostFaceLoading" class="host-face-loading" aria-live="polite">
+            <span class="host-face-loading-spinner"></span> Loading SNMP data&hellip;
+        </span>
+        <input id="ckbxRefreshStatus" type="checkbox" onclick="ajaxLoadStatus = this.checked" checked="checked" />
         <label for="ckbxRefreshStatus" class="inline">refresh</label>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <span class="port ifAdminStatus2" style="width:10px; height:10px">&nbsp;&nbsp;&nbsp;&nbsp;</span> Disabled
@@ -67,6 +70,10 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
         var requestPortTraffic = null;
 
 
+        function hideHostFaceLoading() {
+            d3.select('#hostFaceLoading').style('display', 'none');
+        }
+
         function drawPorts(portsData){
             // TODO: desenhar hostFace com svg
             hostFace = d3.select('#hostFace')
@@ -116,6 +123,12 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
 
                     });
                 }
+
+                // Só mostra o "Loading" na primeira carga — some assim que a
+                // primeira resposta chega (sucesso ou erro), não reaparece nos
+                // polls seguintes de loadPortStatus() (a cada 2s, em segundo
+                // plano, não deveria distrair o operador a cada ciclo).
+                hideHostFaceLoading();
 
                 // Só inicia o polling de status depois que a lista de portas terminou de
                 // carregar: alguns equipamentos (ex.: switches Huawei) não respondem bem
