@@ -11,7 +11,7 @@ RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
 # interactive login prompt. It authenticates itself via bearer token
 # instead (see McpController); every other path keeps requiring the
 # site-wide login.
-<If "%{REQUEST_URI} =~ m#^/mcp#">
+<If "%{REQUEST_URI} =~ m#^/mcp(?:/|$)#">
     Require all granted
 </If>
 <Else>
