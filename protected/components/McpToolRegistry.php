@@ -13,7 +13,7 @@ class McpToolRegistry
     {
         $tools = array();
         foreach (self::allDefinitions() as $name => $def) {
-            if ($def['mode'] === 'readwrite' && $mode !== 'readwrite') {
+            if ($def['mode'] !== 'readonly' && $mode !== 'readwrite') {
                 continue;
             }
             $tools[] = array(
@@ -35,7 +35,7 @@ class McpToolRegistry
 
         $def = $definitions[$name];
 
-        if ($def['mode'] === 'readwrite' && $mode !== 'readwrite') {
+        if ($def['mode'] !== 'readonly' && $mode !== 'readwrite') {
             throw new McpToolException('Server is in read-only mode');
         }
 
