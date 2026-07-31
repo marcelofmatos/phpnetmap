@@ -107,8 +107,8 @@ $preselectedHost = isset($preselectedHost) ? $preselectedHost : null;
 						<span class="host-face-editor-host-info-item"><span class="host-face-editor-field-label">System name</span> <span id="hfe-host-info-sysname"></span></span>
 						<span class="host-face-editor-host-info-item"><span class="host-face-editor-field-label">IP</span> <span id="hfe-host-info-ip"></span></span>
 					</div>
-					<p class="host-face-editor-host-info-sysdescr"><span class="host-face-editor-field-label">System description</span> <span id="hfe-host-info-sysdescr"></span></p>
 					<a id="hfe-host-info-search" href="#" target="_blank" rel="noopener" class="btn btn-default btn-sm host-face-editor-host-info-search">🔍 Search images for this model</a>
+					<p class="host-face-editor-host-info-sysdescr"><span class="host-face-editor-field-label">System description</span> <span id="hfe-host-info-sysdescr"></span></p>
 				</div>
 
 				<div id="hfe-canvas" class="host-face-editor-canvas">

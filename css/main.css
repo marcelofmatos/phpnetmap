@@ -243,6 +243,7 @@ select {
     height: 28px;
     padding: 3px 10px;
     font-size: 12px;
+    font-weight: bold;
     line-height: 1;
     display: inline-flex;
     align-items: center;
@@ -270,6 +271,9 @@ select {
     border-top: 1px solid #eee;
     font-size: 12px;
     color: #444;
+    /* contém o float do botão de busca abaixo — sem isso ele vazaria pra
+       fora desta caixa, sobre o canvas que vem em seguida no card. */
+    overflow: hidden;
 }
 
 .host-face-editor-host-info-row {
@@ -282,12 +286,16 @@ select {
     margin-right: 2px;
 }
 
+/* Flutua à direita, na mesma linha do início do texto — o texto quebra e
+   flui ao redor do botão em vez de truncar com "...". Precisa vir ANTES do
+   parágrafo no HTML pra isso funcionar (ver _form.php). */
+.host-face-editor-host-info-search {
+    float: right;
+    margin-left: 10px;
+}
+
 .host-face-editor-host-info-sysdescr {
     margin: 4px 0 6px;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* Card único "Ports & Positioning": canvas domina a largura (o objetivo é
@@ -348,12 +356,27 @@ select {
 }
 
 /* Status ao vivo (ifOperStatus/ifAdminStatus/dot1dStpPortState) reaproveita
-   as classes/cores já definidas em css/map.css (mesmo padrão de
-   host/_ports.php) — só ifOperStatus2 (porta down, fundo preto) não define
-   uma cor de texto lá (naquela página a herda de a.port); aqui garante
-   contraste no texto branco sobre o fundo preto. */
+   as classes já definidas em css/map.css (mesmo padrão de host/_ports.php),
+   mas lá o fundo é opaco (pensado pra caixa cheia/grade) — aqui a caixa fica
+   sobre a foto do equipamento, então o fundo vira translúcido (mesma opacidade
+   0.5 do fill-opacity da porta em SVG na outra view) pra dar pra ver o fundo.
+   ifOperStatus2 (porta down) também ganha o texto branco que só existe por
+   herança de a.port na outra página — aqui não tem esse ancestral. */
+.host-face-editor-port.ifOperStatus1 {
+    background-color: rgba(0, 136, 0, 0.5);
+}
+
 .host-face-editor-port.ifOperStatus2 {
+    background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
+}
+
+.host-face-editor-port.ifAdminStatus2 {
+    background-color: rgba(136, 0, 0, 0.5) !important;
+}
+
+.host-face-editor-port.ifOperStatus1.dot1dStpPortState2 {
+    background-color: rgba(255, 255, 0, 0.5);
 }
 
 .host-face-editor-edit-modal-backdrop {
