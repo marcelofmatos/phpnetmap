@@ -30,12 +30,15 @@ class UserIdentity extends CUserIdentity
         return $this->errorCode === self::ERROR_NONE;
     }
 
+    // getName() is intentionally NOT overridden — it stays at CUserIdentity's
+    // inherited default, which returns $this->username. Every controller's
+    // accessRules() throughout this app checks the literal string 'admin'
+    // against Yii::app()->user->name (i.e. getName()), so it must keep
+    // returning the raw username, not the numeric id.
+
     /**
-     * getName() is intentionally left at its CUserIdentity-inherited
-     * default (returns $this->username) — every controller's accessRules()
-     * checks the literal string 'admin' against this via
-     * CAccessRule::isUserMatched(), so it must keep returning the raw
-     * username, not the numeric id.
+     * Returns the numeric primary key of the authenticated User row,
+     * overriding CUserIdentity's default (which returns the username).
      */
     public function getId()
     {

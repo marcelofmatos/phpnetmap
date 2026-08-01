@@ -24,6 +24,9 @@ class UserIdentityTest extends TestCase
         $this->assertTrue($identity->authenticate());
         $this->assertSame(UserIdentity::ERROR_NONE, $identity->errorCode);
         $this->assertSame('identitytest', $identity->getName());
+
+        $expectedUser = User::model()->findByAttributes(array('username' => 'identitytest'));
+        $this->assertSame($expectedUser->id, $identity->getId());
     }
 
     public function testAuthenticateFailsWithWrongPassword()
