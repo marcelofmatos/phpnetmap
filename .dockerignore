@@ -5,3 +5,5 @@
 !/protected/runtime/README
 /protected/data/params.ini
 /vendor
+/apc.php
+/index-test.php

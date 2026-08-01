@@ -103,6 +103,17 @@ cd /var/www/phpnetmap
 Apache can serve from works, `/var/www/phpnetmap` is just this guide's
 convention.)
 
+**Remove two files that should never reach production.** Unlike a Docker
+build (which excludes them automatically), a plain `git clone` includes
+`apc.php` (a bundled APCu cache inspector — unauthenticated by default, and
+its cache-entry viewer can expose cached SNMP/CAM/ARP data) and
+`index-test.php` (a debug-mode entry point — its own header says as much).
+Neither is used by the app itself:
+
+```bash
+sudo rm -f apc.php index-test.php
+```
+
 ## 4. Set up writable directories
 
 The app needs to write to three directories — the SQLite database and
