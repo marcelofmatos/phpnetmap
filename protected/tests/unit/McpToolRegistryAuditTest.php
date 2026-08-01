@@ -60,4 +60,30 @@ class McpToolRegistryAuditTest extends TestCase
         $this->assertSame('fake_audited_write', $row['tool_name']);
         $this->assertSame(array('foo' => 'bar'), json_decode($row['params_json'], true));
     }
+
+    public function testCredentialFieldsAreRedactedInAuditLog()
+    {
+        $token = McpToken::model()->findByPk($this->tokenId);
+        McpToolRegistry::$classes = array('McpSnmpTemplateTools');
+
+        McpToolRegistry::call('create_snmp_template', array(
+            'name' => 'mcp-audit-redact-test',
+            'community' => 'super-secret-community',
+            'auth_passphrase' => 'super-secret-auth',
+        ), 'readwrite', $token);
+
+        $row = Yii::app()->db->createCommand('SELECT * FROM mcp_audit_log WHERE mcp_token_id = :id')
+            ->bindValue(':id', $this->tokenId)
+            ->queryRow();
+
+        $this->assertNotFalse($row);
+        $this->assertStringNotContainsString('super-secret-community', $row['params_json']);
+        $this->assertStringNotContainsString('super-secret-auth', $row['params_json']);
+
+        $params = json_decode($row['params_json'], true);
+        $this->assertSame('[REDACTED]', $params['community']);
+        $this->assertSame('[REDACTED]', $params['auth_passphrase']);
+
+        Yii::app()->db->createCommand("DELETE FROM snmp_template WHERE name = 'mcp-audit-redact-test'")->execute();
+    }
 }

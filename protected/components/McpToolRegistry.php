@@ -50,12 +50,33 @@ class McpToolRegistry
 
     private static function recordAudit($token, $toolName, $arguments)
     {
-        Yii::app()->db->createCommand()->insert('mcp_audit_log', array(
-            'mcp_token_id' => $token->id,
-            'tool_name' => $toolName,
-            'params_json' => json_encode($arguments),
-            'created_at' => date('Y-m-d H:i:s'),
-        ));
+        try {
+            Yii::app()->db->createCommand()->insert('mcp_audit_log', array(
+                'mcp_token_id' => $token->id,
+                'tool_name' => $toolName,
+                'params_json' => json_encode(self::redactSensitiveFields($arguments)),
+                'created_at' => date('Y-m-d H:i:s'),
+            ));
+        } catch (Exception $e) {
+            Yii::log('Failed to record MCP audit log entry: ' . $e->getMessage(), CLogger::LEVEL_ERROR, 'application.mcp');
+        }
+    }
+
+    /**
+     * Strips credential fields before they're persisted to the audit log —
+     * mirrors the exclusion already applied to SnmpTemplate read output
+     * (McpSnmpTemplateTools::toArray()), since audit rows are append-only
+     * and outlive credential rotation.
+     */
+    private static function redactSensitiveFields($arguments)
+    {
+        $sensitiveKeys = array('community', 'security_name', 'auth_passphrase', 'priv_passphrase');
+        foreach ($sensitiveKeys as $key) {
+            if (isset($arguments[$key])) {
+                $arguments[$key] = '[REDACTED]';
+            }
+        }
+        return $arguments;
     }
 
     private static function allDefinitions()
