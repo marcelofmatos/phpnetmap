@@ -143,8 +143,10 @@ installed packages:
 * snmpd
 * sqlite3
 
-The login is set in .htaccess and .htpasswd so apache must be configured to 
-read the instructions
+By default, login is PHPNetMap's own built-in login screen — no Apache
+config needed for that. `.htaccess`/`.htpasswd` (Basic Auth) is still
+available as a legacy option, selectable from the app's Configuration
+screen; apache must be configured to read the instructions if you switch to it.
 
 
 # Screenshots

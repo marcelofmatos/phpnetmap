@@ -16,8 +16,8 @@ class SearchController extends Controller {
     public function accessRules()
     {
             return array(
-                    array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                            'actions'=>array('create','update','form','result','index'),
+                    array('allow', // allow authenticated user to perform 'form', 'result' and 'index' actions
+                            'actions'=>array('form','result','index'),
                             'users'=>array('@'),
                     ),
                     array('deny',  // deny all users

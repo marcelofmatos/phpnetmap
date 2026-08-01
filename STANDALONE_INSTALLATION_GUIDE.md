@@ -166,8 +166,10 @@ sudo systemctl reload apache2
 
 ## 6. Create the HTTP login (.htpasswd)
 
-Every page sits behind HTTP Basic Auth (see `.htaccess` at the project
-root) — without a valid `.htpasswd`, nothing loads.
+This sets up the legacy HTTP Basic Auth layer (see `.htaccess` at the
+project root). It's no longer required by default — new installs use the
+PHPNetMap login instead (see step 7's **Authentication Mode** setting) —
+but create it anyway so it's ready if you ever want to switch back to it:
 
 ```bash
 cd /var/www/phpnetmap
@@ -257,8 +259,11 @@ environment is still correctly set up (e.g. after an OS upgrade).
 
 ## 10. First run
 
-Open `http://<server>/` (or your vhost's `ServerName`) in a browser. You'll
-be prompted for the HTTP login from step 6.
+Open `http://<server>/` (or your vhost's `ServerName`) in a browser. By
+default (Authentication Mode = PHPNetMap login, see step 7) you'll land on
+the PHPNetMap sign-in screen — log in as `admin` with the password you set
+in step 7. If you switched Authentication Mode to the legacy `.htpasswd`
+option, you'll get the HTTP login prompt from step 6 instead.
 
 From there:
 
@@ -366,9 +371,10 @@ your data stays intact.
 ## 13. Troubleshooting
 
 **Blank page or HTTP 500 on every request.**
-Almost always one of: `.htpasswd` missing/empty (step 6), `protected/data`
-or `protected/runtime` not writable by `www-data` (step 4), or a missing
-PHP extension. Run `php requirements-check.php` first — it catches all
+Almost always one of: `protected/data` or `protected/runtime` not writable
+by `www-data` (step 4), a missing PHP extension, or — only if you switched
+Authentication Mode to the legacy `.htpasswd` option — that file missing or
+empty (step 6). Run `php requirements-check.php` first — it catches all
 three. Then check Apache's error log:
 
 ```bash

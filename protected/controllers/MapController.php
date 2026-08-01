@@ -16,13 +16,9 @@ class MapController extends Controller {
     public function accessRules()
     {
             return array(
-                    array('allow', // allow authenticated user to perform 'index', 'view', 'create', 'update' and 'listHosts' actions
-                            'actions'=>array('index','view','create','update','listHosts'),
+                    array('allow', // allow authenticated user to perform 'index' and 'listHosts' actions
+                            'actions'=>array('index','listHosts'),
                             'users'=>array('@'),
-                    ),
-                    array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                            'actions'=>array('admin','delete'),
-                            'users'=>array('admin'),
                     ),
                     array('deny',  // deny all users
                             'users'=>array('*'),
