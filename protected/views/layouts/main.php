@@ -46,10 +46,11 @@
                             array('label' => 'Connections', 'url' => array('/connection/admin')),
                             array('label' => 'Search', 'url' => array('/search/index')),
                             array('label' => 'MCP Tokens', 'url' => array('/mcpToken/admin')),
+                            array('label' => 'Users', 'url' => array('/user/admin')),
                             array('label' => 'Configuration', 'url' => array('/config/index')),
                             array('label' => 'About', 'url' => array('/site/page', 'view' => 'about')),
-//				array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
-//				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
+                            array('label' => 'Login', 'url' => array('/site/login'), 'visible' => Yii::app()->user->isGuest),
+                            array('label' => 'Logout (' . CHtml::encode(Yii::app()->user->name) . ')', 'url' => array('/site/logout'), 'visible' => !Yii::app()->user->isGuest),
                     ),
             )); ?>
 	</div><!-- mainmenu -->
