@@ -277,6 +277,7 @@ if ($apacheBinary === null) {
             'rewrite_module'    => 'mod_rewrite — clean URLs (.htaccess RewriteRule)',
             'authn_file_module' => 'mod_authn_file — reads .htpasswd',
             'authz_user_module' => 'mod_authz_user — the "Require valid-user" directive in .htaccess',
+            'version_module'    => 'mod_version — the <If> directive in .htaccess that carves out /mcp from Basic Auth for the MCP server',
         );
         foreach ($requiredModules as $needle => $why) {
             if (strpos($modulesOutput, $needle) !== false) {

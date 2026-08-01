@@ -86,4 +86,21 @@ class McpToolRegistryAuditTest extends TestCase
 
         Yii::app()->db->createCommand("DELETE FROM snmp_template WHERE name = 'mcp-audit-redact-test'")->execute();
     }
+
+    public function testAuditLogRetainsTokenDescriptionAfterTokenDeleted()
+    {
+        $token = McpToken::model()->findByPk($this->tokenId);
+        McpToolRegistry::call('fake_audited_write', array('foo' => 'bar'), 'readwrite', $token);
+
+        Yii::app()->db->createCommand('DELETE FROM mcp_token WHERE id = :id')
+            ->bindValue(':id', $this->tokenId)
+            ->execute();
+
+        $row = Yii::app()->db->createCommand('SELECT * FROM mcp_audit_log WHERE mcp_token_id = :id')
+            ->bindValue(':id', $this->tokenId)
+            ->queryRow();
+
+        $this->assertNotFalse($row);
+        $this->assertSame('audit test token', $row['token_description']);
+    }
 }

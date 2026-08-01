@@ -53,6 +53,7 @@ class McpToolRegistry
         try {
             Yii::app()->db->createCommand()->insert('mcp_audit_log', array(
                 'mcp_token_id' => $token->id,
+                'token_description' => $token->description,
                 'tool_name' => $toolName,
                 'params_json' => json_encode(self::redactSensitiveFields($arguments)),
                 'created_at' => date('Y-m-d H:i:s'),

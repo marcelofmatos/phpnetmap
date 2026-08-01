@@ -24,6 +24,12 @@ status of the [Spanning Tree Protocol](https://en.wikipedia.org/wiki/Spanning_Tr
 on switches with dot1dStpPortState OID. Using an SNMP community with read/write 
 permission you can change the ifAdminStatus or set ifAlias
 
+PHPNetMap also exposes an MCP server at `/mcp` so AI clients can query — and,
+optionally, modify — your network inventory data; enable it and create access
+tokens from the **Configuration** page (see
+[`STANDALONE_INSTALLATION_GUIDE.md`](STANDALONE_INSTALLATION_GUIDE.md) for
+setup details on a non-Docker install).
+
 
 # PHPNetMap and Docker
 

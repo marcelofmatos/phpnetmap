@@ -25,8 +25,9 @@ likely work but aren't verified here.
 - [7. Tune php.ini](#7-tune-phpini)
 - [8. Verify everything with requirements-check.php](#8-verify-everything-with-requirements-checkphp)
 - [9. First run](#9-first-run)
-- [10. Updating](#10-updating)
-- [11. Troubleshooting](#11-troubleshooting)
+- [10. MCP Server](#10-mcp-server)
+- [11. Updating](#11-updating)
+- [12. Troubleshooting](#12-troubleshooting)
 
 ## 1. Prerequisites
 
@@ -232,7 +233,36 @@ show there:
 echo "1.26.0" | sudo tee /var/www/phpnetmap/VERSION
 ```
 
-## 10. Updating
+## 10. MCP Server
+
+PHPNetMap exposes an MCP endpoint at `/mcp` so AI clients (Claude, etc.) can
+query — and, optionally, modify — your network inventory data (hosts,
+connections, VLANs, SNMP templates).
+
+- **Enable it**: go to **Configuration** and check "Enable MCP Server
+  (/mcp)", then pick the mode — **Read-only** or **Read-write** — from "MCP
+  Mode".
+- **Create a token**: go to the **MCP Tokens** nav item → **Create**. The
+  raw token is shown exactly once on creation — copy it immediately, it
+  can't be retrieved again afterwards.
+- **Apache prerequisites**: beyond what step 5 already sets up, `/mcp`
+  specifically needs `mod_version` (the shipped `.htaccess` uses an `<If>`
+  directive, guarded by `mod_version`, to exclude `/mcp` from the site-wide
+  Basic Auth) and relies on `CGIPassAuth`, scoped inside that same `<If>`
+  block in `.htaccess`, to let the client's bearer token reach PHP for
+  `/mcp` requests only. Both are already handled automatically by the
+  shipped `.htaccess` (and by the Docker image) — nothing to configure
+  there — but on a standalone install *you* control the Apache module list,
+  so make sure `mod_version` is enabled too:
+
+  ```bash
+  sudo a2enmod rewrite authn_file auth_basic authz_user version
+  ```
+
+  `requirements-check.php` includes `mod_version` in its (best-effort)
+  Apache module check.
+
+## 11. Updating
 
 ```bash
 cd /var/www/phpnetmap
@@ -244,7 +274,46 @@ php requirements-check.php   # confirm nothing changed under you
 pull` as long as it stays out of version control (it already is, via
 `.gitignore`), so your data and settings survive an update.
 
-## 11. Troubleshooting
+**Note on `protected/data/phpnetmap.db` specifically.** Unlike `params.ini`,
+`phpnetmap.db` *is* committed to the repository, and schema changes (like
+the MCP tables added in this guide's section 10) are applied directly to
+that committed file. That means `git pull` overwrites your live database
+with the repo's snapshot — fine for a fresh/test install with no real data
+yet, but a real risk if you've already added hosts/connections/etc. If you
+have existing data, either accept the reset (and re-import/re-enter your
+data afterwards), or skip pulling the database file and apply just the new
+tables/column by hand instead:
+
+```bash
+sqlite3 protected/data/phpnetmap.db <<'SQL'
+CREATE TABLE "mcp_token" (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "description" VARCHAR(255) NOT NULL,
+    "token_hash" VARCHAR(64) NOT NULL,
+    "token_prefix" VARCHAR(12) NOT NULL,
+    "expires_at" VARCHAR(10) NOT NULL,
+    "last_used_at" DATETIME,
+    "created_at" DATETIME NOT NULL
+);
+CREATE UNIQUE INDEX "idx_mcp_token_hash" ON mcp_token ("token_hash");
+
+CREATE TABLE "mcp_audit_log" (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "mcp_token_id" INTEGER NOT NULL,
+    "tool_name" VARCHAR(50) NOT NULL,
+    "params_json" TEXT NOT NULL,
+    "created_at" DATETIME NOT NULL,
+    FOREIGN KEY(mcp_token_id) REFERENCES "mcp_token"(id)
+);
+ALTER TABLE mcp_audit_log ADD COLUMN token_description VARCHAR(255);
+SQL
+```
+
+Then keep your live database out of the pull, e.g. `git checkout --
+protected/data/phpnetmap.db` right after a `git pull` that touched it, so
+your data stays intact.
+
+## 12. Troubleshooting
 
 **Blank page or HTTP 500 on every request.**
 Almost always one of: `.htpasswd` missing/empty (step 6), `protected/data`
