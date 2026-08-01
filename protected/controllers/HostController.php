@@ -26,7 +26,7 @@ class HostController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view'),
+                'actions' => array('index', 'view', 'viewByName', 'loadPortStatus', 'loadPortTraffic', 'loadPortInfo', 'loadSystemInfo', 'camTable', 'arpTable', 'traffic', 'connections', 'setSNMP'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -37,9 +37,9 @@ class HostController extends Controller {
                 'actions' => array('admin', 'delete', 'fillMacFromArp'),
                 'users' => array('admin'),
             ),
-//			array('deny',  // deny all users
-//				'users'=>array('*'),
-//			),
+            array('deny', // deny all users
+                'users' => array('*'),
+            ),
         );
     }
 

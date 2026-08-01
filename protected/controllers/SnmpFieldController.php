@@ -39,9 +39,9 @@ class SnmpFieldController extends Controller
 				'actions'=>array('admin','delete'),
 				'users'=>array('admin'),
 			),
-//			array('deny',  // deny all users
-//				'users'=>array('*'),
-//			),
+			array('deny',  // deny all users
+				'users'=>array('*'),
+			),
 		);
 	}
 

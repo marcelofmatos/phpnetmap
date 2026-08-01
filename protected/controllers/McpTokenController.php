@@ -19,6 +19,9 @@ class McpTokenController extends Controller
                 'actions' => array('admin', 'create', 'delete'),
                 'users' => array('admin'),
             ),
+            array('deny',
+                'users' => array('*'),
+            ),
         );
     }
 

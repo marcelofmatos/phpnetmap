@@ -19,6 +19,9 @@ class UserController extends Controller
                 'actions' => array('admin', 'create', 'update', 'delete'),
                 'users' => array('admin'),
             ),
+            array('deny',
+                'users' => array('*'),
+            ),
         );
     }
 

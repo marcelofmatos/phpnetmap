@@ -28,7 +28,7 @@ class VlanController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view','viewByTag'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -39,9 +39,9 @@ class VlanController extends Controller
 				'actions'=>array('admin','delete'),
 				'users'=>array('admin'),
 			),
-//			array('deny',  // deny all users
-//				'users'=>array('*'),
-//			),
+			array('deny',  // deny all users
+				'users'=>array('*'),
+			),
 		);
 	}
 
