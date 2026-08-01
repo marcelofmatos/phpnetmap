@@ -54,8 +54,9 @@ docker run -p 80:80 --name=server1 marcelofmatos/phpnetmap
 
 Open a web browser and access http://<server_ip> or http://localhost if 'docker run' executed in your local machine
 The HTTP user is 'admin' and password is string set in ADMIN_PASSWORD environment variable.
-These same ADMIN_USER/ADMIN_PASSWORD values also seed PHPNetMap's own internal login (used to reach
-Create/Update/Admin/Delete pages), on top of the HTTP Basic Auth prompt above.
+This same ADMIN_PASSWORD value also seeds PHPNetMap's own internal login (used to reach
+Create/Update/Admin/Delete pages), on top of the HTTP Basic Auth prompt above. That internal
+account's username is always the literal 'admin', regardless of what ADMIN_USER is set to.
 
 If you wish run container in other port:
 ```

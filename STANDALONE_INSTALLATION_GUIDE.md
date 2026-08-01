@@ -174,11 +174,11 @@ environment variables — there's no env-var equivalent outside Docker, so
 ## 7. Seed the Yii admin login
 
 Every page also sits behind a second, independent login — PHPNetMap's own
-sign-in screen (`site/login`), separate from the `.htpasswd` prompt from
+sign-in screen (`/site/login`), separate from the `.htpasswd` prompt from
 step 6. It gates every Create/Update/Admin/Delete page app-wide (Hosts,
 Vlans, Connections, SNMP Templates, SNMP Fields, Host Faces, MCP Tokens,
 Users) — before this feature, all of those pages were permanently
-unreachable, since this login was broken scaffold.
+unreachable, since this login was a broken scaffold.
 
 Seed the `admin` account's password once after setup:
 
@@ -193,8 +193,8 @@ Docker image's `ADMIN_PASSWORD` env var, but the two logins (`.htpasswd`
 and this one) are otherwise independent — there's no requirement they share
 a password, this is just a convenient default.
 
-Once logged in as `admin` at `site/login`, use the new **Users** nav item
-to create further accounts for other people who need Create/Update/Admin
+Once logged in as `admin` at `/site/login`, use the new **Users** nav item
+to create further accounts for other people who need Create/Update
 access.
 
 ## 8. Tune php.ini
