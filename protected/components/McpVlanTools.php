@@ -86,7 +86,7 @@ class McpVlanTools
     {
         $vlan = self::loadOr404($arguments);
         $vlan->delete();
-        return array('deleted' => true, 'id' => $vlan->id);
+        return self::castIntFields(array('deleted' => true, 'id' => $vlan->id), array('id'));
     }
 
     private static function loadOr404($arguments)

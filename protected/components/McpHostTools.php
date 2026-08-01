@@ -87,7 +87,7 @@ class McpHostTools
     {
         $host = self::loadOr404($arguments);
         $host->delete();
-        return array('deleted' => true, 'id' => $host->id);
+        return self::castIntFields(array('deleted' => true, 'id' => $host->id), array('id'));
     }
 
     private static function loadOr404($arguments)

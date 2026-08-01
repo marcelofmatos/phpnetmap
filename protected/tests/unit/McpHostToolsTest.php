@@ -84,4 +84,11 @@ class McpHostToolsTest extends TestCase
         $this->assertIsInt($fetched['snmp_template_id']);
         $this->assertIsInt($fetched['host_face_id']);
     }
+
+    public function testDeleteHostReturnsIntegerId()
+    {
+        $created = McpHostTools::createHost(array('name' => 'mcp-test-delete-int-check', 'type' => 'switch'));
+        $result = McpHostTools::deleteHost(array('id' => $created['id']));
+        $this->assertIsInt($result['id']);
+    }
 }

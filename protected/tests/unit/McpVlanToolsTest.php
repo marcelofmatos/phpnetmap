@@ -65,4 +65,11 @@ class McpVlanToolsTest extends TestCase
         $fetched = McpVlanTools::getVlan(array('id' => $created['id']));
         $this->assertIsInt($fetched['id']);
     }
+
+    public function testDeleteVlanReturnsIntegerId()
+    {
+        $created = McpVlanTools::createVlan(array('tag' => 994, 'name' => 'mcp-test-delete-int-check'));
+        $result = McpVlanTools::deleteVlan(array('id' => $created['id']));
+        $this->assertIsInt($result['id']);
+    }
 }

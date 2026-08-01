@@ -74,4 +74,11 @@ class McpSnmpTemplateToolsTest extends TestCase
         $this->assertIsInt($fetched['timeout']);
         $this->assertIsInt($fetched['retries']);
     }
+
+    public function testDeleteSnmpTemplateReturnsIntegerId()
+    {
+        $created = McpSnmpTemplateTools::createSnmpTemplate(array('name' => 'mcp-test-delete-int-check'));
+        $result = McpSnmpTemplateTools::deleteSnmpTemplate(array('id' => $created['id']));
+        $this->assertIsInt($result['id']);
+    }
 }

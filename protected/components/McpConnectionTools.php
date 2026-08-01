@@ -86,7 +86,7 @@ class McpConnectionTools
     {
         $connection = self::loadOr404($arguments);
         $connection->delete();
-        return array('deleted' => true, 'id' => $connection->id);
+        return self::castIntFields(array('deleted' => true, 'id' => $connection->id), array('id'));
     }
 
     private static function loadOr404($arguments)

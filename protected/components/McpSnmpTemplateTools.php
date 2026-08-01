@@ -92,7 +92,7 @@ class McpSnmpTemplateTools
     {
         $template = self::loadOr404($arguments);
         $template->delete();
-        return array('deleted' => true, 'id' => $template->id);
+        return self::castIntFields(array('deleted' => true, 'id' => $template->id), array('id'));
     }
 
     private static function loadOr404($arguments)

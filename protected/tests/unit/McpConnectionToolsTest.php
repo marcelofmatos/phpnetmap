@@ -97,4 +97,14 @@ class McpConnectionToolsTest extends TestCase
         $this->assertIsInt($fetched['host_dst_id']);
         $this->assertIsInt($fetched['host_dst_port']);
     }
+
+    public function testDeleteConnectionReturnsIntegerId()
+    {
+        $created = McpConnectionTools::createConnection(array(
+            'host_src_id' => $this->hostAId, 'host_src_port' => 1,
+            'host_dst_id' => $this->hostBId, 'host_dst_port' => 2,
+        ));
+        $result = McpConnectionTools::deleteConnection(array('id' => $created['id']));
+        $this->assertIsInt($result['id']);
+    }
 }
