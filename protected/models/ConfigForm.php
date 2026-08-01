@@ -113,9 +113,13 @@ class ConfigForm extends CFormModel {
         // possible between what the UI shows and what's actually enforced.
         $markerPath = self::getAuthModeMarkerPath();
         if ($this->authMode === 'htpasswd') {
-            touch($markerPath);
-        } else {
-            @unlink($markerPath);
+            if (!touch($markerPath)) {
+                throw new Exception("Could not create auth mode marker file: " . $markerPath);
+            }
+        } elseif (file_exists($markerPath)) {
+            if (!unlink($markerPath)) {
+                throw new Exception("Could not remove auth mode marker file: " . $markerPath);
+            }
         }
     }
 
