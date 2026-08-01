@@ -57,4 +57,26 @@ class McpDiagnosticsToolsTest extends TestCase
         $this->expectException(McpToolException::class);
         McpDiagnosticsTools::getCamTable(array('host_id' => array('unexpected' => 'shape')));
     }
+
+    public function testGetCamTableThrowsToolExceptionForUnsupportedSnmpVersion()
+    {
+        $template = new SnmpTemplate;
+        $template->name = 'mcp-test-diag-badversion';
+        $template->version = '9';
+        $template->save();
+
+        $host = McpHostTools::createHost(array(
+            'name' => 'mcp-test-diag-badversion-host',
+            'type' => Host::TYPE_SWITCH,
+            'snmp_template_id' => $template->id,
+        ));
+
+        try {
+            $this->expectException(McpToolException::class);
+            McpDiagnosticsTools::getCamTable(array('host_id' => $host['id']));
+        } finally {
+            Yii::app()->db->createCommand("DELETE FROM host WHERE id = {$host['id']}")->execute();
+            Yii::app()->db->createCommand("DELETE FROM snmp_template WHERE id = {$template->id}")->execute();
+        }
+    }
 }

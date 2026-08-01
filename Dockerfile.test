@@ -4,6 +4,9 @@
 # image intentionally does not carry.
 FROM php:7.4-apache
 
+# snmp (not just libsnmp-dev) must stay installed: purging libsnmp-dev alone
+# cascades to remove libsnmp40 too (nothing else would depend on it), which
+# breaks the compiled snmp.so at runtime. Keep both packages listed.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         sqlite3 libsqlite3-dev snmp libsnmp-dev git unzip curl \

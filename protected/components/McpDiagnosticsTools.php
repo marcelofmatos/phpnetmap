@@ -36,7 +36,12 @@ class McpDiagnosticsTools
     public static function getCamTable($arguments)
     {
         $host = self::loadHostOr404($arguments);
-        $host->loadCamTable();
+
+        try {
+            $host->loadCamTable();
+        } catch (Exception $e) {
+            throw new McpToolException($e->getMessage());
+        }
 
         $result = array();
         foreach ($host->cam_table as $item) {
@@ -48,7 +53,12 @@ class McpDiagnosticsTools
     public static function getArpTable($arguments)
     {
         $host = self::loadHostOr404($arguments);
-        $host->loadArpTable();
+
+        try {
+            $host->loadArpTable();
+        } catch (Exception $e) {
+            throw new McpToolException($e->getMessage());
+        }
 
         $result = array();
         foreach ($host->arp_table as $mac => $ip) {
@@ -60,7 +70,12 @@ class McpDiagnosticsTools
     public static function listPorts($arguments)
     {
         $host = self::loadHostOr404($arguments);
-        $host->loadPortsInfo(array('ifDescr', 'ifAlias', 'ifOperStatus', 'ifAdminStatus', 'dot1dStpPortState'));
+
+        try {
+            $host->loadPortsInfo(array('ifDescr', 'ifAlias', 'ifOperStatus', 'ifAdminStatus', 'dot1dStpPortState'));
+        } catch (Exception $e) {
+            throw new McpToolException($e->getMessage());
+        }
 
         $result = array();
         foreach ($host->ports as $index => $port) {
