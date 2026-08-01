@@ -24,15 +24,28 @@ RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
 # reserved for Apache's own Basic Auth), which would otherwise leave
 # McpController unable to read the bearer token even with /mcp excluded
 # from Basic Auth. Every other path keeps the header hidden from PHP.
+#
+# Auth mode toggle
+#
+# Which of the two layers below is actually enforced is chosen from the
+# Configuration screen (/config/index, admin-only) — see
+# protected/models/ConfigForm.php. Its choice is bridged to Apache via a
+# marker file at protected/data/.auth_mode_htpasswd: present means Basic
+# Auth is enforced (legacy mode), absent means only the Yii login governs
+# access (default for new installs). The marker's mere existence is checked
+# below with a plain file test — Apache never reads its content.
 <If "%{REQUEST_URI} =~ m#^(?:/index\.php)?/mcp(?:/|$)#">
     CGIPassAuth On
     Require all granted
 </If>
-<Else>
+<ElseIf "-f '%{DOCUMENT_ROOT}/protected/data/.auth_mode_htpasswd'">
     AuthType Basic
     AuthName "Authentication Required"
     AuthUserFile "/app/.htpasswd"
     Require valid-user
+</ElseIf>
+<Else>
+    Require all granted
 </Else>
 
 

@@ -57,6 +57,8 @@ The HTTP user is 'admin' and password is string set in ADMIN_PASSWORD environmen
 This same ADMIN_PASSWORD value also seeds PHPNetMap's own internal login (used to reach
 Create/Update/Admin/Delete pages), on top of the HTTP Basic Auth prompt above. That internal
 account's username is always the literal 'admin', regardless of what ADMIN_USER is set to.
+Which of these two layers is actually enforced is now chosen from the in-app Configuration
+screen (admin-only, /config/index), defaulting to the PHPNetMap login.
 
 If you wish run container in other port:
 ```

@@ -34,6 +34,10 @@ return array(
             'type' => 'dropdownlist',
             'items' => array('readonly' => 'Read-only', 'readwrite' => 'Read-write'),
         ),
+        'authMode' => array(
+            'type' => 'dropdownlist',
+            'items' => array('yii' => 'PHPNetMap login (recommended)', 'htpasswd' => 'HTTP Basic Auth (.htpasswd, legacy)'),
+        ),
     ),
     'buttons' => array(
         'submit' => array('type' => 'submit',

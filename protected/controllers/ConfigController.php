@@ -1,16 +1,34 @@
 <?php
 
 class ConfigController extends Controller {
-    
+
+    public function filters() {
+        return array(
+            'accessControl',
+        );
+    }
+
+    public function accessRules() {
+        return array(
+            array('allow',
+                'actions' => array('form', 'index'),
+                'users' => array('admin'),
+            ),
+            array('deny',
+                'users' => array('*'),
+            ),
+        );
+    }
+
     public function actionForm() {
         $model = new ConfigForm;
         $form = new CForm('application.views.config.form', $model);
         $model->load();
         $this->render('form', array('form' => $form));
     }
-    
+
     public function actionIndex() {
-        
+
         $model = new ConfigForm;
         $form = new CForm('application.views.config.form', $model);
         $model->load();
@@ -24,7 +42,7 @@ class ConfigController extends Controller {
         } else {
             $this->render('index', array('form' => $form));
         }
-        
+
     }
 
 }

@@ -4,6 +4,7 @@
 !/assets/README
 !/protected/runtime/README
 /protected/data/params.ini
+/protected/data/.auth_mode_htpasswd
 /VERSION
 /.superpowers/
 /docs/superpowers/

@@ -197,6 +197,17 @@ Once logged in as `admin` at `/site/login`, use the new **Users** nav item
 to create further accounts for other people who need Create/Update
 access.
 
+The Configuration screen (admin-only, `/config/index`) now has an
+**Authentication Mode** setting to choose which of the two logins above is
+actually enforced: the PHPNetMap login from this section (default for new
+installs) or the legacy `.htpasswd` Basic Auth from step 6. Switching
+between them takes effect immediately — no restart needed — and both
+credential sets stay provisioned regardless of which one is active. Note
+that this changes the *default* behavior for anyone provisioning a fresh
+install from this version onward: previously the site was always behind
+Basic Auth; now Basic Auth is off by default and the Yii login is the sole
+gate unless you explicitly switch back.
+
 ## 8. Tune php.ini
 
 The app never calls `ini_set()` for any of this (see `index.php`), so it's

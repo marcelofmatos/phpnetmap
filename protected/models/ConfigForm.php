@@ -3,7 +3,7 @@
 /**
  * ConfigForm class.
  * ConfigForm is the data structure for custom app configs
- * 
+ *
  * See protected/config/params.php
  */
 
@@ -20,6 +20,7 @@ class ConfigForm extends CFormModel {
     public $showErrorSummary = true;
     public $mcpEnabled = false;
     public $mcpMode = 'readonly';
+    public $authMode = 'yii';
 
 
     /**
@@ -30,7 +31,8 @@ class ConfigForm extends CFormModel {
     public function rules() {
         return array(
             // type and query are required
-            array('adminEmail, translateCamTable, hostGatewayId, cache, cacheTtlDefault, cacheTtlCam, cacheTtlArp, cacheTtlGetSnmp, mcpEnabled, mcpMode', 'required'),
+            array('adminEmail, translateCamTable, hostGatewayId, cache, cacheTtlDefault, cacheTtlCam, cacheTtlArp, cacheTtlGetSnmp, mcpEnabled, mcpMode, authMode', 'required'),
+            array('authMode', 'in', 'range' => array('htpasswd', 'yii')),
         );
     }
 
@@ -47,9 +49,18 @@ class ConfigForm extends CFormModel {
             'cacheTtlDefault' => 'TTL Default Cache (seconds)',
             'mcpEnabled' => 'Enable MCP Server (/mcp)',
             'mcpMode' => 'MCP Mode',
+            'authMode' => 'Authentication Mode',
         );
     }
 
+    /**
+     * Path to the marker file .htaccess itself checks for (plain file-exists
+     * test, no content read) to decide whether to enforce HTTP Basic Auth.
+     * Lives alongside params.ini in the same persistent volume.
+     */
+    private static function getAuthModeMarkerPath() {
+        return dirname(PARAMS_INI_FILE_PATH) . '/.auth_mode_htpasswd';
+    }
 
     public function load() {
         if(!is_readable(PARAMS_INI_FILE_PATH)) {
@@ -65,13 +76,18 @@ class ConfigForm extends CFormModel {
         // parse_ini_file always returns quoted values as strings, so coerce
         // back to a real bool (mirrors the (bool) cast already applied in save()).
         $this->mcpEnabled = (bool) $this->mcpEnabled;
+
+        // authMode is deliberately NOT stored in params.ini — it's derived
+        // straight from the same marker file .htaccess itself reads, so this
+        // form can never show a value that isn't what's actually enforced.
+        $this->authMode = file_exists(self::getAuthModeMarkerPath()) ? 'htpasswd' : 'yii';
     }
-    
+
     public function save() {
         if(!is_writeable(PARAMS_INI_FILE_PATH)) {
             throw new Exception("Config file is not writable: ". PARAMS_INI_FILE_PATH);
         }
-        
+
         $res = array(
             'adminEmail' => (string) $this->adminEmail,
             'translateCamTable' => (bool) $this->translateCamTable,
@@ -84,12 +100,23 @@ class ConfigForm extends CFormModel {
             'mcpEnabled' => (bool) $this->mcpEnabled,
             'mcpMode' => (string) $this->mcpMode,
         );
-        
+
         foreach($res as $key => $val) {
             $configToIni[] = "$key = ".(is_numeric($val) ? $val : '"'.$val.'"');
         }
-        
+
         file_put_contents(PARAMS_INI_FILE_PATH, implode("\r\n", $configToIni));
+
+        // authMode isn't persisted above (see load()) — sync the marker file
+        // .htaccess reads directly instead, so Apache's enforced auth mode
+        // always matches exactly what was just saved here, with no drift
+        // possible between what the UI shows and what's actually enforced.
+        $markerPath = self::getAuthModeMarkerPath();
+        if ($this->authMode === 'htpasswd') {
+            touch($markerPath);
+        } else {
+            @unlink($markerPath);
+        }
     }
 
 }
