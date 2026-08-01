@@ -39,7 +39,23 @@ class McpToolRegistry
             throw new McpToolException('Server is in read-only mode');
         }
 
-        return call_user_func($def['handler'], $arguments);
+        $result = call_user_func($def['handler'], $arguments);
+
+        if ($def['mode'] !== 'readonly') {
+            self::recordAudit($token, $name, $arguments);
+        }
+
+        return $result;
+    }
+
+    private static function recordAudit($token, $toolName, $arguments)
+    {
+        Yii::app()->db->createCommand()->insert('mcp_audit_log', array(
+            'mcp_token_id' => $token->id,
+            'tool_name' => $toolName,
+            'params_json' => json_encode($arguments),
+            'created_at' => date('Y-m-d H:i:s'),
+        ));
     }
 
     private static function allDefinitions()
