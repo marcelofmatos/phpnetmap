@@ -1,3 +1,9 @@
+# Pass the Authorization header through to PHP — mod_php strips it by
+# default (it's reserved for Apache's own Basic Auth), which would leave
+# McpController unable to read the bearer token even once /mcp is
+# excluded from Basic Auth below.
+CGIPassAuth On
+
 RewriteEngine On
 #RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -11,7 +17,13 @@ RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
 # interactive login prompt. It authenticates itself via bearer token
 # instead (see McpController); every other path keeps requiring the
 # site-wide login.
-<If "%{REQUEST_URI} =~ m#^/mcp(?:/|$)#">
+#
+# The regex matches both the original request URI (/mcp) and its
+# mod_rewrite-internal-redirect form (/index.php/mcp): the RewriteRule
+# above triggers an internal redirect that re-runs access control against
+# the rewritten URI, so both forms have to be covered for the exclusion
+# to actually take effect.
+<If "%{REQUEST_URI} =~ m#^(?:/index\.php)?/mcp(?:/|$)#">
     Require all granted
 </If>
 <Else>
