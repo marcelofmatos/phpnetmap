@@ -191,7 +191,12 @@ sign-in screen (`/site/login`), separate from the `.htpasswd` prompt from
 step 6. It gates every Create/Update/Admin/Delete page app-wide (Hosts,
 Vlans, Connections, SNMP Templates, SNMP Fields, Host Faces, MCP Tokens,
 Users) — before this feature, all of those pages were permanently
-unreachable, since this login was a broken scaffold.
+unreachable, since this login was a broken scaffold. With this login as
+the sole gate (the default — see below), it also covers plain viewing
+(list/detail pages) for almost everything, not just the write actions
+above: since Basic Auth is no longer unconditionally in front of the app,
+list/detail pages need their own login too, to avoid exposing things like
+SNMP credentials to anyone on the network.
 
 Seed the `admin` account's password once after setup:
 

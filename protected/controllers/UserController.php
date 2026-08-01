@@ -72,6 +72,8 @@ class UserController extends Controller
                 }
                 if ($model->save(false)) {
                     $this->redirect(array('admin'));
+                } else {
+                    $model->addError('username', 'The "admin" account cannot be renamed — it is needed to sign in to every admin-only page.');
                 }
             }
         }
