@@ -6,9 +6,9 @@ FROM php:7.4-apache
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        sqlite3 libsqlite3-dev git unzip curl \
-    && docker-php-ext-install pdo_sqlite \
-    && apt-get purge -y --auto-remove libsqlite3-dev \
+        sqlite3 libsqlite3-dev snmp libsnmp-dev git unzip curl \
+    && docker-php-ext-install pdo_sqlite snmp \
+    && apt-get purge -y --auto-remove libsqlite3-dev libsnmp-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
