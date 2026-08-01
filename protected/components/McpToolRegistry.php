@@ -7,7 +7,7 @@ class McpToolRegistry
      * method. Appended to by each entity's tool-class task.
      * @var array
      */
-    public static $classes = array('McpHostTools', 'McpConnectionTools', 'McpVlanTools');
+    public static $classes = array('McpHostTools', 'McpConnectionTools', 'McpVlanTools', 'McpSnmpTemplateTools');
 
     public static function listTools($mode)
     {
