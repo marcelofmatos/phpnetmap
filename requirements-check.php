@@ -220,25 +220,29 @@ foreach ($writableDirs as $dir => $why) {
 }
 
 // ---------------------------------------------------------------------
-// 4. .htpasswd — the whole app sits behind Apache Basic Auth (.htaccess),
-//    not a login page; nothing loads at all without this file.
+// 4. .htpasswd — used for Apache Basic Auth (.htaccess) when Authentication
+//    Mode is set to "HTTP Basic Auth (.htpasswd, legacy)" on the
+//    Configuration screen (/config/index). Since this is now optional —
+//    the default is the app's own Yii login instead — an empty/missing
+//    file is no longer a warning by itself; it only matters if htpasswd
+//    mode is actually selected.
 // ---------------------------------------------------------------------
 $htpasswdPath = $root . '/.htpasswd';
 if (file_exists($htpasswdPath) && filesize($htpasswdPath) > 0) {
-    pnm_check('.htpasswd', 'pass', 'present and non-empty — Apache Basic Auth (see .htaccess) will use it');
+    pnm_check('.htpasswd', 'pass', 'present and non-empty — ready if Authentication Mode is switched to "HTTP Basic Auth (.htpasswd)"');
 } elseif (file_exists($htpasswdPath)) {
     pnm_check(
         '.htpasswd',
-        'warn',
-        'exists but is empty — no user can log in yet. Create an entry with: '
-        . 'htpasswd -c ' . $htpasswdPath . ' admin (see STANDALONE_INSTALLATION_GUIDE.md)'
+        'pass',
+        'exists but is empty — fine under the default Yii login mode. Only create an entry '
+        . '(htpasswd -c ' . $htpasswdPath . ' admin) if you plan to switch Authentication Mode to "HTTP Basic Auth" on the Configuration screen.'
     );
 } else {
     pnm_check(
         '.htpasswd',
-        'warn',
-        'not found at project root — every page will 500 until it exists. Create it with: '
-        . 'htpasswd -c ' . $htpasswdPath . ' admin (see STANDALONE_INSTALLATION_GUIDE.md)'
+        'pass',
+        'not found at project root — fine under the default Yii login mode. Only needed if you switch Authentication Mode to '
+        . '"HTTP Basic Auth" on the Configuration screen; create it with: htpasswd -c ' . $htpasswdPath . ' admin'
     );
 }
 
@@ -286,6 +290,27 @@ if ($apacheBinary === null) {
                 pnm_check("Apache: $needle", 'fail', "not enabled — $why. Enable with: a2enmod " . str_replace('_module', '', $needle));
             }
         }
+    }
+}
+
+// ---------------------------------------------------------------------
+// 6. Files that should never reach production — apc.php (bundled APCu
+//    cache inspector, unauthenticated by default) and index-test.php (a
+//    debug-mode entry point, its own header says as much). The Docker
+//    image excludes both via .dockerignore; a standalone checkout doesn't
+//    get that for free.
+// ---------------------------------------------------------------------
+foreach (array('apc.php', 'index-test.php') as $riskyFile) {
+    $riskyPath = $root . '/' . $riskyFile;
+    if (file_exists($riskyPath)) {
+        pnm_check(
+            $riskyFile,
+            'fail',
+            'present at the project root — remove it before going to production: rm -f ' . $riskyPath
+            . ' (see STANDALONE_INSTALLATION_GUIDE.md)'
+        );
+    } else {
+        pnm_check($riskyFile, 'pass', 'correctly absent');
     }
 }
 

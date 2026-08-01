@@ -20,10 +20,6 @@ class SearchController extends Controller {
                             'actions'=>array('create','update','form','result','index'),
                             'users'=>array('@'),
                     ),
-                    array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                            'actions'=>array('admin','delete'),
-                            'users'=>array('admin'),
-                    ),
                     array('deny',  // deny all users
                             'users'=>array('*'),
                     ),
