@@ -30,6 +30,11 @@ $this->menu = array(
         array(
             'class' => 'CButtonColumn',
             'template' => '<span style="white-space:nowrap">{update} {delete}</span>',
+            'buttons' => array(
+                'delete' => array(
+                    'visible' => '$data->username !== "admin"',
+                ),
+            ),
         ),
     ),
 )); ?>

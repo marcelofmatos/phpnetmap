@@ -4,7 +4,7 @@
 
 $this->breadcrumbs = array(
     'Users' => array('admin'),
-    CHtml::encode($model->username) => array('admin'),
+    $model->username => array('admin'),
     'Update',
 );
 
