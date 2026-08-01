@@ -22,12 +22,13 @@ likely work but aren't verified here.
 - [4. Set up writable directories](#4-set-up-writable-directories)
 - [5. Configure Apache](#5-configure-apache)
 - [6. Create the HTTP login (.htpasswd)](#6-create-the-http-login-htpasswd)
-- [7. Tune php.ini](#7-tune-phpini)
-- [8. Verify everything with requirements-check.php](#8-verify-everything-with-requirements-checkphp)
-- [9. First run](#9-first-run)
-- [10. MCP Server](#10-mcp-server)
-- [11. Updating](#11-updating)
-- [12. Troubleshooting](#12-troubleshooting)
+- [7. Seed the Yii admin login](#7-seed-the-yii-admin-login)
+- [8. Tune php.ini](#8-tune-phpini)
+- [9. Verify everything with requirements-check.php](#9-verify-everything-with-requirements-checkphp)
+- [10. First run](#10-first-run)
+- [11. MCP Server](#11-mcp-server)
+- [12. Updating](#12-updating)
+- [13. Troubleshooting](#13-troubleshooting)
 
 ## 1. Prerequisites
 
@@ -170,7 +171,33 @@ existing one.) This is the same mechanism the Docker image's
 environment variables — there's no env-var equivalent outside Docker, so
 `htpasswd` is how you set it directly.
 
-## 7. Tune php.ini
+## 7. Seed the Yii admin login
+
+Every page also sits behind a second, independent login — PHPNetMap's own
+sign-in screen (`site/login`), separate from the `.htpasswd` prompt from
+step 6. It gates every Create/Update/Admin/Delete page app-wide (Hosts,
+Vlans, Connections, SNMP Templates, SNMP Fields, Host Faces, MCP Tokens,
+Users) — before this feature, all of those pages were permanently
+unreachable, since this login was broken scaffold.
+
+Seed the `admin` account's password once after setup:
+
+```bash
+cd /var/www/phpnetmap
+ADMIN_PASSWORD=yourpassword php seed_admin_user.php
+```
+
+This is safe and idempotent — re-run it any time to reset the `admin`
+account's password. It reads the same `ADMIN_PASSWORD` convention as the
+Docker image's `ADMIN_PASSWORD` env var, but the two logins (`.htpasswd`
+and this one) are otherwise independent — there's no requirement they share
+a password, this is just a convenient default.
+
+Once logged in as `admin` at `site/login`, use the new **Users** nav item
+to create further accounts for other people who need Create/Update/Admin
+access.
+
+## 8. Tune php.ini
 
 The app never calls `ini_set()` for any of this (see `index.php`), so it's
 entirely at the mercy of your server's `php.ini`
@@ -192,21 +219,21 @@ sudo nano /etc/php/7.4/apache2/php.ini
 sudo systemctl reload apache2
 ```
 
-## 8. Verify everything with requirements-check.php
+## 9. Verify everything with requirements-check.php
 
 ```bash
 php requirements-check.php
 ```
 
 This checks PHP version, the extensions above, the php.ini settings from
-step 7, directory permissions, `.htpasswd`, and (best-effort) the Apache
-modules — everything from steps 1–7 — and tells you exactly what's still
-missing. Fix anything reported as
+step 8, directory permissions, `.htpasswd`, and (best-effort) the Apache
+modules — everything from the setup steps above — and tells you exactly
+what's still missing. Fix anything reported as
 `FAIL` (blocking) before continuing; `WARN` items are worth reading but
 won't stop the app from loading. Re-run it any time you're unsure the
 environment is still correctly set up (e.g. after an OS upgrade).
 
-## 9. First run
+## 10. First run
 
 Open `http://<server>/` (or your vhost's `ServerName`) in a browser. You'll
 be prompted for the HTTP login from step 6.
@@ -233,7 +260,7 @@ show there:
 echo "1.26.0" | sudo tee /var/www/phpnetmap/VERSION
 ```
 
-## 10. MCP Server
+## 11. MCP Server
 
 PHPNetMap exposes an MCP endpoint at `/mcp` so AI clients (Claude, etc.) can
 query — and, optionally, modify — your network inventory data (hosts,
@@ -262,7 +289,7 @@ connections, VLANs, SNMP templates).
   `requirements-check.php` includes `mod_version` in its (best-effort)
   Apache module check.
 
-## 11. Updating
+## 12. Updating
 
 ```bash
 cd /var/www/phpnetmap
@@ -276,7 +303,7 @@ pull` as long as it stays out of version control (it already is, via
 
 **Note on `protected/data/phpnetmap.db` specifically.** Unlike `params.ini`,
 `phpnetmap.db` *is* committed to the repository, and schema changes (like
-the MCP tables added in this guide's section 10) are applied directly to
+the MCP tables added in this guide's section 11) are applied directly to
 that committed file. That means `git pull` overwrites your live database
 with the repo's snapshot — fine for a fresh/test install with no real data
 yet, but a real risk if you've already added hosts/connections/etc. If you
@@ -306,6 +333,7 @@ CREATE TABLE "mcp_audit_log" (
     FOREIGN KEY(mcp_token_id) REFERENCES "mcp_token"(id)
 );
 ALTER TABLE mcp_audit_log ADD COLUMN token_description VARCHAR(255);
+CREATE UNIQUE INDEX idx_user_username ON user (username);
 SQL
 ```
 
@@ -313,7 +341,7 @@ Then keep your live database out of the pull, e.g. `git checkout --
 protected/data/phpnetmap.db` right after a `git pull` that touched it, so
 your data stays intact.
 
-## 12. Troubleshooting
+## 13. Troubleshooting
 
 **Blank page or HTTP 500 on every request.**
 Almost always one of: `.htpasswd` missing/empty (step 6), `protected/data`
