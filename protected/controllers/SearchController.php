@@ -1,6 +1,13 @@
 <?php
 
 class SearchController extends Controller {
+    public function filters()
+    {
+        return array(
+            'accessControl',
+        );
+    }
+
     /**
      * Specifies the access control rules.
      * This method is used by the 'accessControl' filter.
@@ -10,11 +17,11 @@ class SearchController extends Controller {
     {
             return array(
                     array('allow',  // allow all users to perform 'index' and 'view' actions
-                            'actions'=>array('index','view','form','result'),
+                            'actions'=>array('index','view'),
                             'users'=>array('*'),
                     ),
                     array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                            'actions'=>array('create','update'),
+                            'actions'=>array('create','update','form','result'),
                             'users'=>array('@'),
                     ),
                     array('allow', // allow admin user to perform 'admin' and 'delete' actions
