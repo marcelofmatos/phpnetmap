@@ -35,28 +35,34 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once __DIR__ . '/yii/framework/yii.php';
-Yii::createWebApplication(__DIR__ . '/protected/config/main.php');
 
-$username = 'admin'; // deliberately NOT getenv('ADMIN_USER') — see note above
+try {
+    Yii::createWebApplication(__DIR__ . '/protected/config/main.php');
 
-$password = getenv('ADMIN_PASSWORD');
-if ($password === false || $password === '') {
-    fwrite(STDOUT, "ADMIN_PASSWORD not set — skipping Yii admin-user seeding.\n");
-    exit(0);
+    $username = 'admin'; // deliberately NOT getenv('ADMIN_USER') — see note above
+
+    $password = getenv('ADMIN_PASSWORD');
+    if ($password === false || $password === '') {
+        fwrite(STDOUT, "ADMIN_PASSWORD not set — skipping Yii admin-user seeding.\n");
+        exit(0);
+    }
+
+    $user = User::model()->findByAttributes(array('username' => $username));
+    if ($user === null) {
+        $user = new User;
+        $user->username = $username;
+        $user->email = $username . '@localhost';
+    }
+    $user->setPassword($password);
+
+    if ($user->save(false)) {
+        fwrite(STDOUT, "Seeded Yii login for \"$username\".\n");
+        exit(0);
+    }
+
+    fwrite(STDERR, "Failed to seed Yii admin user: " . print_r($user->getErrors(), true) . "\n");
+    exit(1);
+} catch (Exception $e) {
+    fwrite(STDERR, "Failed to seed Yii admin user: " . $e->getMessage() . "\n");
+    exit(1);
 }
-
-$user = User::model()->findByAttributes(array('username' => $username));
-if ($user === null) {
-    $user = new User;
-    $user->username = $username;
-    $user->email = $username . '@localhost';
-}
-$user->setPassword($password);
-
-if ($user->save(false)) {
-    fwrite(STDOUT, "Seeded Yii login for \"$username\".\n");
-    exit(0);
-}
-
-fwrite(STDERR, "Failed to seed Yii admin user: " . print_r($user->getErrors(), true) . "\n");
-exit(1);
