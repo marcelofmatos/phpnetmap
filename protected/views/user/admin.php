@@ -32,7 +32,7 @@ $this->menu = array(
             'template' => '<span style="white-space:nowrap">{update} {delete}</span>',
             'buttons' => array(
                 'delete' => array(
-                    'visible' => '$data->username !== "admin"',
+                    'visible' => 'strcasecmp($data->username, "admin") !== 0',
                 ),
             ),
         ),
