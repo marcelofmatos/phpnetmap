@@ -6,7 +6,7 @@ class UserTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Yii::app()->db->createCommand("DELETE FROM user WHERE username LIKE 'test-%' OR username = 'admin'")->execute();
+        Yii::app()->db->createCommand("DELETE FROM user WHERE username LIKE 'test-%' OR LOWER(username) = 'admin' OR username = 'not-admin-anymore'")->execute();
     }
 
     public function testSetPasswordHashesAndValidatePasswordRoundTrips()
@@ -66,5 +66,47 @@ class UserTest extends TestCase
 
         $this->assertFalse($admin->delete());
         $this->assertNotNull(User::model()->findByAttributes(array('username' => 'admin')));
+    }
+
+    public function testCannotDeleteAnAdminAccountRegardlessOfUsernameCase()
+    {
+        $admin = new User;
+        $admin->username = 'Admin';
+        $admin->email = 'admin-case@example.com';
+        $admin->setPassword('whatever');
+        $this->assertTrue($admin->save());
+
+        $this->assertFalse($admin->delete());
+        $this->assertNotNull(User::model()->findByAttributes(array('username' => 'Admin')));
+    }
+
+    public function testCannotRenameTheAdminAccountAway()
+    {
+        $admin = new User;
+        $admin->username = 'admin';
+        $admin->email = 'admin@example.com';
+        $admin->setPassword('whatever');
+        $this->assertTrue($admin->save());
+
+        $admin->username = 'not-admin-anymore';
+        $this->assertFalse($admin->save());
+
+        $reloaded = User::model()->findByPk($admin->id);
+        $this->assertSame('admin', $reloaded->username);
+    }
+
+    public function testAdminAccountCanStillBeSavedWithUsernameUnchanged()
+    {
+        $admin = new User;
+        $admin->username = 'admin';
+        $admin->email = 'admin@example.com';
+        $admin->setPassword('whatever');
+        $this->assertTrue($admin->save());
+
+        $admin->email = 'admin-updated@example.com';
+        $this->assertTrue($admin->save());
+
+        $reloaded = User::model()->findByPk($admin->id);
+        $this->assertSame('admin-updated@example.com', $reloaded->email);
     }
 }
