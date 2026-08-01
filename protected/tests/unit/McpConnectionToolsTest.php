@@ -94,5 +94,7 @@ class McpConnectionToolsTest extends TestCase
         $this->assertIsInt($fetched['id']);
         $this->assertIsInt($fetched['host_src_id']);
         $this->assertIsInt($fetched['host_src_port']);
+        $this->assertIsInt($fetched['host_dst_id']);
+        $this->assertIsInt($fetched['host_dst_port']);
     }
 }

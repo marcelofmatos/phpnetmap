@@ -73,4 +73,15 @@ class McpHostToolsTest extends TestCase
         $fetched = McpHostTools::getHost(array('id' => $created['id']));
         $this->assertIsInt($fetched['id']);
     }
+
+    public function testGetHostReturnsIntegerForeignKeyFieldsWhenSet()
+    {
+        $created = McpHostTools::createHost(array(
+            'name' => 'mcp-test-fk-check', 'type' => 'switch',
+            'snmp_template_id' => 1, 'host_face_id' => 1,
+        ));
+        $fetched = McpHostTools::getHost(array('id' => $created['id']));
+        $this->assertIsInt($fetched['snmp_template_id']);
+        $this->assertIsInt($fetched['host_face_id']);
+    }
 }
