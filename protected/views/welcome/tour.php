@@ -6,25 +6,29 @@ $this->breadcrumbs = array(
     'Tour',
 );
 
+// 'url' isn't rendered as a link in this task (the cards are informational
+// only, by design — see docs/superpowers/plans/2026-08-01-welcome-wizard.md
+// Task 2), but is kept accurate to each section's real top-nav route
+// (protected/views/layouts/main.php) in case a future change wires it in.
 $tourCards = array(
     array(
         'label' => 'SNMP Templates',
-        'url' => array('/snmpTemplate/index'),
+        'url' => array('/snmpTemplate/admin'),
         'description' => 'Reusable SNMP v1/2c/3 credentials (community string or v3 security settings) that hosts reference, so you set them up once instead of on every device.',
     ),
     array(
         'label' => 'Hosts',
-        'url' => array('/host/index'),
+        'url' => array('/host/admin'),
         'description' => 'Your monitored switches and routers — inventory, port status, traffic graphs, and CAM/ARP tables for each device.',
     ),
     array(
         'label' => 'Vlans',
-        'url' => array('/vlan/index'),
+        'url' => array('/vlan/admin'),
         'description' => 'The VLANs on your network, used to color and group ports and hosts on the map.',
     ),
     array(
         'label' => 'Connections',
-        'url' => array('/connection/index'),
+        'url' => array('/connection/admin'),
         'description' => 'The links between hosts (which port connects to which) — this is what PHPNetMap draws as your network topology map.',
     ),
     array(
@@ -35,7 +39,7 @@ $tourCards = array(
     array(
         'label' => 'MCP Tokens',
         'url' => array('/mcpToken/admin'),
-        'description' => "API tokens for connecting AI assistants to PHPNetMap's MCP server, in read-only or read-write mode.",
+        'description' => "API tokens for connecting AI assistants to PHPNetMap's MCP server. Whether they're read-only or read-write is a single site-wide setting on the Configuration screen, not chosen per token.",
     ),
     array(
         'label' => 'Users',
@@ -45,7 +49,7 @@ $tourCards = array(
     array(
         'label' => 'Configuration',
         'url' => array('/config/index'),
-        'description' => 'The settings you just reviewed — admin email, caching, the SNMP gateway host, and the MCP server.',
+        'description' => 'The settings you just reviewed — admin email, caching, the SNMP gateway host, and the MCP server\'s read-only/read-write mode.',
     ),
 );
 ?>
