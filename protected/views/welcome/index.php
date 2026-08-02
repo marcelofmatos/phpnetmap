@@ -8,7 +8,7 @@ $this->breadcrumbs = array(
 
 <h1>Welcome to PHPNetMap</h1>
 
-<p>Hi, <strong>admin</strong> — this looks like a fresh install: no hosts have been added yet.</p>
+<p>Hi, <strong><?php echo CHtml::encode(Yii::app()->user->name); ?></strong> — this looks like a fresh install: no hosts have been added yet.</p>
 
 <p>
     PHPNetMap is software for monitoring Layer 2 and Layer 3 network equipment

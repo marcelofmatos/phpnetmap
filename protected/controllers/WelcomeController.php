@@ -27,6 +27,10 @@ class WelcomeController extends Controller
         // Defensive re-check: if the install is no longer fresh (a real
         // host got added since this page was linked/bookmarked), don't
         // show a stale welcome screen — send the admin to the normal app.
+        // Threshold is > 1, not > 0, because every install ships with one
+        // seeded "localhost" placeholder host (id 1) that Configuration's
+        // required Gateway field needs — that alone doesn't count as "a
+        // real host was added."
         if (Host::model()->count() > 1) {
             $this->redirect(array('map/index'));
         }
