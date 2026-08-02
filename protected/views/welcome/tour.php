@@ -79,7 +79,7 @@ $tourCards = array(
 <h1>You're all set — here's a quick tour</h1>
 
 <p class="pnm-tour-intro">
-    Here's what each part of PHPNetMap does. You'll always find these in the top menu.
+    Here's what each part of PHPNetMap does. You'll always find these in the sidebar menu.
     <br>
     <?php echo CHtml::link('Skip tour', array('/map/index'), array('class' => 'pnm-skip')); ?>
 </p>
