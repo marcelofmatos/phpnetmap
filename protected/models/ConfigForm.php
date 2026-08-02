@@ -121,6 +121,8 @@ class ConfigForm extends CFormModel {
                 throw new Exception("Could not remove auth mode marker file: " . $markerPath);
             }
         }
+
+        return true;
     }
 
 }
