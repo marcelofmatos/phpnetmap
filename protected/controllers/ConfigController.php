@@ -36,9 +36,14 @@ class ConfigController extends Controller {
         if ($form->submitted('submit') && $model->validate()) {
             $model->attributes = $_POST['ConfigForm'];
             if ($model->save()) {
+                // In wizard mode, move on to the guided tour instead of
+                // re-rendering this screen with a flash message.
+                if (isset($_GET['wizard'])) {
+                    $this->redirect(array('welcome/tour'));
+                }
                 Yii::app()->user->setFlash('config', Yii::t('app', 'Your new options have been saved.'));
             }
-            $this->render('index', array('form' => $form, 'model'=> $model, 'result' => $result));
+            $this->render('index', array('form' => $form, 'model' => $model));
         } else {
             $this->render('index', array('form' => $form));
         }
