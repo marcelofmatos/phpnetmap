@@ -352,16 +352,16 @@
 		}
 
 		html[data-pnm-nav="icons"] .pnm-sidenav {
-			width: 56px !important;
+			width: 56px;
 		}
 		html[data-pnm-nav="icons"] .pnm-sidenav-nav .nav-link .pnm-nav-label {
-			display: none !important;
+			display: none;
 		}
 		html[data-pnm-nav="full"] .pnm-sidenav {
-			width: 200px !important;
+			width: 200px;
 		}
 		html[data-pnm-nav="full"] .pnm-sidenav-nav .nav-link .pnm-nav-label {
-			display: inline !important;
+			display: inline;
 		}
 	</style>
 
@@ -391,20 +391,56 @@
 
 <div class="pnm-shell">
 	<aside class="pnm-sidenav" id="pnmSidenav">
-		<button type="button" class="pnm-sidenav-toggle" id="pnmSidenavToggle" title="Toggle icon/text sidebar">»</button>
+		<button type="button" class="pnm-sidenav-toggle" id="pnmSidenavToggle" aria-label="Toggle icon/text sidebar" title="Toggle icon/text sidebar">»</button>
 		<?php $this->widget('bootstrap.widgets.TbNav', array(
 			'encodeLabel' => false,
 			'htmlOptions' => array('class' => 'nav flex-column pnm-sidenav-nav'),
 			'items' => array(
-				array('label' => $pnmIcons['snmpTemplate'] . '<span class="pnm-nav-label">SNMP Templates</span>', 'url' => array('/snmpTemplate/admin')),
-				array('label' => $pnmIcons['host'] . '<span class="pnm-nav-label">Hosts</span>', 'url' => array('/host/admin')),
-				array('label' => $pnmIcons['vlan'] . '<span class="pnm-nav-label">Vlans</span>', 'url' => array('/vlan/admin')),
-				array('label' => $pnmIcons['connection'] . '<span class="pnm-nav-label">Connections</span>', 'url' => array('/connection/admin')),
-				array('label' => $pnmIcons['search'] . '<span class="pnm-nav-label">Search</span>', 'url' => array('/search/index')),
-				array('label' => $pnmIcons['mcpToken'] . '<span class="pnm-nav-label">MCP Tokens</span>', 'url' => array('/mcpToken/admin')),
-				array('label' => $pnmIcons['user'] . '<span class="pnm-nav-label">Users</span>', 'url' => array('/user/admin')),
-				array('label' => $pnmIcons['config'] . '<span class="pnm-nav-label">Configuration</span>', 'url' => array('/config/index')),
-				array('label' => $pnmIcons['about'] . '<span class="pnm-nav-label">About</span>', 'url' => array('/site/page', 'view' => 'about')),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['snmpTemplate'] . '</span><span class="pnm-nav-label">SNMP Templates</span>',
+					'url' => array('/snmpTemplate/admin'),
+					'linkOptions' => array('aria-label' => 'SNMP Templates', 'title' => 'SNMP Templates'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['host'] . '</span><span class="pnm-nav-label">Hosts</span>',
+					'url' => array('/host/admin'),
+					'linkOptions' => array('aria-label' => 'Hosts', 'title' => 'Hosts'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['vlan'] . '</span><span class="pnm-nav-label">Vlans</span>',
+					'url' => array('/vlan/admin'),
+					'linkOptions' => array('aria-label' => 'Vlans', 'title' => 'Vlans'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['connection'] . '</span><span class="pnm-nav-label">Connections</span>',
+					'url' => array('/connection/admin'),
+					'linkOptions' => array('aria-label' => 'Connections', 'title' => 'Connections'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['search'] . '</span><span class="pnm-nav-label">Search</span>',
+					'url' => array('/search/index'),
+					'linkOptions' => array('aria-label' => 'Search', 'title' => 'Search'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['mcpToken'] . '</span><span class="pnm-nav-label">MCP Tokens</span>',
+					'url' => array('/mcpToken/admin'),
+					'linkOptions' => array('aria-label' => 'MCP Tokens', 'title' => 'MCP Tokens'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['user'] . '</span><span class="pnm-nav-label">Users</span>',
+					'url' => array('/user/admin'),
+					'linkOptions' => array('aria-label' => 'Users', 'title' => 'Users'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['config'] . '</span><span class="pnm-nav-label">Configuration</span>',
+					'url' => array('/config/index'),
+					'linkOptions' => array('aria-label' => 'Configuration', 'title' => 'Configuration'),
+				),
+				array(
+					'label' => '<span aria-hidden="true">' . $pnmIcons['about'] . '</span><span class="pnm-nav-label">About</span>',
+					'url' => array('/site/page', 'view' => 'about'),
+					'linkOptions' => array('aria-label' => 'About', 'title' => 'About'),
+				),
 			),
 		)); ?>
 	</aside>
