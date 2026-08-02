@@ -47,25 +47,27 @@ class TbGridView extends CGridView
     public function init()
     {
         parent::init();
-        $classes = array('table');
-        if (isset($this->type) && !empty($this->type)) {
-            if (is_string($this->type)) {
-                $this->type = explode(' ', $this->type);
-            }
-
-            // BS5 renamed table-condensed to table-sm; every other
-            // TbHtml::GRID_TYPE_* value (striped/bordered/hover) is unchanged.
-            foreach ($this->type as $type) {
-                $classes[] = 'table-' . ($type === 'condensed' ? 'sm' : $type);
-            }
+        if (!isset($this->type) || empty($this->type)) {
+            // Every admin grid gets zebra striping + row hover by default so
+            // the CRUD screens read consistently instead of each view having
+            // to opt in with its own 'type' => 'striped hover'. A view can
+            // still override this by setting its own 'type' explicitly.
+            $this->type = array(TbHtml::GRID_TYPE_STRIPED, TbHtml::GRID_TYPE_HOVER);
         }
-        if (!empty($classes)) {
-            $classes = implode(' ', $classes);
-            if (isset($this->itemsCssClass)) {
-                $this->itemsCssClass .= ' ' . $classes;
-            } else {
-                $this->itemsCssClass = $classes;
-            }
+        if (is_string($this->type)) {
+            $this->type = explode(' ', $this->type);
+        }
+        $classes = array('table');
+        // BS5 renamed table-condensed to table-sm; every other
+        // TbHtml::GRID_TYPE_* value (striped/bordered/hover) is unchanged.
+        foreach ($this->type as $type) {
+            $classes[] = 'table-' . ($type === 'condensed' ? 'sm' : $type);
+        }
+        $classes = implode(' ', $classes);
+        if (isset($this->itemsCssClass)) {
+            $this->itemsCssClass .= ' ' . $classes;
+        } else {
+            $this->itemsCssClass = $classes;
         }
     }
 
