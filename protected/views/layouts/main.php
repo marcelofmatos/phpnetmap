@@ -141,7 +141,7 @@
 			display: block;
 			color: var(--bs-danger);
 			font-size: .875rem;
-			margin-top: -.5rem;
+			margin-top: .25rem;
 		}
 		.card-body .errorSummary {
 			color: var(--bs-danger-text-emphasis);
@@ -161,6 +161,20 @@
 			border-radius: .375rem;
 			padding: .75rem 1rem;
 			margin-bottom: 1rem;
+		}
+		/* CHtml::addErrorCss() (yii/framework/web/helpers/CHtml.php) appends
+		   class="error" straight onto the input AND its label whenever
+		   $model->hasErrors($attribute) — form.css used to give that a red
+		   background/border, lost when form.css was dropped in favor of our
+		   own field styling above. */
+		.card-body .row:not(.pnm-grid) label.error {
+			color: var(--bs-danger);
+		}
+		.card-body .row:not(.pnm-grid) input.error,
+		.card-body .row:not(.pnm-grid) select.error,
+		.card-body .row:not(.pnm-grid) textarea.error {
+			background-color: var(--bs-danger-bg-subtle);
+			border-color: var(--bs-danger);
 		}
 
 		/* Flex items default to min-width:auto, meaning they refuse to
