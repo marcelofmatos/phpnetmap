@@ -94,12 +94,11 @@ class SiteController extends Controller
 			if($model->validate() && $model->login())
 			{
 				// Fresh install, admin's first login: show the welcome
-				// wizard instead of wherever they were headed. This has no
-				// persisted state — it naturally re-triggers every login
-				// while the install stays this empty (only the seeded
-				// "localhost" placeholder host, id 1, or nothing), and
-				// naturally stops the moment a real host exists.
-				if(Yii::app()->user->name === 'admin' && Host::model()->count() <= 1)
+				// wizard instead of wherever they were headed. Triggered by
+				// the absence of a saved config file, not host count — this
+				// naturally stops the moment setup has been completed once,
+				// regardless of how many hosts exist.
+				if(Yii::app()->user->name === 'admin' && ConfigForm::isUnconfigured())
 					$this->redirect(array('welcome/index'));
 				$this->redirect(Yii::app()->user->returnUrl);
 			}

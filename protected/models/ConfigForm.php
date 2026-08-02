@@ -62,6 +62,18 @@ class ConfigForm extends CFormModel {
         return dirname(PARAMS_INI_FILE_PATH) . '/.auth_mode_htpasswd';
     }
 
+    /**
+     * True until save() has been called at least once. load() only ever
+     * touch()es an empty placeholder file into existence when missing —
+     * save() is the only code path that writes real content — so a
+     * missing or empty file reliably means setup was never completed.
+     * Used by SiteController to gate the first-run welcome wizard.
+     * @return bool
+     */
+    public static function isUnconfigured() {
+        return !is_file(PARAMS_INI_FILE_PATH) || filesize(PARAMS_INI_FILE_PATH) === 0;
+    }
+
     public function load() {
         if(!is_readable(PARAMS_INI_FILE_PATH)) {
             try {
