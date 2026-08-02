@@ -236,15 +236,24 @@
 		}
 
 		/* CGridView's filter-row <input> (.filter-container, one per
-		   column) has no size= and no width of its own, so every column
-		   got the browser's default text-input width (~170-200px)
-		   regardless of whether that column's actual data is a single
-		   digit or a long string — inflating the whole table and the
-		   horizontal scroll it now needs. width:100% makes each filter
-		   input fill its own <td> instead, so the column's width follows
-		   its DATA (the rows below it), not the filter input. */
+		   column) has no size= and no width of its own. width:100% alone
+		   doesn't fix this: for a table with table-layout:auto (the
+		   default), the browser's column-sizing pass treats a percentage
+		   width on a cell's DESCENDANT as auto (CSS2.1 17.5.2.2) — it
+		   falls back to the input's unconstrained intrinsic default
+		   (~170-200px) when deciding how wide the COLUMN needs to be,
+		   regardless of what width:100% would later resolve to. Every
+		   column whose real content (header + data rows) is narrower than
+		   that default got dragged out to ~200px anyway, while width:100%
+		   only ever controlled the input's fill *within* that
+		   already-oversized column. max-width caps the input's own
+		   contribution to that sizing pass, so the column instead follows
+		   its header/data content like it was always meant to; the input
+		   still fills 100% of whatever the column ends up being, up to
+		   this cap. */
 		.card-body .filter-container input {
 			width: 100%;
+			max-width: 160px;
 			box-sizing: border-box;
 			padding: .25rem .5rem;
 			border: 1px solid var(--bs-border-color);
