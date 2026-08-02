@@ -262,6 +262,26 @@
 			color: var(--bs-body-color);
 		}
 
+		/* search/index.php: form on the left, results on the right, sharing
+		   the card like the host-detail map's menu+map split. flex-wrap
+		   (not a media query) drops .result below .form automatically the
+		   moment there isn't enough width for both side by side — same
+		   mechanism, no separate narrow-screen breakpoint to keep in sync. */
+		.search-layout {
+			display: flex;
+			align-items: flex-start;
+			flex-wrap: wrap;
+			gap: 1.5rem;
+		}
+		.search-layout .form {
+			flex: 0 0 320px;
+			max-width: 100%;
+		}
+		.search-layout .result {
+			flex: 1 1 480px;
+			min-width: 0;
+		}
+
 		/* Vertical main navigation — replaces the old horizontal link
 		   list. Reuses TbNav (encodeLabel=false, raw icon+label HTML per
 		   item) so active-route highlighting keeps working unmodified;
