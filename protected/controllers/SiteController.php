@@ -92,7 +92,17 @@ class SiteController extends Controller
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login())
+			{
+				// Fresh install, admin's first login: show the welcome
+				// wizard instead of wherever they were headed. This has no
+				// persisted state — it naturally re-triggers every login
+				// while the install stays this empty (only the seeded
+				// "localhost" placeholder host, id 1, or nothing), and
+				// naturally stops the moment a real host exists.
+				if(Yii::app()->user->name === 'admin' && Host::model()->count() <= 1)
+					$this->redirect(array('welcome/index'));
 				$this->redirect(Yii::app()->user->returnUrl);
+			}
 		}
 		// display the login form
 		$this->render('login',array('model'=>$model));
