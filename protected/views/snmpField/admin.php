@@ -55,6 +55,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 					'label' => 'Copy SnmpField',
 					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
 					'url' => '$this->grid->controller->createUrl("snmpField/create", array("snmp_oid" => $data->snmp_oid, "key" => $data->key, "label" => $data->label))',
+					'options' => array('class' => 'copy'),
 				),
 			),
 		),

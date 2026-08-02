@@ -67,6 +67,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 					'label' => 'Copy SnmpTemplate',
 					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
 					'url' => '$this->grid->controller->createUrl("snmpTemplate/create", array("version" => $data->version, "security_name" => $data->security_name, "security_level" => $data->security_level, "auth_protocol" => $data->auth_protocol, "priv_protocol" => $data->priv_protocol, "timeout" => $data->timeout, "retries" => $data->retries))',
+					'options' => array('class' => 'copy'),
 				),
 			),
 		),

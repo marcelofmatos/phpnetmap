@@ -75,6 +75,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 					'label' => 'Copy Connection',
 					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
 					'url' => '$this->grid->controller->createUrl("connection/create", array("type" => $data->type))',
+					'options' => array('class' => 'copy'),
 				),
 			),
 		),

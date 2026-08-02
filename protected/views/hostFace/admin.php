@@ -63,6 +63,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 					'label' => 'Copy HostFace',
 					'imageUrl' => Yii::app()->request->baseUrl.'/images/copy.gif',
 					'url' => '$this->grid->controller->createUrl("hostFace/create", array("copyFromId" => $data->id))',
+					'options' => array('class' => 'copy'),
 				),
 			),
 		),

@@ -67,6 +67,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
                                 'label' => 'Copy VLAN',
                                 'imageUrl'=>Yii::app()->request->baseUrl.'/images/copy.gif',
                                 'url'=>'$this->grid->controller->createUrl("vlan/create", array("tag" => $data->tag,"name" => $data->name,"font_color" => $data->font_color,"background_color" => $data->background_color))',
+                                'options' => array('class' => 'copy'),
                             ),
                         ),
 		),

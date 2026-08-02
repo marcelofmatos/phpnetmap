@@ -78,13 +78,19 @@ body
     border-color: var(--bs-danger-border-subtle);
 }
 
-.button-column a img {
+.button-column a.view img,
+.button-column a.update img,
+.button-column a.delete img,
+.button-column a.copy img {
     width: 14px;
     height: 14px;
     opacity: .75;
 }
 
-.button-column a:hover img {
+.button-column a.view:hover img,
+.button-column a.update:hover img,
+.button-column a.delete:hover img,
+.button-column a.copy:hover img {
     opacity: 1;
 }
 
