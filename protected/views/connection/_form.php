@@ -7,7 +7,7 @@ $hostOptions = Host::model()->findAll();
 ?>
 <div class="form">
 
-<?php $form=$this->beginWidget('TbActiveForm', array(
+<?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'connection-form',
 	'enableAjaxValidation'=>false,
 )); ?>

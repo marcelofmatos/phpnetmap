@@ -6,7 +6,7 @@
 
 <div class="form">
 
-<?php $form=$this->beginWidget('TbActiveForm', array(
+<?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'host-form',
 	'enableAjaxValidation'=>false,
 )); ?>

@@ -18,7 +18,7 @@ $version = is_file($versionFile) ? trim(file_get_contents($versionFile)) : '';
 
 <h3>PHPNetMap</h3>
 
-<p class="muted">Version <?php echo CHtml::encode($version !== '' ? $version : 'development'); ?></p>
+<p class="text-muted">Version <?php echo CHtml::encode($version !== '' ? $version : 'development'); ?></p>
 
 <p>Software for monitoring Layer 2 and Layer 3 network equipment with SNMP v(1/2c/3) protocol</p>
 

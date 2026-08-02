@@ -255,7 +255,7 @@ class HostController extends Controller {
         return array(
             array('label' => 'Web Config', 'url' => 'http://' . $model->ip, 'linkOptions' => array('target' => '_blank')),
             array('label' => 'Update Host', 'url' => array('update', 'id' => $model->id)),
-            '<li class="divider"></li>',
+            '<li><hr class="dropdown-divider my-1"></li>',
             array('label' => 'Delete Host', 'url' => '#', 'linkOptions' => array(
                 'submit' => array('delete', 'id' => $model->id),
                 'confirm' => 'Are you sure you want to delete this item?',

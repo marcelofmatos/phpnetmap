@@ -33,8 +33,13 @@ class TbGridView extends CGridView
     public $cssFile = false;
     /**
      * @var string the template to be used to control the layout of various sections in the view.
+     * .table-responsive wraps the table in a horizontally-scrollable box —
+     * without it, a wide grid (many columns) forces its flex column wider
+     * than intended instead of scrolling, bleeding into whatever sits next
+     * to it (e.g. the Operations sidebar in column2.php). row-fluid/span6
+     * (BS2) replaced with BS5 flex utilities for the pager+summary line.
      */
-    public $template = "{items}\n<div class=\"row-fluid\"><div class=\"span6\">{pager}</div><div class=\"span6\">{summary}</div></div>";
+    public $template = "<div class=\"table-responsive\">{items}</div>\n<div class=\"d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2\">{pager}{summary}</div>";
 
     /**
      * Initializes the widget.
@@ -48,8 +53,10 @@ class TbGridView extends CGridView
                 $this->type = explode(' ', $this->type);
             }
 
+            // BS5 renamed table-condensed to table-sm; every other
+            // TbHtml::GRID_TYPE_* value (striped/bordered/hover) is unchanged.
             foreach ($this->type as $type) {
-                $classes[] = 'table-' . $type;
+                $classes[] = 'table-' . ($type === 'condensed' ? 'sm' : $type);
             }
         }
         if (!empty($classes)) {

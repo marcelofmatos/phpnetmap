@@ -30,8 +30,9 @@ class TbListView extends CListView
     public $cssFile = false;
     /**
      * @var string the template to be used to control the layout of various sections in the view.
+     * row-fluid/span6 (BS2) replaced with BS5 flex utilities.
      */
-    public $template = "{items}\n<div class=\"row-fluid\"><div class=\"span6\">{pager}</div><div class=\"span6\">{summary}</div></div>";
+    public $template = "{items}\n<div class=\"d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2\">{pager}{summary}</div>";
 
     /**
      * Renders the empty message when there is no data.

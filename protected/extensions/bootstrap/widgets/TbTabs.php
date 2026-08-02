@@ -119,7 +119,11 @@ class TbTabs extends CWidget
     public function registerClientScript()
     {
         $selector = '#' . $this->htmlOptions['id'];
-        Yii::app()->clientScript->registerScript(__CLASS__ . $selector, "jQuery('{$selector}').tab('show');");
+        // BS5 dropped the jQuery .tab() plugin — tab switching is handled
+        // automatically by bootstrap.bundle.min.js's own data-api on
+        // [data-bs-toggle="tab"] (see TbHtml::normalizeTabs()), and the
+        // initially active pane already carries the .active.show classes in
+        // the markup, so no explicit "show" call is needed on load.
         $this->registerEvents($selector, $this->events);
     }
 }

@@ -38,8 +38,11 @@ class TbDetailView extends CDetailView
                 $this->type = explode(' ', $this->type);
             }
 
+            // BS5 renamed table-condensed to table-sm (this class's own
+            // default $type always includes DETAIL_TYPE_CONDENSED, so every
+            // detail view in the app hits this).
             foreach ($this->type as $type) {
-                $classes[] = 'table-' . $type;
+                $classes[] = 'table-' . ($type === 'condensed' ? 'sm' : $type);
             }
         }
         TbHtml::addCssClass($classes, $this->htmlOptions);
