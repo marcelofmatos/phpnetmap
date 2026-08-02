@@ -1,12 +1,11 @@
 <?php
-$width = isset($width) ? $width : 1200;
 $height = isset($height) ? $height : null;
 $navigation = isset($navigation) ? $navigation : true;
 $dataUrl = isset($dataUrl) ? $dataUrl : Yii::app()->createUrl("/map/listHosts");
 
 $hostTypes = Host::getTypes();
 ?>
-<div id="netmap" style="width: <?php echo $width; ?>px;">
+<div id="netmap">
     <div id="menuhosts">
         <input type="text" name="hostfilter" id="hostfilter" style="display: none" />
         <div id="listhosts">
@@ -15,13 +14,12 @@ $hostTypes = Host::getTypes();
 </div>
 
 <script type="text/javascript">
-    var mapData, force, links, hosts, labels, infobox,
+    var mapData, force, links, hosts, labels, infobox, w,
 <?php if ($height == null): ?>
         h = (window.screen.height) ? window.screen.height - 320 : 600, // svg height auto
 <?php else: ?>
         h = <?php echo $height; ?>, // svg height
 <?php endif; ?>
-    w = <?php echo $width; ?> - 160    // svg width - menu
     mapDataURL = '<?php echo $dataUrl ?>';
 
     var navigation = <?php echo (bool) $navigation ?>;
@@ -299,7 +297,19 @@ $hostTypes = Host::getTypes();
         box.attr('visibility', 'hidden');
     }
 
-    //start
-    loadMap(mapDataURL);
+    //start — deferred until the whole document has finished parsing, so
+    // #netmap's measured width reflects its final layout instead of a
+    // mid-parse snapshot taken before later sibling columns (e.g. the
+    // Operations sidebar from layouts/column2.php, which comes AFTER this
+    // partial in the same row) have been inserted into the DOM. Measuring
+    // synchronously at parse time saw #netmap as the row's only child so
+    // far and returned an inflated width, causing the menu (float:left)
+    // and the svg (float:right) to together need more space than the row
+    // actually had once the sidebar showed up — wrapping the svg onto its
+    // own line below the menu instead of sitting beside it.
+    $(function () {
+        w = document.getElementById('netmap').clientWidth - 160; // svg width - menu
+        loadMap(mapDataURL);
+    });
 
 </script>

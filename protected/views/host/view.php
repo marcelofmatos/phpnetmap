@@ -13,12 +13,13 @@ $this->pageTitle = $model ." ". $this->pageTitle;
 <?php $this->renderPartial('/host/_header', array('model' => $model)); ?>
 
 <div class="card">
-    <?php $this->renderPartial('/map/_view', array(
-        'height' => 300,
-        'width' => 800,
-        'navigation' => true,
-        'dataUrl' => Yii::app()->createUrl('/map/listHosts?hostId=' . $model->id),
-    )); ?>
+    <div class="card-body">
+        <?php $this->renderPartial('/map/_view', array(
+            'height' => 300,
+            'navigation' => true,
+            'dataUrl' => Yii::app()->createUrl('/map/listHosts?hostId=' . $model->id),
+        )); ?>
+    </div>
 </div>
 
 <div class="card">

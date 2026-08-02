@@ -204,14 +204,10 @@ text.shadow {
 }*/
 
 #netmap {
-    float:left;
-    width: 80%;
+    width: 100%;
+    box-sizing: border-box;
     /*	position: fixed;*/
     /*	margin: -12px 0 0 -4px;*/
-}
-
-#netmap svg {
-    float:right;
 }
 #bg-map {
     /*cursor: hand;*/
@@ -257,12 +253,6 @@ form, input, h1, h2, button, label, a, img, image, svg {
      this will work for QtWebKit in future 
     -webkit-user-drag: none;
 }*/
-
-#listhosts {
-    float:left;
-    width: 200px;
-}
-
 
 
 /* custom */
@@ -483,8 +473,13 @@ table.items th:first-child
 
 /* map */
 #netmap {
-    display: block;
-    border: 1px solid #efefef;
+    /* flex (not float) so #menuhosts and the svg map sit reliably side by
+       side at their natural widths, stretched to the same height — floats
+       silently drop the second element to a new line the moment their
+       combined width doesn't fit exactly, which sub-pixel rounding made
+       happen intermittently. */
+    display: flex;
+    align-items: stretch;
 }
 
 #yw1 {
@@ -688,10 +683,8 @@ table.items th:first-child
 
 
 #menuhosts {
-    display: block;
-    float: left;
+    flex: 0 0 160px;
     width: 160px;
-    height: 100%;
     padding: 0;
 }
 #menuhosts #hostfilter {
