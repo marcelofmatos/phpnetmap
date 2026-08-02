@@ -20,6 +20,7 @@
 	// threw "$ is not defined" and never got to populate the host list).
 	// Bootstrap 5 itself doesn't need jQuery, but this app still does.
 	Yii::app()->clientScript->registerCoreScript('jquery');
+	$pnmIcons = require(Yii::app()->basePath . '/config/pnmIcons.php');
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -251,6 +252,117 @@
 			background-color: var(--bs-body-bg);
 			color: var(--bs-body-color);
 		}
+
+		/* Vertical main navigation — replaces the old horizontal link
+		   list. Reuses TbNav (encodeLabel=false, raw icon+label HTML per
+		   item) so active-route highlighting keeps working unmodified;
+		   only the label content and this CSS are new. Responsive by
+		   default (icon-only below the same 992px breakpoint the old
+		   navbar already collapsed at, icon+text at/above it); a manual
+		   toggle can force either mode via data-pnm-nav on <html>,
+		   mirroring the data-bs-theme/localStorage pattern the theme
+		   toggle already uses. */
+		.pnm-shell {
+			display: flex;
+			align-items: flex-start;
+		}
+
+		.pnm-sidenav {
+			flex: 0 0 auto;
+			position: sticky;
+			top: 4.5rem;
+			height: calc(100vh - 4.5rem);
+			overflow-y: auto;
+			box-sizing: border-box;
+			width: 56px;
+			padding: .75rem .5rem;
+			background-color: var(--bs-tertiary-bg);
+			border-right: 1px solid var(--bs-border-color);
+		}
+
+		.pnm-sidenav-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			margin: 0 auto .75rem;
+			padding: 0;
+			border: 1px solid var(--bs-border-color);
+			border-radius: .25rem;
+			background-color: var(--bs-body-bg);
+			color: var(--bs-body-color);
+			font-size: 1rem;
+			line-height: 1;
+			cursor: pointer;
+		}
+
+		.pnm-sidenav-toggle:hover {
+			background-color: var(--bs-secondary-bg);
+		}
+
+		.pnm-sidenav-nav.nav {
+			flex-wrap: nowrap;
+		}
+
+		.pnm-sidenav-nav .nav-link {
+			display: flex;
+			align-items: center;
+			gap: .6rem;
+			padding: .5rem;
+			margin-bottom: .125rem;
+			border-radius: .375rem;
+			color: var(--bs-body-color);
+			white-space: nowrap;
+			overflow: hidden;
+		}
+
+		.pnm-sidenav-nav .nav-link svg {
+			flex: 0 0 20px;
+			width: 20px;
+			height: 20px;
+		}
+
+		.pnm-sidenav-nav .nav-link .pnm-nav-label {
+			display: none;
+			font-size: .9rem;
+		}
+
+		.pnm-sidenav-nav .nav-link:hover {
+			background-color: var(--bs-secondary-bg);
+		}
+
+		.pnm-sidenav-nav .nav-link.active {
+			background-color: var(--bs-primary);
+			color: #fff;
+		}
+
+		.pnm-main {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		@media (min-width: 992px) {
+			.pnm-sidenav {
+				width: 200px;
+			}
+			.pnm-sidenav-nav .nav-link .pnm-nav-label {
+				display: inline;
+			}
+		}
+
+		html[data-pnm-nav="icons"] .pnm-sidenav {
+			width: 56px !important;
+		}
+		html[data-pnm-nav="icons"] .pnm-sidenav-nav .nav-link .pnm-nav-label {
+			display: none !important;
+		}
+		html[data-pnm-nav="full"] .pnm-sidenav {
+			width: 200px !important;
+		}
+		html[data-pnm-nav="full"] .pnm-sidenav-nav .nav-link .pnm-nav-label {
+			display: inline !important;
+		}
 	</style>
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
@@ -264,19 +376,10 @@
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pnmNav">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<div class="collapse navbar-collapse" id="pnmNav">
+		<div class="collapse navbar-collapse justify-content-end" id="pnmNav">
 			<?php $this->widget('bootstrap.widgets.TbNav', array(
-				'htmlOptions' => array('class' => 'navbar-nav me-auto mb-2 mb-lg-0'),
+				'htmlOptions' => array('class' => 'navbar-nav mb-2 mb-lg-0'),
 				'items' => array(
-					array('label' => 'SNMP Templates', 'url' => array('/snmpTemplate/admin')),
-					array('label' => 'Hosts', 'url' => array('/host/admin')),
-					array('label' => 'Vlans', 'url' => array('/vlan/admin')),
-					array('label' => 'Connections', 'url' => array('/connection/admin')),
-					array('label' => 'Search', 'url' => array('/search/index')),
-					array('label' => 'MCP Tokens', 'url' => array('/mcpToken/admin')),
-					array('label' => 'Users', 'url' => array('/user/admin')),
-					array('label' => 'Configuration', 'url' => array('/config/index')),
-					array('label' => 'About', 'url' => array('/site/page', 'view' => 'about')),
 					array('label' => 'Login', 'url' => array('/site/login'), 'visible' => Yii::app()->user->isGuest),
 					array('label' => 'Logout (' . Yii::app()->user->name . ')', 'url' => array('/site/logout'), 'visible' => !Yii::app()->user->isGuest),
 				),
@@ -286,26 +389,49 @@
 	</div>
 </nav>
 
-<div class="container-fluid mt-3">
+<div class="pnm-shell">
+	<aside class="pnm-sidenav" id="pnmSidenav">
+		<button type="button" class="pnm-sidenav-toggle" id="pnmSidenavToggle" title="Toggle icon/text sidebar">»</button>
+		<?php $this->widget('bootstrap.widgets.TbNav', array(
+			'encodeLabel' => false,
+			'htmlOptions' => array('class' => 'nav flex-column pnm-sidenav-nav'),
+			'items' => array(
+				array('label' => $pnmIcons['snmpTemplate'] . '<span class="pnm-nav-label">SNMP Templates</span>', 'url' => array('/snmpTemplate/admin')),
+				array('label' => $pnmIcons['host'] . '<span class="pnm-nav-label">Hosts</span>', 'url' => array('/host/admin')),
+				array('label' => $pnmIcons['vlan'] . '<span class="pnm-nav-label">Vlans</span>', 'url' => array('/vlan/admin')),
+				array('label' => $pnmIcons['connection'] . '<span class="pnm-nav-label">Connections</span>', 'url' => array('/connection/admin')),
+				array('label' => $pnmIcons['search'] . '<span class="pnm-nav-label">Search</span>', 'url' => array('/search/index')),
+				array('label' => $pnmIcons['mcpToken'] . '<span class="pnm-nav-label">MCP Tokens</span>', 'url' => array('/mcpToken/admin')),
+				array('label' => $pnmIcons['user'] . '<span class="pnm-nav-label">Users</span>', 'url' => array('/user/admin')),
+				array('label' => $pnmIcons['config'] . '<span class="pnm-nav-label">Configuration</span>', 'url' => array('/config/index')),
+				array('label' => $pnmIcons['about'] . '<span class="pnm-nav-label">About</span>', 'url' => array('/site/page', 'view' => 'about')),
+			),
+		)); ?>
+	</aside>
 
-	<?php if (!empty($this->breadcrumbs)): ?>
-		<nav aria-label="breadcrumb">
-			<?php $this->widget('bootstrap.widgets.TbBreadcrumb', array(
-				'links' => $this->breadcrumbs,
-			)); ?>
-		</nav>
-	<?php endif; ?>
+	<div class="pnm-main">
+	<div class="container-fluid mt-3">
 
-	<div class="card">
-		<div class="card-body">
-			<?php echo $content; ?>
+		<?php if (!empty($this->breadcrumbs)): ?>
+			<nav aria-label="breadcrumb">
+				<?php $this->widget('bootstrap.widgets.TbBreadcrumb', array(
+					'links' => $this->breadcrumbs,
+				)); ?>
+			</nav>
+		<?php endif; ?>
+
+		<div class="card">
+			<div class="card-body">
+				<?php echo $content; ?>
+			</div>
 		</div>
+
+		<footer class="text-body-secondary my-4 small">
+			<?php echo CHtml::encode(Yii::app()->name); ?> <?php echo date('Y'); ?>
+		</footer>
+
 	</div>
-
-	<footer class="text-body-secondary my-4 small">
-		<?php echo CHtml::encode(Yii::app()->name); ?> <?php echo date('Y'); ?>
-	</footer>
-
+	</div>
 </div>
 
 <script src="<?php echo Yii::app()->baseUrl; ?>/js/bootstrap5/bootstrap.bundle.min.js"></script>
@@ -323,6 +449,33 @@
 			root.setAttribute('data-bs-theme', next);
 			localStorage.setItem('pnm-theme', next);
 			toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+		});
+	})();
+</script>
+<script>
+	(function () {
+		var root = document.documentElement;
+		var navToggle = document.getElementById('pnmSidenavToggle');
+		var storedNav = localStorage.getItem('pnm-nav-mode');
+		if (storedNav) {
+			root.setAttribute('data-pnm-nav', storedNav);
+		}
+		function effectiveNavMode() {
+			var stored = root.getAttribute('data-pnm-nav');
+			if (stored) {
+				return stored;
+			}
+			return window.matchMedia('(min-width: 992px)').matches ? 'full' : 'icons';
+		}
+		function updateNavToggleGlyph() {
+			navToggle.textContent = effectiveNavMode() === 'full' ? '«' : '»';
+		}
+		updateNavToggleGlyph();
+		navToggle.addEventListener('click', function () {
+			var next = effectiveNavMode() === 'full' ? 'icons' : 'full';
+			root.setAttribute('data-pnm-nav', next);
+			localStorage.setItem('pnm-nav-mode', next);
+			updateNavToggleGlyph();
 		});
 	})();
 </script>
