@@ -688,10 +688,11 @@ table.items th:first-child
     padding: 0;
 }
 #menuhosts #hostfilter {
-    width: 80%;
+    width: 100%;
+    box-sizing: border-box;
     background: url('../images/search.png') no-repeat 7px center;
     padding: 5px 0 5px 27px;
-    margin: 1px;
+    margin: 0 0 1px;
     border: 1px solid #eee;
 }
 #listhosts {
