@@ -217,6 +217,13 @@ text.shadow {
     /*cursor: hand;*/
 }
 
+/* map/_view.php's pan/zoom-catcher rect — was a hardcoded white SVG fill
+   attribute (always white regardless of theme); this CSS rule overrides it
+   (CSS always wins over an SVG presentation attribute). */
+.netmap-bg {
+    fill: var(--bs-body-bg);
+}
+
 .legenda {
     /*	position: fixed;*/
     float: right;
@@ -591,19 +598,23 @@ table.items th:first-child
     font-size: 10.5px;
 }
 
-/* traffic bullet chart (host Traffic page + port panel graph) */
+/* traffic bullet chart (host Traffic page + port panel graph). .marker/
+   .measure are intentional in/out accent colors (legend-like, meant to stay
+   consistent regardless of theme) — left alone on purpose. .range (the
+   unfilled gauge track) and the title/subtitle/tick text were hardcoded
+   light-mode-only greys, invisible-ish against a dark card background. */
 .bullet { font: 10px sans-serif; }
 .bullet .marker { stroke-width: 2px; }
 .bullet .marker.s0 { stroke: #274902; background-color: #274902; }
 .bullet .marker.s1 { stroke: #12125B; background-color: #12125B; }
-.bullet .tick line { stroke: #666; stroke-width: .5px; }
-.bullet .range.s0 { fill: #ddd; }
-.bullet .range.s1 { fill: #ccc; }
-.bullet .range.s2 { fill: #bbb; }
+.bullet .tick line { stroke: var(--bs-secondary-color); stroke-width: .5px; }
+.bullet .range.s0 { fill: var(--bs-tertiary-bg); }
+.bullet .range.s1 { fill: var(--bs-secondary-bg); }
+.bullet .range.s2 { fill: var(--bs-border-color); }
 .bullet .measure.s0 { fill: #5FB404; background-color: #5FB404; }
 .bullet .measure.s1 { fill: #2E2EFE; background-color: #2E2EFE; }
-.bullet .title { font-size: 12px; font-weight: bold; }
-.bullet .subtitle { font-size: 12px; fill: #333; }
+.bullet .title { font-size: 12px; font-weight: bold; fill: var(--bs-body-color); }
+.bullet .subtitle { font-size: 12px; fill: var(--bs-secondary-color); }
 
 #portInfoBox {
     display: none;

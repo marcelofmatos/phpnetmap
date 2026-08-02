@@ -49,12 +49,16 @@ $hostTypes = Host::getTypes();
                 .call(d3.behavior.zoom().on("zoom", redraw))
                 .append('svg:g');
 
-        // background to zoom
+        // background to zoom — fill comes from CSS (.netmap-bg, css/map.css),
+        // not this inline attribute, so it follows the light/dark theme
+        // instead of staying hardcoded white (CSS always wins over an SVG
+        // presentation attribute regardless of specificity).
         vis.append('svg:rect')
                 .attr('width', w * 3)
                 .attr('height', h * 3)
                 .attr('x', -h / 2)
                 .attr('y', -w / 2)
+                .attr('class', 'netmap-bg')
                 .attr('fill', 'white');
 
         d3.json(url, function(json) {

@@ -247,12 +247,19 @@ select {
     height: 28px;
 }
 
-/* Bootstrap nesse app é 2.3.2 (sem .btn-sm/.btn-default reais) — sem isso
-   os botões da toolbar (inclusive os <label> usados como botão de file
-   input) caem no tamanho padrão do .btn, maior e inconsistente com os
-   inputs/selects de 28px acima (via box-sizing diferente e <label> vs
-   <button> tendo métricas nativas distintas). */
-.host-face-editor-card .btn {
+/* .btn-default (BS2/3) doesn't exist in Bootstrap 5, so it's dead weight —
+   plain .btn alone has --bs-btn-bg/--bs-btn-border-color: transparent (its
+   color must come from a modifier like .btn-secondary), so these buttons
+   had NO visible background/border at all. A real <button> still picks up
+   a little native browser chrome, which is why "Export SVG" looked
+   marginally more button-like than "Import SVG" (a <label>, with zero
+   native button styling) — same underlying cause as both looking wrong,
+   not two separate bugs. <label> and <button> also differ in native box
+   metrics even at identical box-sizing/padding, so the height rule below
+   now names the <label> directly instead of relying only on the shared
+   .btn class. */
+.host-face-editor-card .btn,
+.host-face-editor-file-btn label {
     box-sizing: border-box;
     height: 28px;
     padding: 3px 10px;
@@ -261,6 +268,18 @@ select {
     line-height: 1;
     display: inline-flex;
     align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+    vertical-align: middle;
+    color: var(--bs-body-color);
+    background-color: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .25rem;
+}
+
+.host-face-editor-card .btn:hover,
+.host-face-editor-file-btn label:hover {
+    background-color: var(--bs-secondary-bg);
 }
 
 .host-face-editor-card > p.host-face-editor-empty-hint {

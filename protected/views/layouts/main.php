@@ -11,6 +11,15 @@
 	$cssVersion = function ($file) use ($layoutWebroot) {
 		return '?v=' . filemtime($layoutWebroot . '/css/' . $file);
 	};
+	// Yii::app()->bootstrap->register() (the old BS2 layout) called
+	// TbApi::registerCoreScripts(), which always pulled in jQuery as a side
+	// effect — several views (map/_view.php's host-list filter/slideDown,
+	// among others) depend on jQuery being present but never register it
+	// themselves. Dropping that call along with the rest of yiistrap's BS2
+	// registration silently broke those pages (confirmed live: map/_view.php
+	// threw "$ is not defined" and never got to populate the host list).
+	// Bootstrap 5 itself doesn't need jQuery, but this app still does.
+	Yii::app()->clientScript->registerCoreScript('jquery');
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -59,17 +68,44 @@
 			font-weight: 500;
 		}
 		/* :not([size]) leaves fields that already declare a HTML size= (the
-		   port-number inputs in connection/_form.php, meant to stay a few
-		   characters wide) at their natural compact width instead of
-		   stretching them to 420px. */
+		   port-number inputs in connection/_form.php; a multi-row <select
+		   size="12"> like search/form.php's Hosts listbox) at their natural
+		   size instead of stretching/squashing them. */
 		.card-body .row:not(.pnm-grid) input[type=text]:not([size]),
 		.card-body .row:not(.pnm-grid) input[type=email]:not([size]),
 		.card-body .row:not(.pnm-grid) input[type=password]:not([size]),
-		.card-body .row:not(.pnm-grid) select,
+		.card-body .row:not(.pnm-grid) select:not([size]) {
+			display: block;
+			width: 100%;
+			max-width: 420px;
+			/* A <select> renders taller than a text input at the same
+			   padding (the native dropdown arrow/box adds to its intrinsic
+			   height in most browsers) — box-sizing + an explicit height
+			   (Bootstrap 5's own .form-control height formula) forces both
+			   to match instead of the row looking uneven. */
+			box-sizing: border-box;
+			height: calc(1.5em + .75rem + 2px);
+			line-height: 1.5;
+			padding: .375rem .75rem;
+			border: 1px solid var(--bs-border-color);
+			border-radius: .375rem;
+			background-color: var(--bs-body-bg);
+			color: var(--bs-body-color);
+		}
+		.card-body .row:not(.pnm-grid) select[size] {
+			max-width: 420px;
+			box-sizing: border-box;
+			padding: .375rem .75rem;
+			border: 1px solid var(--bs-border-color);
+			border-radius: .375rem;
+			background-color: var(--bs-body-bg);
+			color: var(--bs-body-color);
+		}
 		.card-body .row:not(.pnm-grid) textarea {
 			display: block;
 			width: 100%;
 			max-width: 420px;
+			box-sizing: border-box;
 			padding: .375rem .75rem;
 			border: 1px solid var(--bs-border-color);
 			border-radius: .375rem;
@@ -78,6 +114,15 @@
 		}
 		.card-body .row:not(.pnm-grid) input[type=text][size],
 		.card-body .row:not(.pnm-grid) input[type=password][size] {
+			/* Bootstrap 5's OWN ".row > *" grid rule (meant for real .col-*
+			   children) sets width/max-width:100% on EVERY direct child of
+			   any .row, including these — since this rule set no width of
+			   its own, that BS5 default silently won by default (no
+			   contender for that property), stretching a native size="6"
+			   input (e.g. the Vlan color-picker fields) to the full row
+			   width instead of respecting its size attribute. */
+			width: auto;
+			max-width: none;
 			padding: .375rem .75rem;
 			border: 1px solid var(--bs-border-color);
 			border-radius: .375rem;
