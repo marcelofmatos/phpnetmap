@@ -1,69 +1,43 @@
 /* ===================================================================
    Welcome / first-configuration wizard (welcome/index.php, welcome/tour.php)
 
-   All rules below are prefixed `.pnm-` and scoped to these two views only
-   — nothing here touches shared selectors like .diagnostic-card/.form/.btn
-   used elsewhere in the app. System font stacks only (no external font
-   requests — this app ships into networks that may have no outbound
-   internet access at all).
+   All rules below are prefixed `.pnm-` and scoped to these two views only.
+   Built from the same Bootstrap 5 tokens (var(--bs-*)) and .btn/.card
+   language as the rest of the app, so the wizard reads as part of
+   PHPNetMap instead of a separate product-landing-page moment — this
+   also means it follows the site's light/dark theme toggle automatically,
+   with no fixed palette of its own to keep in sync.
    =================================================================== */
-
-:root {
-    --pnm-ink: #0b1e33;
-    --pnm-ink-soft: #14314f;
-    --pnm-accent: #22d3c5;
-    --pnm-accent-dim: rgba(34, 211, 197, 0.35);
-    --pnm-mono: ui-monospace, "Cascadia Code", "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
-}
 
 .pnm-hero {
     position: relative;
-    overflow: hidden;
     margin: 10px 0 28px;
-    padding: 42px 40px 38px;
-    border-radius: 10px;
-    background-color: var(--pnm-ink);
-    background-image:
-        radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.14) 1px, transparent 0),
-        linear-gradient(135deg, var(--pnm-ink) 0%, var(--pnm-ink-soft) 100%);
-    background-size: 22px 22px, 100% 100%;
-    box-shadow: 0 18px 40px -18px rgba(11, 30, 51, 0.55);
-    color: #d7e4ef;
-}
-
-.pnm-hero::after {
-    content: "";
-    position: absolute;
-    top: -60px;
-    right: -60px;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--pnm-accent-dim) 0%, transparent 70%);
-    pointer-events: none;
+    padding: 32px 32px 28px;
+    border: 1px solid var(--bs-border-color);
+    border-radius: .5rem;
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
 }
 
 .pnm-eyebrow {
     display: inline-block;
     margin: 0 0 14px;
     padding: 3px 10px;
-    border: 1px solid var(--pnm-accent-dim);
+    border: 1px solid var(--bs-primary);
     border-radius: 20px;
-    font-family: var(--pnm-mono);
-    font-size: 10px;
-    letter-spacing: 0.14em;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--pnm-accent);
+    color: var(--bs-primary);
 }
 
 .pnm-hero h1 {
     margin: 0 0 16px;
-    font-family: var(--pnm-mono);
-    font-size: 30px;
+    font-size: 28px;
     line-height: 1.25;
     font-weight: 700;
-    color: #ffffff;
-    letter-spacing: -0.01em;
+    color: var(--bs-emphasis-color);
 }
 
 .pnm-hero p {
@@ -71,11 +45,11 @@
     margin: 0 0 14px;
     font-size: 14px;
     line-height: 1.65;
-    color: #b9cbdc;
+    color: var(--bs-secondary-color);
 }
 
 .pnm-hero p strong {
-    color: #ffffff;
+    color: var(--bs-emphasis-color);
 }
 
 .pnm-hero-actions {
@@ -86,37 +60,17 @@
     flex-wrap: wrap;
 }
 
-.pnm-hero-actions .btn-primary,
-.pnm-hero-actions .btn.btn-primary {
-    background: var(--pnm-accent);
-    background-image: none;
-    border: none;
-    color: #06231f;
-    font-weight: 700;
-    padding: 10px 22px;
-    border-radius: 6px;
-    box-shadow: 0 10px 24px -10px rgba(34, 211, 197, 0.65);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.pnm-hero-actions .btn-primary:hover,
-.pnm-hero-actions .btn.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 28px -10px rgba(34, 211, 197, 0.8);
-    color: #06231f;
-}
-
 .pnm-hero-actions a.pnm-skip {
-    color: #9fb4c7;
+    color: var(--bs-secondary-color);
     font-size: 13px;
     text-decoration: none;
-    border-bottom: 1px dashed rgba(159, 180, 199, 0.5);
+    border-bottom: 1px dashed var(--bs-border-color);
     padding-bottom: 1px;
 }
 
 .pnm-hero-actions a.pnm-skip:hover {
-    color: #ffffff;
-    border-bottom-color: #ffffff;
+    color: var(--bs-emphasis-color);
+    border-bottom-color: var(--bs-secondary-color);
 }
 
 /* Step indicator — shared visual language across welcome -> config -> tour */
@@ -125,10 +79,9 @@
     align-items: center;
     gap: 8px;
     margin: 0 0 24px;
-    font-family: var(--pnm-mono);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: #9aa7b2;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--bs-secondary-color);
 }
 
 .pnm-steps .pnm-step {
@@ -137,7 +90,7 @@
     gap: 6px;
     padding: 4px 10px 4px 4px;
     border-radius: 20px;
-    background: #eef2f5;
+    background: var(--bs-tertiary-bg);
 }
 
 .pnm-steps .pnm-step-num {
@@ -147,31 +100,31 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #cfd8de;
-    color: #5a6a75;
+    background: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
     font-size: 10px;
     font-weight: 700;
 }
 
 .pnm-steps .pnm-step.is-active {
-    background: var(--pnm-ink);
+    background: var(--bs-primary);
     color: #fff;
 }
 
 .pnm-steps .pnm-step.is-active .pnm-step-num {
-    background: var(--pnm-accent);
-    color: #06231f;
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
 }
 
 .pnm-steps .pnm-step.is-done .pnm-step-num {
-    background: var(--pnm-ink-soft);
-    color: var(--pnm-accent);
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
 }
 
 .pnm-steps .pnm-step-sep {
     width: 16px;
     height: 1px;
-    background: #d3dbe1;
+    background: var(--bs-border-color);
 }
 
 /* Guided tour cards */
@@ -180,7 +133,7 @@
     max-width: 640px;
     font-size: 14px;
     line-height: 1.6;
-    color: var(--bs-secondary-color, #55636c);
+    color: var(--bs-secondary-color);
 }
 
 .pnm-tour-grid {
@@ -190,28 +143,20 @@
     margin: 0 0 30px;
 }
 
-/* Fixed dark-navy identity, same as .pnm-hero above it and deliberately NOT
-   theme-aware (var(--bs-*)) — these cards used to be a hardcoded white
-   #ffffff, which read fine against a light page but turned into 8 stark
-   white boxes sitting under the always-dark hero once the app grew a dark
-   theme. Matching the hero's own fixed palette instead of trying to make
-   the cards theme-aware keeps the whole wizard reading as one deliberate,
-   self-contained visual moment regardless of site theme. */
 .pnm-tour-card {
     position: relative;
     padding: 20px 18px 18px;
-    background: var(--pnm-ink-soft);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-top: 3px solid var(--pnm-accent);
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .5rem;
     opacity: 0;
     transform: translateY(8px);
     animation: pnm-card-in 0.4s ease forwards;
 }
 
 .pnm-tour-card:hover {
-    box-shadow: 0 14px 26px -14px rgba(0, 0, 0, 0.5);
+    border-color: var(--bs-secondary-color);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
 }
 
@@ -223,8 +168,8 @@
     height: 34px;
     margin-bottom: 12px;
     border-radius: 7px;
-    background: var(--pnm-ink);
-    color: var(--pnm-accent);
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-primary);
 }
 
 .pnm-tour-card-icon svg {
@@ -234,17 +179,16 @@
 
 .pnm-tour-card h4 {
     margin: 0 0 6px;
-    font-family: var(--pnm-mono);
-    font-size: 13.5px;
-    letter-spacing: 0.01em;
-    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bs-emphasis-color);
 }
 
 .pnm-tour-card p {
     margin: 0;
     font-size: 12.5px;
     line-height: 1.55;
-    color: #b9cbdc;
+    color: var(--bs-secondary-color);
 }
 
 @keyframes pnm-card-in {
@@ -259,25 +203,5 @@
     align-items: center;
     gap: 18px;
     padding-top: 6px;
-    /* Unlike .pnm-tour-card above, this divider sits directly on the
-       regular page background (not inside the fixed-dark card), so it
-       should follow the site theme like the rest of the page does. */
     border-top: 1px solid var(--bs-border-color);
-}
-
-.pnm-tour-footer .btn-primary,
-.pnm-tour-footer .btn.btn-primary {
-    background: var(--pnm-ink);
-    background-image: none;
-    border: none;
-    padding: 9px 24px;
-    border-radius: 6px;
-    font-weight: 700;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.pnm-tour-footer .btn-primary:hover,
-.pnm-tour-footer .btn.btn-primary:hover {
-    background: var(--pnm-ink-soft);
-    transform: translateY(-1px);
 }
