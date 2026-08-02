@@ -496,17 +496,27 @@
 		if (storedNav) {
 			root.setAttribute('data-pnm-nav', storedNav);
 		}
+		var navBreakpoint = window.matchMedia('(min-width: 992px)');
 		function effectiveNavMode() {
 			var stored = root.getAttribute('data-pnm-nav');
 			if (stored) {
 				return stored;
 			}
-			return window.matchMedia('(min-width: 992px)').matches ? 'full' : 'icons';
+			return navBreakpoint.matches ? 'full' : 'icons';
 		}
 		function updateNavToggleGlyph() {
 			navToggle.textContent = effectiveNavMode() === 'full' ? '«' : '»';
 		}
 		updateNavToggleGlyph();
+		// Without a manual override, the glyph should track the responsive
+		// CSS breakpoint live — otherwise resizing the browser window (no
+		// reload) leaves the glyph showing the mode from page-load time
+		// instead of the mode a click would now switch away from.
+		if (navBreakpoint.addEventListener) {
+			navBreakpoint.addEventListener('change', updateNavToggleGlyph);
+		} else if (navBreakpoint.addListener) {
+			navBreakpoint.addListener(updateNavToggleGlyph);
+		}
 		navToggle.addEventListener('click', function () {
 			var next = effectiveNavMode() === 'full' ? 'icons' : 'full';
 			root.setAttribute('data-pnm-nav', next);
