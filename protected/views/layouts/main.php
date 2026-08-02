@@ -41,7 +41,7 @@
 	<script type="text/javascript" src="<?php echo Yii::app()->baseUrl; ?>/js/d3/d3.min.js"></script>
 
 	<style>
-		body { padding-top: 4.5rem; }
+		body { padding-top: 3.625rem; }
 		[data-bs-theme="dark"] body { background-color: #14181f; }
 		.pnm-navbar-brand { font-family: ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .02em; }
 		.theme-toggle { font-size: 1.1rem; line-height: 1; }
@@ -270,8 +270,8 @@
 		.pnm-sidenav {
 			flex: 0 0 auto;
 			position: sticky;
-			top: 4.5rem;
-			height: calc(100vh - 4.5rem);
+			top: 3.625rem;
+			height: calc(100vh - 3.625rem);
 			overflow-y: auto;
 			box-sizing: border-box;
 			width: 56px;
