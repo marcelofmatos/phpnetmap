@@ -19,6 +19,7 @@ class TbGridView extends CGridView
      * @var string|array the table style.
      * Valid values are TbHtml::GRID_TYPE_STRIPED, TbHtml::GRID_TYPE_BORDERED, TbHtml::GRID_TYPE_CONDENSED and/or
      * TbHtml::GRID_TYPE_HOVER.
+     * Defaults to array(TbHtml::GRID_TYPE_STRIPED, TbHtml::GRID_TYPE_HOVER) when not set.
      */
     public $type;
     /**
@@ -47,7 +48,7 @@ class TbGridView extends CGridView
     public function init()
     {
         parent::init();
-        if (!isset($this->type) || empty($this->type)) {
+        if (empty($this->type)) {
             // Every admin grid gets zebra striping + row hover by default so
             // the CRUD screens read consistently instead of each view having
             // to opt in with its own 'type' => 'striped hover'. A view can
