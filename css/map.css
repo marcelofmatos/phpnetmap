@@ -192,10 +192,15 @@ text.host-label {
 }
 
 text.host-label:hover,
-text.host-label.selected {
+text.host-label.selected,
+g.host.host-hovered text.host-label {
     /*    font-weight:bold;*/
     text-decoration: underline;
-    fill: var(--bs-emphasis-color);
+    /* All three states sit on top of the yellow .infobox hover highlight
+       (showHostInfoBox() in map/_view.php sets a yellow rect behind the
+       label) — dark text is the fixed correct choice here regardless of
+       theme, not one of the var(--bs-*) tokens the base rule above uses. */
+    fill: #000;
     /*    stroke: #FFF;
         stroke-width: 0.5px;*/
     /*    stroke-opacity: .8;*/

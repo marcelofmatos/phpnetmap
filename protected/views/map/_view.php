@@ -281,6 +281,13 @@ $hostTypes = Host::getTypes();
         var boxSVG = this.getBBox();
         var box = d3.select(this).select('.infobox');
 
+        // CSS :hover on text.host-label only fires while the mouse sits
+        // exactly over the tiny glyph outlines, not the whole host group —
+        // this class is the reliable version, toggled from the same
+        // mouseover/mouseout that shows/hides the yellow .infobox rect
+        // behind the label, so the two always match.
+        d3.select(this).classed('host-hovered', true);
+
         box.attr('width', (boxSVG.width) + 'px')
                 .attr('visibility', 'visible');
 
@@ -293,6 +300,7 @@ $hostTypes = Host::getTypes();
     }
 
     function hideHostInfoBox() {
+        d3.select(this).classed('host-hovered', false);
         var box = d3.select(this).select('.infobox');
         box.attr('visibility', 'hidden');
     }
