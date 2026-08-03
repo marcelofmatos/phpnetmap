@@ -30,10 +30,6 @@ return array(
         'mcpEnabled' => array(
             'type' => 'checkbox'
         ),
-        'mcpMode' => array(
-            'type' => 'dropdownlist',
-            'items' => array('readonly' => 'Read-only', 'readwrite' => 'Read-write'),
-        ),
         'authMode' => array(
             'type' => 'dropdownlist',
             'items' => array('yii' => 'PHPNetMap login (recommended)', 'htpasswd' => 'HTTP Basic Auth (.htpasswd, legacy)'),

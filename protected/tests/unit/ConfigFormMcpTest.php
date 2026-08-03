@@ -22,25 +22,28 @@ class ConfigFormMcpTest extends TestCase
         }
     }
 
-    public function testMcpSettingsDefaultToDisabledAndReadonly()
+    public function testMcpEnabledDefaultsToFalse()
     {
         $model = new ConfigForm;
         $this->assertFalse($model->mcpEnabled);
-        $this->assertSame('readonly', $model->mcpMode);
     }
 
-    public function testMcpSettingsRoundTripThroughIniFile()
+    public function testMcpEnabledRoundTripsThroughIniFile()
     {
         $model = new ConfigForm;
         $model->load();
         $model->mcpEnabled = true;
-        $model->mcpMode = 'readwrite';
         $model->save();
 
         $reloaded = new ConfigForm;
         $reloaded->load();
 
         $this->assertTrue($reloaded->mcpEnabled);
-        $this->assertSame('readwrite', $reloaded->mcpMode);
+    }
+
+    public function testMcpModeIsNoLongerAConfigFormProperty()
+    {
+        $model = new ConfigForm;
+        $this->assertObjectNotHasAttribute('mcpMode', $model);
     }
 }

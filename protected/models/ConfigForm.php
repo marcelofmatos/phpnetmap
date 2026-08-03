@@ -19,7 +19,6 @@ class ConfigForm extends CFormModel {
     public $cacheTtlGetSnmp = 10;
     public $showErrorSummary = true;
     public $mcpEnabled = false;
-    public $mcpMode = 'readonly';
     public $authMode = 'yii';
 
 
@@ -31,7 +30,7 @@ class ConfigForm extends CFormModel {
     public function rules() {
         return array(
             // type and query are required
-            array('adminEmail, translateCamTable, hostGatewayId, cache, cacheTtlDefault, cacheTtlCam, cacheTtlArp, cacheTtlGetSnmp, mcpEnabled, mcpMode, authMode', 'required'),
+            array('adminEmail, translateCamTable, hostGatewayId, cache, cacheTtlDefault, cacheTtlCam, cacheTtlArp, cacheTtlGetSnmp, mcpEnabled, authMode', 'required'),
             array('authMode', 'in', 'range' => array('htpasswd', 'yii')),
         );
     }
@@ -48,7 +47,6 @@ class ConfigForm extends CFormModel {
             'cacheTtlGetSnmp' => 'TTL for SNMP Get Cache (seconds)',
             'cacheTtlDefault' => 'TTL Default Cache (seconds)',
             'mcpEnabled' => 'Enable MCP Server (/mcp)',
-            'mcpMode' => 'MCP Mode',
             'authMode' => 'Authentication Mode',
         );
     }
@@ -110,7 +108,6 @@ class ConfigForm extends CFormModel {
             'cacheTtlArp' => (int) $this->cacheTtlArp,
             'cacheTtlGetSnmp' => (int) $this->cacheTtlGetSnmp,
             'mcpEnabled' => (bool) $this->mcpEnabled,
-            'mcpMode' => (string) $this->mcpMode,
         );
 
         foreach($res as $key => $val) {
