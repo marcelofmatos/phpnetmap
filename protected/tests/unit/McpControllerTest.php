@@ -17,12 +17,18 @@ class McpControllerTest extends TestCase
         McpToolRegistry::$classes = $this->originalClasses;
     }
 
-    private function config($enabled, $mode)
+    private function config($enabled)
     {
         $config = new ConfigForm;
         $config->mcpEnabled = $enabled;
-        $config->mcpMode = $mode;
         return $config;
+    }
+
+    private function token($mode)
+    {
+        $token = new McpToken;
+        $token->mode = $mode;
+        return $token;
     }
 
     public function testParseRequestReturnsNullForMalformedJson()
@@ -46,7 +52,7 @@ class McpControllerTest extends TestCase
     public function testDispatchHandlesInitialize()
     {
         $controller = new McpController('mcp');
-        $response = $controller->dispatch(array('id' => 1, 'method' => 'initialize', 'params' => array()), $this->config(true, 'readonly'), null);
+        $response = $controller->dispatch(array('id' => 1, 'method' => 'initialize', 'params' => array()), null);
 
         $this->assertSame('2.0', $response['jsonrpc']);
         $this->assertSame('phpnetmap', $response['result']['serverInfo']['name']);
@@ -55,7 +61,7 @@ class McpControllerTest extends TestCase
     public function testDispatchHandlesToolsListFilteredByMode()
     {
         $controller = new McpController('mcp');
-        $response = $controller->dispatch(array('id' => 2, 'method' => 'tools/list', 'params' => array()), $this->config(true, 'readonly'), null);
+        $response = $controller->dispatch(array('id' => 2, 'method' => 'tools/list', 'params' => array()), $this->token('readonly'));
 
         $this->assertSame(array(), $response['result']['tools']);
     }
@@ -63,7 +69,7 @@ class McpControllerTest extends TestCase
     public function testDispatchReturnsMethodNotFoundForUnknownMethod()
     {
         $controller = new McpController('mcp');
-        $response = $controller->dispatch(array('id' => 3, 'method' => 'bogus/method', 'params' => array()), $this->config(true, 'readonly'), null);
+        $response = $controller->dispatch(array('id' => 3, 'method' => 'bogus/method', 'params' => array()), null);
 
         $this->assertSame(-32601, $response['error']['code']);
     }
@@ -73,8 +79,7 @@ class McpControllerTest extends TestCase
         $controller = new McpController('mcp');
         $response = $controller->dispatch(
             array('id' => 4, 'method' => 'tools/call', 'params' => array('name' => 'does_not_exist', 'arguments' => array())),
-            $this->config(true, 'readwrite'),
-            null
+            $this->token('readwrite')
         );
 
         $this->assertSame(-32601, $response['error']['code']);
@@ -88,8 +93,7 @@ class McpControllerTest extends TestCase
         $controller = new McpController('mcp');
         $response = $controller->dispatch(
             array('id' => 5, 'method' => 'tools/call', 'params' => array('name' => 'fake_write', 'arguments' => array())),
-            $this->config(true, 'readonly'),
-            null
+            $this->token('readonly')
         );
 
         $this->assertArrayNotHasKey('error', $response);

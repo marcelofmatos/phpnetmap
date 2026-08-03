@@ -43,15 +43,17 @@ class McpController extends Controller
             Yii::app()->end();
         }
 
-        echo json_encode($this->dispatch($rpcRequest, $config, $token));
+        echo json_encode($this->dispatch($rpcRequest, $token));
         Yii::app()->end();
     }
 
     /**
      * Pure dispatch, split out from actionIndex() so it's testable without
-     * a real HTTP request (php://input can't be faked from PHPUnit).
+     * a real HTTP request (php://input can't be faked from PHPUnit). Mode
+     * comes from the resolved token, not a site-wide setting — each token
+     * carries its own readonly/readwrite mode.
      */
-    public function dispatch($rpcRequest, $config, $token)
+    public function dispatch($rpcRequest, $token)
     {
         $id = $rpcRequest['id'];
 
@@ -59,9 +61,9 @@ class McpController extends Controller
             case 'initialize':
                 return McpJsonRpc::result($id, $this->buildInitializeResult());
             case 'tools/list':
-                return McpJsonRpc::result($id, McpToolRegistry::listTools($config->mcpMode));
+                return McpJsonRpc::result($id, McpToolRegistry::listTools($token->mode));
             case 'tools/call':
-                return $this->callTool($id, $rpcRequest['params'], $config, $token);
+                return $this->callTool($id, $rpcRequest['params'], $token);
             default:
                 return McpJsonRpc::error($id, -32601, 'Method not found');
         }
@@ -79,13 +81,13 @@ class McpController extends Controller
         );
     }
 
-    private function callTool($id, $params, $config, $token)
+    private function callTool($id, $params, $token)
     {
         $toolName = isset($params['name']) ? $params['name'] : null;
         $arguments = isset($params['arguments']) ? $params['arguments'] : array();
 
         try {
-            $result = McpToolRegistry::call($toolName, $arguments, $config->mcpMode, $token);
+            $result = McpToolRegistry::call($toolName, $arguments, $token->mode, $token);
             return McpJsonRpc::result($id, array('content' => array(array('type' => 'text', 'text' => json_encode($result)))));
         } catch (McpUnknownToolException $e) {
             return McpJsonRpc::error($id, -32601, $e->getMessage());
