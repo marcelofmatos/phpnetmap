@@ -44,6 +44,6 @@ class ConfigFormMcpTest extends TestCase
     public function testMcpModeIsNoLongerAConfigFormProperty()
     {
         $model = new ConfigForm;
-        $this->assertObjectNotHasAttribute('mcpMode', $model);
+        $this->assertObjectNotHasProperty('mcpMode', $model);
     }
 }
