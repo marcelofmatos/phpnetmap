@@ -707,8 +707,11 @@ table.items th:first-child
 .actions input:not(.btn){
     width:100%;
 }
+/* was float:right — a no-op under BS5, since .nav-pills is now a flex
+   container (display:flex) and floats don't apply to flex items. The
+   flexbox equivalent of "push to the far end" is margin-left:auto. */
 #btnClosePortBox {
-    float: right;
+    margin-left: auto;
 }
 
 
