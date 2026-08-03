@@ -396,7 +396,15 @@ a.port {
     text-decoration: none;
 }
 
-.hover,
+/* .port.hover (not bare .hover) — a port that also has .hasConnection
+   (_ports.php's loadPortStatus()) tied for specificity against
+   .hasConnection's own border-color:#0000cf !important below (both single
+   classes), so source order decided the winner: .hasConnection came later
+   and won, leaving a clicked-and-connected port blue instead of orange.
+   .port.hover is two classes, so it wins regardless of order. .hover is
+   only ever applied to .port elements (grep confirms), so this loses no
+   coverage. */
+.port.hover,
 .port:hover,
 g.host rect:hover {
     border-color: orange !important;
