@@ -635,16 +635,25 @@ table.items th:first-child
 }
 
 #portInfoBox select {
-    display: inline; 
-    color: #000;
+    display: inline;
+    /* was color:#000 on a transparent background — invisible against the
+       dark theme's card, and this base rule had no border at all (only
+       .readonly below did), so the editable Admin Status select had no
+       visible edge on any theme. */
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .25rem;
     height: 1.5em;
     font-size: 10px;
-    background-color: transparent;
 }
 
 #portInfoBox select.readonly {
-    color: #888;
-    border: 1px solid gray;
+    /* was color:#888 — kept as a muted/non-interactive look, but themed
+       instead of a fixed mid-gray, plus a subtly tinted background so
+       "not editable" reads clearly on either theme. */
+    color: var(--bs-secondary-color);
+    background-color: var(--bs-tertiary-bg);
 }
 
 #portInfoBox form {
@@ -663,9 +672,17 @@ table.items th:first-child
     padding:3px 5px;
     height: 22px;
 }
-#portInfoBox input{
+/* :not(.btn) — #btnClosePortBox is a real Bootstrap .btn now (was the dead
+   BS2 class btn-mini); this ID+element rule would otherwise beat its
+   .btn-outline-secondary/.btn-sm classes on specificity and override their
+   padding/border-radius/color with these generic input styles. */
+#portInfoBox input:not(.btn) {
     font-size: 15px;
     padding: 3px;
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .25rem;
 }
 
 #portInfoBox .nav {

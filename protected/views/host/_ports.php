@@ -465,7 +465,7 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
     <div id="portInfoBox" class="well well-small" style="display:none">
         <div class="nav nav-pills">
             Port <label id="ifDescr" class="inline"></label>
-            <input id="btnClosePortBox" class="btn btn-mini" type="button" title="Close this box" onclick="stopPortTraffic(); $('#portInfoBox').slideUp();" value="close">
+            <input id="btnClosePortBox" class="btn btn-outline-secondary btn-sm" type="button" title="Close this box" onclick="stopPortTraffic(); $('#portInfoBox').slideUp();" value="close">
         </div>
         <table width="97%">
             <tr>
