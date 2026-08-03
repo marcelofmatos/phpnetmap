@@ -81,6 +81,23 @@ try {
         $db->createCommand('ALTER TABLE "mcp_audit_log" ADD COLUMN "token_description" VARCHAR(255)')->execute();
     }
 
+    // mcp_token.mode didn't exist before this change — same idempotent
+    // ALTER-if-missing pattern as mcp_audit_log.token_description above.
+    // 'readonly' default is deliberate and fail-closed: an existing token
+    // never silently gains write access it didn't have, even if the
+    // (now-removed) site-wide Configuration mode used to be 'readwrite'.
+    $columns = $db->createCommand('PRAGMA table_info(mcp_token)')->queryAll();
+    $hasMode = false;
+    foreach ($columns as $column) {
+        if ($column['name'] === 'mode') {
+            $hasMode = true;
+            break;
+        }
+    }
+    if (!$hasMode) {
+        $db->createCommand('ALTER TABLE "mcp_token" ADD COLUMN "mode" VARCHAR(10) NOT NULL DEFAULT \'readonly\'')->execute();
+    }
+
     fwrite(STDOUT, "Schema check complete.\n");
     exit(0);
 } catch (Exception $e) {

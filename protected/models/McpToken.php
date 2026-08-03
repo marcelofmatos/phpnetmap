@@ -8,6 +8,7 @@ class McpToken extends CActiveRecord
     public $expires_at;
     public $last_used_at;
     public $created_at;
+    public $mode = 'readonly';
 
     public static function model($className = __CLASS__)
     {
@@ -22,9 +23,10 @@ class McpToken extends CActiveRecord
     public function rules()
     {
         return array(
-            array('description, expires_at', 'required'),
+            array('description, expires_at, mode', 'required'),
             array('description', 'length', 'max' => 255),
             array('expires_at', 'date', 'format' => 'yyyy-MM-dd'),
+            array('mode', 'in', 'range' => array('readonly', 'readwrite')),
         );
     }
 
@@ -36,6 +38,7 @@ class McpToken extends CActiveRecord
             'expires_at' => 'Expires At',
             'last_used_at' => 'Last Used At',
             'created_at' => 'Created At',
+            'mode' => 'Mode',
         );
     }
 

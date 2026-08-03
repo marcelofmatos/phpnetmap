@@ -52,4 +52,34 @@ class McpTokenTest extends TestCase
     {
         $this->assertNull(McpToken::findValidByRawToken('not-a-real-token'));
     }
+
+    public function testModeDefaultsToReadonly()
+    {
+        $model = new McpToken;
+        $this->assertSame('readonly', $model->mode);
+    }
+
+    public function testModeAcceptsReadwrite()
+    {
+        $model = new McpToken;
+        $model->description = 'readwrite token';
+        $model->expires_at = date('Y-m-d', strtotime('+30 days'));
+        $model->mode = 'readwrite';
+        $model->generateToken();
+
+        $this->assertTrue($model->save());
+        $this->assertSame('readwrite', McpToken::model()->findByPk($model->id)->mode);
+    }
+
+    public function testModeRejectsInvalidValue()
+    {
+        $model = new McpToken;
+        $model->description = 'bad mode token';
+        $model->expires_at = date('Y-m-d', strtotime('+30 days'));
+        $model->mode = 'delete-everything';
+        $model->generateToken();
+
+        $this->assertFalse($model->save());
+        $this->assertArrayHasKey('mode', $model->getErrors());
+    }
 }
