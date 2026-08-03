@@ -667,13 +667,20 @@ table.items th:first-child
     font-weight: bold;
 }
 
+/* :not(.btn) — same reasoning as #connections a.add-connection above: the
+   "Create connection" submit in host/_ports.php is a real Bootstrap
+   .btn.btn-primary. This selector's specificity (class+element) beats
+   .btn-primary's single class, so background-color:#fff here was winning
+   over Bootstrap's blue background while .btn-primary's color:#fff (no
+   competing rule) stayed white text — white on white, button looked empty
+   with only its border showing. */
 .action,
-.actions input {
+.actions input:not(.btn) {
     padding: 2px 4px;
     margin: auto 2px;
     background-color: #fff;
 }
-.actions input{
+.actions input:not(.btn){
     width:100%;
 }
 #btnClosePortBox {
