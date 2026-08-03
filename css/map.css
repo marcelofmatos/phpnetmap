@@ -177,14 +177,16 @@ circle.selected-host {
 
 text.host-label {
     font: 10px sans-serif;
-    fill: #333;
+    /* was a hardcoded #333 — legible on the old light-only map, close to
+       invisible against the dark theme's navy background. */
+    fill: var(--bs-body-color);
 }
 
 text.host-label:hover,
 text.host-label.selected {
     /*    font-weight:bold;*/
     text-decoration: underline;
-    fill: #000;
+    fill: var(--bs-emphasis-color);
     /*    stroke: #FFF;
         stroke-width: 0.5px;*/
     /*    stroke-opacity: .8;*/
@@ -603,6 +605,11 @@ table.items th:first-child
 .bullet .marker.s0 { stroke: #274902; background-color: #274902; }
 .bullet .marker.s1 { stroke: #12125B; background-color: #12125B; }
 .bullet .tick line { stroke: var(--bs-secondary-color); stroke-width: .5px; }
+/* D3's axis .tick group also has a <text> sibling next to the <line> above —
+   the comment block up top always intended to cover it too, but only the
+   line got a rule; the text fell back to SVG's default fill:black, exactly
+   as invisible against a dark card as .range/.title/.subtitle used to be. */
+.bullet .tick text { fill: var(--bs-secondary-color); }
 .bullet .range.s0 { fill: var(--bs-tertiary-bg); }
 .bullet .range.s1 { fill: var(--bs-secondary-bg); }
 .bullet .range.s2 { fill: var(--bs-border-color); }
