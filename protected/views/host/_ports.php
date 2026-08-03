@@ -274,6 +274,14 @@ if ($model instanceof Host && !empty($model->snmpTemplate)):
             var connOnPort = d3.selectAll('.link.port' + port.ifIndex +':not(.supposed_link)');
             var connContainer = d3.select('#connections');
 
+            // Highlight this port's own line in the topology map above (if
+            // it has one) in the same yellow as the map's own hover
+            // highlight (.infobox in map/_view.php) — .link is on the map's
+            // DOM, not this script's own scope, but a class selector reaches
+            // it fine since both scripts share the same page.
+            d3.selectAll('.link.port-selected').classed('port-selected', false);
+            connOnPort.classed('port-selected', true);
+
             connContainer.html('');
             
             if (port.hasConnection) {

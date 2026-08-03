@@ -122,6 +122,15 @@ marker#local {
     stroke-width: 1.5px;
 }
 
+/* the currently-selected port's line in the map above (_ports.php's
+   showPortConnections() toggles this) — !important to win over every
+   cable-type color rule below (.utp_cat5e, .backbone, etc.), same yellow
+   as the map's own hover highlight (.infobox in map/_view.php). */
+.link.port-selected {
+    stroke: yellow !important;
+    stroke-width: 3px !important;
+}
+
 .link.local {
     stroke: blue;
 }
