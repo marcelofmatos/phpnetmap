@@ -299,11 +299,12 @@ query — and, optionally, modify — your network inventory data (hosts,
 connections, VLANs, SNMP templates).
 
 - **Enable it**: go to **Configuration** and check "Enable MCP Server
-  (/mcp)", then pick the mode — **Read-only** or **Read-write** — from "MCP
-  Mode".
-- **Create a token**: go to the **MCP Tokens** nav item → **Create**. The
-  raw token is shown exactly once on creation — copy it immediately, it
-  can't be retrieved again afterwards.
+  (/mcp)".
+- **Create a token**: go to the **MCP Tokens** nav item → **Create**, and
+  pick the mode — **Read-only** or **Read-write** — for that token (mode is
+  per-token, not site-wide, and can be changed later from the same page's
+  update action). The raw token is shown exactly once on creation — copy it
+  immediately, it can't be retrieved again afterwards.
 - **Apache prerequisites**: beyond what step 5 already sets up, `/mcp`
   specifically needs `mod_version` (the shipped `.htaccess` uses an `<If>`
   directive, guarded by `mod_version`, to exclude `/mcp` from the site-wide
@@ -365,6 +366,7 @@ CREATE TABLE "mcp_audit_log" (
     FOREIGN KEY(mcp_token_id) REFERENCES "mcp_token"(id)
 );
 ALTER TABLE mcp_audit_log ADD COLUMN token_description VARCHAR(255);
+ALTER TABLE mcp_token ADD COLUMN mode VARCHAR(10) NOT NULL DEFAULT 'readonly';
 CREATE UNIQUE INDEX idx_user_username ON user (username);
 SQL
 ```
