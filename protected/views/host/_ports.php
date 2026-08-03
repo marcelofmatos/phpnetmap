@@ -1,7 +1,12 @@
 <?php
 if ($model instanceof Host && !empty($model->snmpTemplate)):
     ?>
-    <div id="info" style="float:right">
+    <?php // float:right is a no-op here — the immediate parent .card is a BS5
+    // flex container (display:flex; flex-direction:column), and floats
+    // don't apply to flex items. text-align right-aligns #info's own inline
+    // content (checkbox, label, legend swatches) within its full-width box
+    // instead, the same visual effect the float used to achieve. ?>
+    <div id="info" style="text-align:right">
         <span id="hostFaceLoading" class="host-face-loading" aria-live="polite">
             <span class="host-face-loading-spinner"></span> Loading SNMP data&hellip;
         </span>
