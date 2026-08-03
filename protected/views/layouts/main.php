@@ -481,6 +481,14 @@
 			<nav aria-label="breadcrumb">
 				<?php $this->widget('bootstrap.widgets.TbBreadcrumb', array(
 					'links' => $this->breadcrumbs,
+					// Default homeLabel renders TbHtml::icon('home'), an
+					// "icon-home" <i> tag from the old BS2 glyphicon font —
+					// gone under BS5, so it rendered as an empty invisible
+					// crumb with just its "/" separator showing before the
+					// first real item. The navbar-brand link already covers
+					// "back to home", so drop this crumb instead of chasing
+					// a replacement icon for a redundant link.
+					'homeLabel' => false,
 				)); ?>
 			</nav>
 		<?php endif; ?>
