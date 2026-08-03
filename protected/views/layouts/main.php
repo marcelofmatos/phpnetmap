@@ -282,6 +282,20 @@
 			min-width: 0;
 		}
 
+		/* CRUD admin.php grids' "Advanced Search" toggle (host, vlan,
+		   connection, snmpTemplate, snmpField, hostFace,
+		   snmpFieldSnmpTemplate) — a card-header button that expands a
+		   .card-body via BS5's native collapse (data-bs-toggle), no custom
+		   jQuery toggle script needed anymore. Bootstrap toggles .collapsed
+		   on the trigger button itself automatically, so this chevron
+		   flips for free without tracking state separately. */
+		.pnm-search-toggle .pnm-search-chevron {
+			transition: transform .15s ease;
+		}
+		.pnm-search-toggle:not(.collapsed) .pnm-search-chevron {
+			transform: rotate(180deg);
+		}
+
 		/* Vertical main navigation — replaces the old horizontal link
 		   list. Reuses TbNav (encodeLabel=false, raw icon+label HTML per
 		   item) so active-route highlighting keeps working unmodified;
