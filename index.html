@@ -152,7 +152,7 @@
   }
 
   /* instalação */
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:s}
+  .steps{display:grid;grid-template-columns:1fr;gap:18px;counter-reset:s;max-width:640px;margin:0 auto}
   .step{padding:30px;position:relative}
   .step::before{counter-increment:s;content:"0" counter(s);
     font-size:2.4rem;font-weight:900;display:block;margin-bottom:8px;
@@ -208,7 +208,7 @@
   .reveal.on{opacity:1;transform:none}
 
   @media(max-width:780px){
-    .pains,.grid3,.steps{grid-template-columns:1fr}
+    .pains,.grid3{grid-template-columns:1fr}
     section{padding:52px 0}
     .ia-box,.cta-final{padding:40px 24px}
   }
