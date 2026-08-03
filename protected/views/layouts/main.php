@@ -45,7 +45,7 @@
 		body { padding-top: 3.625rem; }
 		[data-bs-theme="dark"] body { background-color: #14181f; }
 		.pnm-navbar-brand { display: inline-flex; align-items: center; gap: .55rem; font-family: ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .02em; }
-		.pnm-navbar-brand .pnm-logo-mark { width: 28px; height: 28px; flex-shrink: 0; box-shadow: 0 3px 10px rgba(124, 58, 237, .35); }
+		.pnm-navbar-brand .pnm-logo-mark { width: 28px; height: 28px; flex-shrink: 0; border-radius: 9px; box-shadow: 0 3px 10px rgba(124, 58, 237, .35); }
 		.theme-toggle { font-size: 1.1rem; line-height: 1; }
 
 		/* Yii core's CForm AND CActiveForm/TbActiveForm-based views (10
