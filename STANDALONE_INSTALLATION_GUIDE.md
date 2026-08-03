@@ -330,50 +330,29 @@ sudo git pull
 php requirements-check.php   # confirm nothing changed under you
 ```
 
-`protected/data/` (the database and `params.ini`) is untouched by `git
-pull` as long as it stays out of version control (it already is, via
-`.gitignore`), so your data and settings survive an update.
+`protected/data/params.ini` is untouched by `git pull` as long as it stays
+out of version control (it already is, via `.gitignore`), so your settings
+survive an update.
 
 **Note on `protected/data/phpnetmap.db` specifically.** Unlike `params.ini`,
-`phpnetmap.db` *is* committed to the repository, and schema changes (like
-the MCP tables added in this guide's section 11) are applied directly to
-that committed file. That means `git pull` overwrites your live database
-with the repo's snapshot — fine for a fresh/test install with no real data
-yet, but a real risk if you've already added hosts/connections/etc. If you
-have existing data, either accept the reset (and re-import/re-enter your
-data afterwards), or skip pulling the database file and apply just the new
-tables/column by hand instead:
+`phpnetmap.db` *is* committed to the repository, so `git pull` overwrites
+your live database with the repo's snapshot — fine for a fresh/test install
+with no real data yet, but a real risk if you've already added
+hosts/connections/etc. Keep your live database out of the pull instead:
 
 ```bash
-sqlite3 protected/data/phpnetmap.db <<'SQL'
-CREATE TABLE "mcp_token" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "description" VARCHAR(255) NOT NULL,
-    "token_hash" VARCHAR(64) NOT NULL,
-    "token_prefix" VARCHAR(12) NOT NULL,
-    "expires_at" VARCHAR(10) NOT NULL,
-    "last_used_at" DATETIME,
-    "created_at" DATETIME NOT NULL
-);
-CREATE UNIQUE INDEX "idx_mcp_token_hash" ON mcp_token ("token_hash");
-
-CREATE TABLE "mcp_audit_log" (
-    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "mcp_token_id" INTEGER NOT NULL,
-    "tool_name" VARCHAR(50) NOT NULL,
-    "params_json" TEXT NOT NULL,
-    "created_at" DATETIME NOT NULL,
-    FOREIGN KEY(mcp_token_id) REFERENCES "mcp_token"(id)
-);
-ALTER TABLE mcp_audit_log ADD COLUMN token_description VARCHAR(255);
-ALTER TABLE mcp_token ADD COLUMN mode VARCHAR(10) NOT NULL DEFAULT 'readonly';
-CREATE UNIQUE INDEX idx_user_username ON user (username);
-SQL
+git checkout -- protected/data/phpnetmap.db   # right after any pull that touched it
 ```
 
-Then keep your live database out of the pull, e.g. `git checkout --
-protected/data/phpnetmap.db` right after a `git pull` that touched it, so
-your data stays intact.
+Then bring its schema up to date with `ensure_schema.php` — the same
+self-healing migration script the Docker image already runs automatically
+on every container start (see `docker-entrypoint.sh`). It only ever adds
+tables, columns and indexes that are missing, idempotently, so it's always
+safe to run, whether or not this particular update touched the schema:
+
+```bash
+php ensure_schema.php
+```
 
 ## 13. Troubleshooting
 

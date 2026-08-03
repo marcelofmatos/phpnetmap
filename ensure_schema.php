@@ -98,6 +98,14 @@ try {
         $db->createCommand('ALTER TABLE "mcp_token" ADD COLUMN "mode" VARCHAR(10) NOT NULL DEFAULT \'readonly\'')->execute();
     }
 
+    // Only ever applied to the committed protected/data/phpnetmap.db
+    // directly (see git log 34fe69e) — never added here, so any deployment
+    // whose live database predates that commit never got it, the same gap
+    // this whole script exists to close for every other table/column.
+    $db->createCommand('
+        CREATE UNIQUE INDEX IF NOT EXISTS "idx_user_username" ON "user" ("username")
+    ')->execute();
+
     fwrite(STDOUT, "Schema check complete.\n");
     exit(0);
 } catch (Exception $e) {
