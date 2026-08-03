@@ -280,6 +280,7 @@ $hostTypes = Host::getTypes();
 
         var boxSVG = this.getBBox();
         var box = d3.select(this).select('.infobox');
+        var hostName = d3.select(this).datum().name;
 
         // CSS :hover on text.host-label only fires while the mouse sits
         // exactly over the tiny glyph outlines, not the whole host group —
@@ -287,6 +288,14 @@ $hostTypes = Host::getTypes();
         // mouseover/mouseout that shows/hides the yellow .infobox rect
         // behind the label, so the two always match.
         d3.select(this).classed('host-hovered', true);
+
+        // Same yellow as a clicked port's own line (.port-selected, see
+        // host/_ports.php's showPortConnections()) — here every link
+        // touching this host, not just one port, since hovering the whole
+        // host has no single port to key off of.
+        links.filter(function(l) {
+            return l.source.name === hostName || l.target.name === hostName;
+        }).classed('link-hovered', true);
 
         box.attr('width', (boxSVG.width) + 'px')
                 .attr('visibility', 'visible');
@@ -301,6 +310,7 @@ $hostTypes = Host::getTypes();
 
     function hideHostInfoBox() {
         d3.select(this).classed('host-hovered', false);
+        links.classed('link-hovered', false);
         var box = d3.select(this).select('.infobox');
         box.attr('visibility', 'hidden');
     }

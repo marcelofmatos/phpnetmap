@@ -122,11 +122,13 @@ marker#local {
     stroke-width: 1.5px;
 }
 
-/* the currently-selected port's line in the map above (_ports.php's
-   showPortConnections() toggles this) — !important to win over every
-   cable-type color rule below (.utp_cat5e, .backbone, etc.), same yellow
-   as the map's own hover highlight (.infobox in map/_view.php). */
-.link.port-selected {
+/* .port-selected: the currently-selected port's line (_ports.php's
+   showPortConnections()). .link-hovered: every link touching a host
+   currently moused-over (showHostInfoBox() below) — !important to win over
+   every cable-type color rule below (.utp_cat5e, .backbone, etc.), same
+   yellow as the map's own hover highlight (.infobox). */
+.link.port-selected,
+.link.link-hovered {
     stroke: yellow !important;
     stroke-width: 3px !important;
 }
