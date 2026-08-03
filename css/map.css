@@ -730,7 +730,10 @@ table.items th:first-child
     background-repeat: no-repeat;
     background-position: 7px center;
     color: var(--bs-body-color);
-    padding: 5px 0 5px 27px;
+    /* height matches #listhosts a's own 30px so the search box lines up
+       with the host rows below it instead of standing taller than them. */
+    height: 30px;
+    padding: 0 8px 0 27px;
     margin: 0 0 1px;
     border: 1px solid var(--bs-border-color);
 }
