@@ -142,6 +142,59 @@ select {
     width: 100px !important;
 }
 
+/* CGridView sortable column headers (host/vlan/connection/snmpTemplate/
+   snmpField/hostFace/snmpFieldSnmpTemplate admin.php all share this same
+   TbDataColumn markup: <a class="sort-link">Label<span class="caret">
+   </span></a>). A bare <a> defaults to link-blue + underline, reading as
+   body text instead of a table header; the old BS2 .caret (a CSS
+   border-trick triangle) has no BS5 replacement, so the sort affordance
+   was invisible. table.items scopes this to actual CGridView tables only
+   — leaves hand-coded tables (host-connection-list, the host/view.php
+   Overview tab) alone. */
+table.items.table thead th {
+    background-color: var(--bs-tertiary-bg);
+    border-bottom: 2px solid var(--bs-border-color);
+    vertical-align: middle;
+}
+
+.sort-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    color: var(--bs-emphasis-color);
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-decoration: none;
+}
+
+.sort-link:hover {
+    color: var(--bs-primary);
+}
+
+/* CSS-triangle caret (border trick, no icon font loaded) — points down by
+   default, .asc rotates it to point up. Faint until this is the actively
+   sorted column (.asc/.desc, added by CSort::link only to the current sort
+   attribute) so unsorted columns don't look like they're already sorted. */
+.sort-link .caret {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    opacity: .35;
+}
+
+.sort-link.asc .caret,
+.sort-link.desc .caret {
+    opacity: .85;
+}
+
+.sort-link.asc .caret {
+    transform: rotate(180deg);
+}
+
 .text-nowrap {
     white-space: nowrap;
 }
