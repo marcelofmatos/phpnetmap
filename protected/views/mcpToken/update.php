@@ -8,7 +8,14 @@ $this->breadcrumbs = array(
     $model->description => array('admin'),
     'Update Mode',
 );
+
+$this->menu = array(
+    array('label' => 'Create MCP Token', 'url' => array('create')),
+    array('label' => 'Manage MCP Tokens', 'url' => array('admin')),
+);
 ?>
+
+<h1>Update Mode: <?php echo CHtml::encode($model->description); ?></h1>
 
 <div class="form">
 
@@ -22,12 +29,12 @@ $this->breadcrumbs = array(
     <?php echo $form->errorSummary($model); ?>
 
     <div class="row">
-        <div>Description:</div>
+        <label>Description:</label>
         <div><?php echo CHtml::encode($model->description); ?></div>
     </div>
 
     <div class="row">
-        <div>Token Prefix:</div>
+        <label>Token Prefix:</label>
         <div><?php echo CHtml::encode($model->token_prefix); ?></div>
     </div>
 
