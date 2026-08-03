@@ -704,10 +704,18 @@ table.items th:first-child
 #menuhosts #hostfilter {
     width: 100%;
     box-sizing: border-box;
-    background: url('../images/search.png') no-repeat 7px center;
+    /* search.png's dark-gray glyph disappeared against a dark input
+       background — an inline SVG lets the icon be a fixed mid-gray that
+       reads on both a near-white (light) and near-black (dark) fill,
+       instead of needing a separate icon per theme. */
+    background-color: var(--bs-body-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='6.5' cy='6.5' r='5' fill='none' stroke='%23888' stroke-width='1.6'/%3E%3Cpath d='M10.5 10.5L14 14' stroke='%23888' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 7px center;
+    color: var(--bs-body-color);
     padding: 5px 0 5px 27px;
     margin: 0 0 1px;
-    border: 1px solid #eee;
+    border: 1px solid var(--bs-border-color);
 }
 #listhosts {
     overflow-x: hidden;
@@ -719,7 +727,9 @@ table.items th:first-child
     display: block;
     height: 30px;
     vertical-align: middle;
-    background-color: #F4F4F4;
+    /* was a hardcoded #F4F4F4 — a glaring light-mode-only strip cutting
+       through the dark theme's page background. */
+    background-color: var(--bs-tertiary-bg);
     margin-bottom: 1px;
     background-position: left center;
 }
