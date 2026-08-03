@@ -2,29 +2,33 @@
 /* @var $this McpTokenController */
 /* @var $model McpToken */
 /* @var $form CActiveForm */
+
+$this->breadcrumbs = array(
+    'MCP Tokens' => array('admin'),
+    $model->description => array('admin'),
+    'Update Mode',
+);
 ?>
 
 <div class="form">
 
 <?php $form = $this->beginWidget('CActiveForm', array(
-    'id' => 'mcp-token-form',
+    'id' => 'mcp-token-update-form',
     'enableAjaxValidation' => false,
 )); ?>
 
-    <p class="note">Fields with <span class="required">*</span> are required.</p>
+    <p class="note">Only the mode can be changed after a token is created — the token value itself is never re-shown or re-derivable.</p>
 
     <?php echo $form->errorSummary($model); ?>
 
     <div class="row">
-        <?php echo $form->labelEx($model, 'description'); ?>
-        <?php echo $form->textField($model, 'description', array('size' => 60, 'maxlength' => 255)); ?>
-        <?php echo $form->error($model, 'description'); ?>
+        <div>Description:</div>
+        <div><?php echo CHtml::encode($model->description); ?></div>
     </div>
 
     <div class="row">
-        <?php echo $form->labelEx($model, 'expires_at'); ?>
-        <?php echo $form->textField($model, 'expires_at', array('type' => 'date')); ?>
-        <?php echo $form->error($model, 'expires_at'); ?>
+        <div>Token Prefix:</div>
+        <div><?php echo CHtml::encode($model->token_prefix); ?></div>
     </div>
 
     <div class="row">
@@ -34,7 +38,7 @@
     </div>
 
     <div class="row buttons">
-        <?php echo CHtml::submitButton('➕ Create', array('class' => 'btn btn-primary')); ?>
+        <?php echo CHtml::submitButton('💾 Save', array('class' => 'btn btn-primary')); ?>
     </div>
 
 <?php $this->endWidget(); ?>

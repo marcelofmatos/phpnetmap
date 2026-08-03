@@ -27,12 +27,13 @@ $this->menu = array(
         'id',
         'description',
         'token_prefix',
+        'mode',
         'expires_at',
         'last_used_at',
         'created_at',
         array(
             'class' => 'CButtonColumn',
-            'template' => '<span style="white-space:nowrap">{delete}</span>',
+            'template' => '<span style="white-space:nowrap">{update} {delete}</span>',
         ),
     ),
 )); ?>

@@ -16,7 +16,7 @@ class McpTokenController extends Controller
     {
         return array(
             array('allow',
-                'actions' => array('admin', 'create', 'delete'),
+                'actions' => array('admin', 'create', 'update', 'delete'),
                 'users' => array('admin'),
             ),
             array('deny',
@@ -50,6 +50,28 @@ class McpTokenController extends Controller
         }
 
         $this->render('create', array('model' => $model));
+    }
+
+    public function actionUpdate($id)
+    {
+        $model = $this->loadModel($id);
+
+        if (isset($_POST['McpToken']['mode'])) {
+            $model->mode = $_POST['McpToken']['mode'];
+            // validate(array('mode')) restricts validation to just this
+            // attribute; save(false, ...) is required alongside it —
+            // save($runValidation=true, ...) would re-run full validation on
+            // every attribute (description, expires_at) as a second pass,
+            // which could reject this update over an unrelated field on an
+            // old row that predates a validation rule change. Only mode is
+            // meant to be editable here — the token's hash/prefix/
+            // description stay exactly as they were at creation.
+            if ($model->validate(array('mode')) && $model->save(false, array('mode'))) {
+                $this->redirect(array('admin'));
+            }
+        }
+
+        $this->render('update', array('model' => $model));
     }
 
     public function actionDelete($id)
