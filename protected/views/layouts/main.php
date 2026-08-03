@@ -27,6 +27,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/svg+xml" href="<?php echo Yii::app()->baseUrl; ?>/images/favicon.svg">
 
 	<!-- main.css loads BEFORE bootstrap5 on purpose: it still defines
 	     app-specific classes Phase 1 hasn't touched yet (diagnostic cards,
@@ -43,7 +44,8 @@
 	<style>
 		body { padding-top: 3.625rem; }
 		[data-bs-theme="dark"] body { background-color: #14181f; }
-		.pnm-navbar-brand { font-family: ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .02em; }
+		.pnm-navbar-brand { display: inline-flex; align-items: center; gap: .55rem; font-family: ui-monospace, "SF Mono", Consolas, monospace; letter-spacing: .02em; }
+		.pnm-navbar-brand .pnm-logo-mark { width: 28px; height: 28px; flex-shrink: 0; box-shadow: 0 3px 10px rgba(124, 58, 237, .35); }
 		.theme-toggle { font-size: 1.1rem; line-height: 1; }
 
 		/* Yii core's CForm AND CActiveForm/TbActiveForm-based views (10
@@ -415,7 +417,10 @@
 
 <nav class="navbar navbar-expand-lg fixed-top bg-body-tertiary border-bottom">
 	<div class="container-fluid">
-		<a class="navbar-brand pnm-navbar-brand" href="<?php echo Yii::app()->getBaseUrl(true); ?>"><?php echo CHtml::encode(Yii::app()->name); ?></a>
+		<a class="navbar-brand pnm-navbar-brand" href="<?php echo Yii::app()->getBaseUrl(true); ?>">
+			<img class="pnm-logo-mark" src="<?php echo Yii::app()->baseUrl; ?>/images/favicon.svg" alt="" width="28" height="28">
+			<?php echo CHtml::encode(Yii::app()->name); ?>
+		</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pnmNav">
 			<span class="navbar-toggler-icon"></span>
 		</button>
