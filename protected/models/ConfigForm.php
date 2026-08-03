@@ -81,7 +81,14 @@ class ConfigForm extends CFormModel {
             }
         }
         foreach(@parse_ini_file(PARAMS_INI_FILE_PATH) as $key => $val) {
-            $this->$key = $val;
+            // property_exists guards against obsolete keys a persisted
+            // params.ini can carry over from before a setting was renamed
+            // or dropped (e.g. mcpMode, removed when the site-wide MCP mode
+            // setting became per-token) — CComponent::__set() throws on any
+            // key that isn't a declared property instead of ignoring it.
+            if (property_exists($this, $key)) {
+                $this->$key = $val;
+            }
         }
         // parse_ini_file always returns quoted values as strings, so coerce
         // back to a real bool (mirrors the (bool) cast already applied in save()).

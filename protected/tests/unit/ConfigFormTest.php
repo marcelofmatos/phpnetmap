@@ -42,4 +42,22 @@ class ConfigFormTest extends TestCase
 
         $this->assertFalse(ConfigForm::isUnconfigured());
     }
+
+    public function testLoadIgnoresObsoleteKeysFromAnOlderParamsIniFile()
+    {
+        // A deploy upgrading straight from a pre-per-token-mode release
+        // (mcpMode used to live directly on ConfigForm, see
+        // ConfigFormMcpTest::testMcpModeIsNoLongerAConfigFormProperty) still
+        // has this key sitting in its persisted params.ini. load() used to
+        // assign every ini key straight onto $this, which threw
+        // 'Property "ConfigForm.mcpMode" is not defined.' on that property
+        // and broke both /config and /mcp (McpController::actionIndex()
+        // calls load() too) for anyone who hadn't rewritten the file since.
+        file_put_contents(PARAMS_INI_FILE_PATH, 'adminEmail = "ops@example.org"' . "\r\n" . 'mcpMode = "readonly"');
+
+        $model = new ConfigForm;
+        $model->load();
+
+        $this->assertSame('ops@example.org', $model->adminEmail);
+    }
 }
