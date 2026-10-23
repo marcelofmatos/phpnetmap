@@ -21,6 +21,7 @@ $this->breadcrumbs = array(
             case "camtable:vlan_tag" :
 
                 $dataProvider = new CArrayDataProvider($result, array(
+                    'keyField' => false,
                     'sort' => array(
                         'attributes' => array(
                             'host', 'port', 'port_dst_host', 'vlan', 'mac',
@@ -70,7 +71,7 @@ $this->breadcrumbs = array(
                                 'create_host' => array(
                                     'label' => 'Create Host',
                                     'imageUrl' => Yii::app()->request->baseUrl . '/images/host/add.png',
-                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => $data[\'ip\'], "mac" => $data[\'mac\']))',
+                                    'url' => '$this->grid->controller->createUrl("host/create", array("ip" => isset($data[\'ip\']) ? $data[\'ip\'] : null, "mac" => $data[\'mac\']))',
                                     'visible' => '! $data[\'hostDst\'] instanceof Host',
                                 ),
                             ),
@@ -84,6 +85,7 @@ $this->breadcrumbs = array(
             case 'arptable:ip':
 
                 $dataProvider = new CArrayDataProvider($result, array(
+                    'keyField' => false,
                     'sort' => array(
                         'attributes' => array(
                             'mac', 'ip', 'host',
@@ -130,6 +132,7 @@ $this->breadcrumbs = array(
             case 'portsinfo:ifAlias':
 
                 $dataProvider = new CArrayDataProvider($result, array(
+                    'keyField' => false,
                     'sort' => array(
                         'attributes' => array(
                             'host', 'port', 'info',

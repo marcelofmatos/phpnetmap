@@ -9,6 +9,7 @@ if (is_array($cam_table)) {
 //    }
   
     $dataProvider = new CArrayDataProvider($cam_table,array(
+        'keyField' => false,
         'sort'=>array(
             'attributes'=>array(
                  'port', 'vlan', 'mac', 'ip',
@@ -26,7 +27,7 @@ if (is_array($cam_table)) {
         'columns' => array(
             array(
                 'name' => 'port',
-                'value' => 'CHtml::link(CHtml::encode($data[\'port_name\'] ? $data[\'port_name\'] : $data[\'port\']), Yii::app()->createUrl("host/viewByName",array("name"=>$data[\'host_dst\']->name)), array("title"=>"Link to: {$data[\'host_dst\']}", "name"=>"port_{$data[\'port\']}", "class"=>"portlabel"))',
+                'value' => 'CHtml::link(CHtml::encode($data[\'port_name\'] ? $data[\'port_name\'] : $data[\'port\']), Yii::app()->createUrl("host/viewByName",array("name"=>($data[\'host_dst\'] instanceof Host ? $data[\'host_dst\']->name : null))), array("title"=>"Link to: {$data[\'host_dst\']}", "name"=>"port_{$data[\'port\']}", "class"=>"portlabel"))',
                 'type' => 'raw',
             ),
             array(
@@ -54,7 +55,7 @@ if (is_array($cam_table)) {
                         'label' => 'Create Connection',
                         'imageUrl'=>Yii::app()->request->baseUrl.'/images/connection/add.png',
                         'url'=>'$this->grid->controller->createUrl("connection/create", array("host_src_id"=>'.$model->id.', "host_src_port" => $data[\'port\'], "host_dst_id" => $data[\'host\']->id))',
-                        'visible'=>' ! $data[\'host_dst\'] instanceof Host && $data[\'host\']->id',
+                        'visible'=>' ! $data[\'host_dst\'] instanceof Host && isset($data[\'host\']->id)',
                     ),
                     'create_host'=>array(
                         'label' => 'Create Host',

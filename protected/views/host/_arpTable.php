@@ -4,6 +4,7 @@ if (is_array($arp_table)) {
 
        
         $dataProvider = new CArrayDataProvider($arp_table,array(
+            'keyField' => false,
             'sort'=>array(
                 'attributes'=>array(
                      'mac', 'ip',

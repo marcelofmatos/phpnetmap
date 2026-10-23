@@ -550,6 +550,7 @@ class HostController extends Controller {
 
             $model->loadArpTable();
 
+            $arp_table = array();
             foreach ($model->arp_table as $mac => $ip) {
                 $atItem['mac'] = $mac;
                 $atItem['ip'] = $ip;

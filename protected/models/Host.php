@@ -469,7 +469,11 @@ class Host extends CActiveRecord {
                     //if( ! isset($this->ports[$portIndex]) ) {
                     $this->ports[$portIndex]['ifIndex'] = $portIndex;
                     //}
-                    preg_match('/([^:]+): "?([^"]+)"?/', $res, $values_match);
+                    // Valor vazio (ex.: ifAlias sem descrição vem como "") não
+                    // casa a regex — fica null, como já ficava antes do PHP 8.
+                    if (!preg_match('/([^:]+): "?([^"]+)"?/', $res, $values_match)) {
+                        $values_match = array(1 => null, 2 => null);
+                    }
 
                     switch($values_match[1]) {
                         case "INTEGER":
@@ -496,7 +500,7 @@ class Host extends CActiveRecord {
         }
         
         foreach ($this->ports as $k => $port) {
-                    if (preg_match($this->ifNameExceptionsRegex, $port['ifDescr'])) {
+                    if (isset($port['ifDescr']) && preg_match($this->ifNameExceptionsRegex, $port['ifDescr'])) {
                         unset($this->ports[$k]);
                     }
         }

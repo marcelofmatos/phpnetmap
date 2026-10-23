@@ -78,7 +78,7 @@ class MapController extends Controller {
                         $port = $camHost['port'];
                         $portLabelPrefix = 'port_';
 
-                        if ($port == $rootHost->cam_table[$k + 1]['port'] || $sourcePort == $portLabelPrefix . $port) {
+                        if ((isset($rootHost->cam_table[$k + 1]) && $port == $rootHost->cam_table[$k + 1]['port']) || (isset($sourcePort) && $sourcePort == $portLabelPrefix . $port)) {
 
                             $sourcePort = $portLabelPrefix . $port;
                             
@@ -123,7 +123,7 @@ class MapController extends Controller {
 
                         // connection
                         $c = new Connection();
-                        $c->hostSrc = ($virtualHost[$sourcePort]) ? $virtualHost[$sourcePort] : $rootHost;
+                        $c->hostSrc = isset($sourcePort, $virtualHost[$sourcePort]) ? $virtualHost[$sourcePort] : $rootHost;
                         $c->hostDst = $h;
                         $c->host_src_port = $camHost['port'];
                         $c->type = Connection::TYPE_UNKNOWN;

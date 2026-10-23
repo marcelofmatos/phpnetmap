@@ -73,7 +73,7 @@ class SearchForm extends CFormModel {
                         if ($this->exact_match) {
                                 $found = $row[$search_field] == $this->query;
                         } else {
-                                $found = strpos($row[$search_field], $this->query) !== FALSE;
+                                $found = strpos((string) $row[$search_field], $this->query) !== FALSE;
                         }
 
                         if ($found) {
@@ -87,6 +87,10 @@ class SearchForm extends CFormModel {
                             $row['host'] = $host;
                             $row['hostDst'] = $hostDst instanceof Host ? $hostDst : Host::model()->findByAttributes(array('mac' => $row['mac']));
                             $row['vlan'] = Vlan::model()->findByAttributes(array('tag' => $row['vlan_tag']));
+                            if (!$row['vlan'] instanceof Vlan) {
+                                $row['vlan'] = new Vlan();
+                                $row['vlan']->tag = $row['vlan_tag'];
+                            }
                             $result[] = $row;
                         }
                     }
@@ -127,7 +131,7 @@ class SearchForm extends CFormModel {
                         if ($this->exact_match) {
                                 $found = $port[$search_field] == $this->query;
                         } else {
-                                $found = strpos($port[$search_field], $this->query) !== FALSE;
+                                $found = strpos((string) $port[$search_field], $this->query) !== FALSE;
                         }
 
                         if ($found) {
