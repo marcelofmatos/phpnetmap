@@ -9,8 +9,12 @@ class HostArpTableTest extends TestCase
 
     protected function tearDown(): void
     {
-        Yii::app()->db->createCommand("DELETE FROM host WHERE id = {$this->hostId}")->execute();
-        Yii::app()->db->createCommand("DELETE FROM snmp_template WHERE id = {$this->templateId}")->execute();
+        if ($this->hostId) {
+            Yii::app()->db->createCommand("DELETE FROM host WHERE id = {$this->hostId}")->execute();
+        }
+        if ($this->templateId) {
+            Yii::app()->db->createCommand("DELETE FROM snmp_template WHERE id = {$this->templateId}")->execute();
+        }
     }
 
     // loadArpTable() used each(), removed in PHP 8 — any host with an SNMP

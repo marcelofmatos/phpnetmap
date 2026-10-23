@@ -8,7 +8,6 @@ class HostSaveTest extends TestCase
 
     protected function tearDown(): void
     {
-        restore_error_handler();
         if ($this->hostId) {
             Yii::app()->db->createCommand("DELETE FROM host WHERE id = {$this->hostId}")->execute();
         }
@@ -21,11 +20,15 @@ class HostSaveTest extends TestCase
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
         }, E_ALL);
-        $host = new Host();
-        $host->name = 'host-save-test-no-mac';
-        $host->type = Host::TYPE_UNKNOWN;
-        $this->assertTrue($host->save(false));
-        $this->hostId = $host->id;
+        try {
+            $host = new Host();
+            $host->name = 'host-save-test-no-mac';
+            $host->type = Host::TYPE_UNKNOWN;
+            $this->assertTrue($host->save(false));
+            $this->hostId = $host->id;
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function testSaveNormalizesCiscoStyleMac()
