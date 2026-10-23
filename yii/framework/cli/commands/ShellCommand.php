@@ -3,9 +3,9 @@
  * ShellCommand class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -125,7 +125,18 @@ EOD;
 					$_command_->run($_args_);
 				}
 				else
-					echo eval($_line_.';');
+				{
+					try
+					{
+						$evalResult = eval($_line_ . ';');
+					}
+					catch (ParseError $e)
+					{
+						$evalResult = false;
+					}
+
+					echo $evalResult;
+				}
 			}
 			catch(Exception $e)
 			{

@@ -3,9 +3,9 @@
  * CVarDumper class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -60,7 +60,7 @@ class CVarDumper
 		if($highlight)
 		{
 			$result=highlight_string("<?php\n".self::$_output,true);
-			self::$_output=preg_replace('/&lt;\\?php<br \\/>/','',$result,1);
+			self::$_output=preg_replace('/&lt;\\?php(<br \\/>|\\n)/','',$result,1);
 		}
 		return self::$_output;
 	}

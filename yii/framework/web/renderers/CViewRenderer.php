@@ -3,9 +3,9 @@
  * CViewRenderer class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -22,7 +22,7 @@
  * Parsing results are saved as temporary files that may be stored
  * under the application runtime directory or together with the source view file.
  *
- * @author Steve Heyns http://customgothic.com/
+ * @author Steve Heyns https://customgothic.com/
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @package system.web.renderers
  * @since 1.0
@@ -61,6 +61,7 @@ abstract class CViewRenderer extends CApplicationComponent implements IViewRende
 	 * @param mixed $data the data to be passed to the view
 	 * @param boolean $return whether the rendering result should be returned
 	 * @return mixed the rendering result, or null if the rendering result is not needed.
+	 * @throws CException
 	 */
 	public function renderFile($context,$sourceFile,$data,$return)
 	{

@@ -3,9 +3,9 @@
  * CTimestampBehavior class file.
  *
  * @author Jonah Turnquist <poppitypop@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -67,7 +67,7 @@ class CTimestampBehavior extends CActiveRecordBehavior {
 	 * fall back to using the current UNIX timestamp.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
-	 * please refer to the {@link http://www.php.net/manual/en/language.expressions.php php manual}.
+	 * please refer to the {@link https://www.php.net/manual/en/language.expressions.php php manual}.
 	 */
 	public $timestampExpression;
 
@@ -105,7 +105,16 @@ class CTimestampBehavior extends CActiveRecordBehavior {
 		if ($this->timestampExpression instanceof CDbExpression)
 			return $this->timestampExpression;
 		elseif ($this->timestampExpression !== null)
-			return @eval('return '.$this->timestampExpression.';');
+		{
+			try
+			{
+				return @eval('return '.$this->timestampExpression.';');
+			}
+			catch (ParseError $e)
+			{
+				return false;
+			}
+		}
 
 		$columnType = $this->getOwner()->getTableSchema()->getColumn($attribute)->dbType;
 		return $this->getTimestampByColumnType($columnType);

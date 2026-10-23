@@ -7,7 +7,7 @@
  *
  * LICENSE: This source file is subject to version 3.0 of the PHP license
  * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * https://www.php.net/license/3_0.txt.  If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
@@ -15,9 +15,9 @@
  * @package    Text_Highlighter
  * @author     Andrey Demenev <demenev@gmail.com>
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    CVS: $Id: Highlighter.php,v 1.1 2007/06/03 02:35:28 ssttoo Exp $
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 
 // {{{ BC constants
@@ -46,7 +46,9 @@ if (!defined('HL_NUMBERS_LI')) {
 /**
  * for our purpose, it is infinity
  */
-define ('HL_INFINITY',      1000000000);
+if (!defined('HL_INFINITY')) {
+    define('HL_INFINITY', 1000000000);
+}
 
 // }}}
 
@@ -55,9 +57,9 @@ define ('HL_INFINITY',      1000000000);
  *
  * @author     Andrey Demenev <demenev@gmail.com>
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    Release: 0.7.1
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 
 // {{{ Text_Highlighter
@@ -81,7 +83,7 @@ define ('HL_INFINITY',      1000000000);
  * Usage example
  * <code>
  *require_once 'Text/Highlighter.php';
- *$hlSQL =& Text_Highlighter::factory('SQL',array('numbers'=>true));
+ *$hlSQL = Text_Highlighter::factory('SQL',array('numbers'=>true));
  *echo $hlSQL->highlight('SELECT * FROM table a WHERE id = 12');
  * </code>
  *
@@ -89,7 +91,7 @@ define ('HL_INFINITY',      1000000000);
  * @package Text_Highlighter
  * @access public
  */
-
+#[AllowDynamicProperties]
 class Text_Highlighter
 {
     // {{{ members

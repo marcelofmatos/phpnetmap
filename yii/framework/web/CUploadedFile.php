@@ -3,9 +3,9 @@
  * CUploadedFile class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -189,6 +189,9 @@ class CUploadedFile extends CComponent
 	 * @param boolean $deleteTempFile whether to delete the temporary file after saving.
 	 * If true, you will not be able to save the uploaded file again in the current request.
 	 * @return boolean true whether the file is saved successfully
+	 * 
+	 * In some exceptional cases such as not enough permissions to write to the path specified
+	 * PHP warning is triggered.
 	 */
 	public function saveAs($file,$deleteTempFile=true)
 	{
@@ -244,7 +247,7 @@ class CUploadedFile extends CComponent
 	/**
 	 * Returns an error code describing the status of this file uploading.
 	 * @return integer the error code
-	 * @see http://www.php.net/manual/en/features.file-upload.errors.php
+	 * @see https://www.php.net/manual/en/features.file-upload.errors.php
 	 */
 	public function getError()
 	{

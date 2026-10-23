@@ -6,9 +6,9 @@
  *
  * The algorithm used here is mostly lifted from the perl module
  * Algorithm::Diff (version 1.06) by Ned Konz, which is available at:
- * http://www.perl.com/CPAN/authors/id/N/NE/NEDKONZ/Algorithm-Diff-1.06.zip
+ * https://www.perl.com/CPAN/authors/id/N/NE/NEDKONZ/Algorithm-Diff-1.06.zip
  *
- * More ideas are taken from: http://www.ics.uci.edu/~eppstein/161/960229.html
+ * More ideas are taken from: https://www.ics.uci.edu/~eppstein/161/960229.html
  *
  * Some ideas (and a bit of code) are taken from analyze.c, of GNU
  * diffutils-2.7, which can be found at:
@@ -18,17 +18,27 @@
  * Geoffrey T. Dairiki <dairiki@dairiki.org>. The original PHP version of this
  * code was written by him, and is used/adapted with his permission.
  *
- * $Horde: framework/Text_Diff/Diff/Engine/native.php,v 1.7.2.4 2008/01/04 10:38:10 jan Exp $
+ * $Horde: framework/Text_Diff/Diff/Engine/native.php,v 1.7.2.5 2009/01/06 15:23:41 jan Exp $
  *
- * Copyright 2004-2008 The Horde Project (http://www.horde.org/)
+ * Copyright 2004-2009 The Horde Project (https://www.horde.org/)
  *
  * See the enclosed file COPYING for license information (LGPL). If you did
- * not receive this file, see http://opensource.org/licenses/lgpl-license.php.
+ * not receive this file, see https://opensource.org/licenses/lgpl-license.php.
  *
  * @author  Geoffrey T. Dairiki <dairiki@dairiki.org>
  * @package Text_Diff
  */
 class Text_Diff_Engine_native {
+
+    public $xchanged;
+    public $ychanged;
+    public $xv;
+    public $yv;
+    public $xind;
+    public $yind;
+    public $seq;
+    public $in_seq;
+    public $lcs;
 
     function diff($from_lines, $to_lines)
     {
@@ -63,9 +73,11 @@ class Text_Diff_Engine_native {
         }
 
         // Ignore lines which do not exist in both files.
+        $xhash = [];
         for ($xi = $skip; $xi < $n_from - $endskip; $xi++) {
             $xhash[$from_lines[$xi]] = 1;
         }
+        $yhash = [];
         for ($yi = $skip; $yi < $n_to - $endskip; $yi++) {
             $line = $to_lines[$yi];
             if (($this->ychanged[$yi] = empty($xhash[$line]))) {
@@ -160,6 +172,7 @@ class Text_Diff_Engine_native {
                 = array($yoff, $ylim, $xoff, $xlim);
         }
 
+        $ymatches = array();
         if ($flip) {
             for ($i = $ylim - 1; $i >= $yoff; $i--) {
                 $ymatches[$this->xv[$i]][] = $i;
@@ -173,7 +186,7 @@ class Text_Diff_Engine_native {
         $this->lcs = 0;
         $this->seq[0]= $yoff - 1;
         $this->in_seq = array();
-        $ymids[0] = array();
+        $ymids = array(array());
 
         $numer = $xlim - $xoff + $nchunks - 1;
         $x = $xoff;
@@ -192,15 +205,16 @@ class Text_Diff_Engine_native {
                 }
                 $matches = $ymatches[$line];
                 reset($matches);
-                while (list(, $y) = each($matches)) {
+                while ($y = current($matches)) {
                     if (empty($this->in_seq[$y])) {
                         $k = $this->_lcsPos($y);
                         assert($k > 0);
                         $ymids[$k] = $ymids[$k - 1];
                         break;
                     }
+                    next($matches);
                 }
-                while (list(, $y) = each($matches)) {
+                while ($y = current($matches)) {
                     if ($y > $this->seq[$k - 1]) {
                         assert($y <= $this->seq[$k]);
                         /* Optimization: this is a common case: next match is
@@ -213,11 +227,12 @@ class Text_Diff_Engine_native {
                         assert($k > 0);
                         $ymids[$k] = $ymids[$k - 1];
                     }
+                    next($matches);
                 }
             }
         }
 
-        $seps[] = $flip ? array($yoff, $xoff) : array($xoff, $yoff);
+        $seps = array($flip ? array($yoff, $xoff) : array($xoff, $yoff));
         $ymid = $ymids[$this->lcs];
         for ($n = 0; $n < $nchunks - 1; $n++) {
             $x1 = $xoff + (int)(($numer + ($xlim - $xoff) * $n) / $nchunks);
@@ -332,7 +347,7 @@ class Text_Diff_Engine_native {
         $i = 0;
         $j = 0;
 
-        assert('count($lines) == count($changed)');
+        assert(count($lines) == count($changed));
         $len = count($lines);
         $other_len = count($other_changed);
 
@@ -353,7 +368,7 @@ class Text_Diff_Engine_native {
             }
 
             while ($i < $len && ! $changed[$i]) {
-                assert('$j < $other_len && ! $other_changed[$j]');
+                assert($j < $other_len && ! $other_changed[$j]);
                 $i++; $j++;
                 while ($j < $other_len && $other_changed[$j]) {
                     $j++;
@@ -385,11 +400,11 @@ class Text_Diff_Engine_native {
                     while ($start > 0 && $changed[$start - 1]) {
                         $start--;
                     }
-                    assert('$j > 0');
+                    assert($j > 0);
                     while ($other_changed[--$j]) {
                         continue;
                     }
-                    assert('$j >= 0 && !$other_changed[$j]');
+                    assert($j >= 0 && !$other_changed[$j]);
                 }
 
                 /* Set CORRESPONDING to the end of the changed run, at the
@@ -410,7 +425,7 @@ class Text_Diff_Engine_native {
                         $i++;
                     }
 
-                    assert('$j < $other_len && ! $other_changed[$j]');
+                    assert($j < $other_len && ! $other_changed[$j]);
                     $j++;
                     if ($j < $other_len && $other_changed[$j]) {
                         $corresponding = $i;
@@ -426,11 +441,11 @@ class Text_Diff_Engine_native {
             while ($corresponding < $i) {
                 $changed[--$start] = 1;
                 $changed[--$i] = 0;
-                assert('$j > 0');
+                assert($j > 0);
                 while ($other_changed[--$j]) {
                     continue;
                 }
-                assert('$j >= 0 && !$other_changed[$j]');
+                assert($j >= 0 && !$other_changed[$j]);
             }
         }
     }

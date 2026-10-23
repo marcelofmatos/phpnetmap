@@ -3,9 +3,9 @@
  * CDbAuthManager class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -94,7 +94,7 @@ class CDbAuthManager extends CAuthManager
 			return false;
 		Yii::trace('Checking permission "'.$item->getName().'"','system.web.auth.CDbAuthManager');
 		if(!isset($params['userId']))
-		    $params['userId'] = $userId;
+			$params['userId'] = $userId;
 		if($this->executeBizRule($item->getBizRule(),$params,$item->getData()))
 		{
 			if(in_array($itemName,$this->defaultRoles))

@@ -3,9 +3,9 @@
  * CEmailValidator class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -48,6 +48,12 @@ class CEmailValidator extends CValidator
 	 */
 	public $checkPort=false;
 	/**
+	 * @var null|int timeout to use when attempting to open connection to port in checkMxPorts. If null (default)
+	 * use default_socket_timeout value from php.ini. If not null the timeout is set in seconds.
+	 * @since 1.1.19
+	 */
+	public $timeout=null;
+	/**
 	 * @var boolean whether the attribute value can be null or empty. Defaults to true,
 	 * meaning that if the attribute is empty, it is considered valid.
 	 */
@@ -68,6 +74,8 @@ class CEmailValidator extends CValidator
 	protected function validateAttribute($object,$attribute)
 	{
 		$value=$object->$attribute;
+		if($this->allowEmpty && $this->isEmpty($value))
+			return;
 
 		if(!$this->validateValue($value))
 		{
@@ -78,17 +86,17 @@ class CEmailValidator extends CValidator
 
 	/**
 	 * Validates a static value to see if it is a valid email.
-	 * Note that this method does not respect {@link allowEmpty} property.
 	 * This method is provided so that you can call it directly without going through the model validation rule mechanism.
+	 *
+	 * Note that this method does not respect the {@link allowEmpty} property.
+	 *
 	 * @param mixed $value the value to be validated
 	 * @return boolean whether the value is a valid email
 	 * @since 1.1.1
+	 * @see https://github.com/yiisoft/yii/issues/3764#issuecomment-75457805
 	 */
 	public function validateValue($value)
 	{
-		if($this->allowEmpty && $this->isEmpty($value))
-			return true;
-
 		if(is_string($value) && $this->validateIDN)
 			$value=$this->encodeIDN($value);
 		// make sure string length is limited to avoid DOS attacks
@@ -154,10 +162,11 @@ if(".($this->allowEmpty ? "jQuery.trim(value)!='' && " : '').$condition.") {
 		$records=dns_get_record($domain, DNS_MX);
 		if($records===false || empty($records))
 			return false;
+		$timeout=is_int($this->timeout)?$this->timeout:((int)ini_get('default_socket_timeout'));
 		usort($records,array($this,'mxSort'));
 		foreach($records as $record)
 		{
-			$handle=@fsockopen($record['target'],25);
+			$handle=@fsockopen($record['target'],25,$errno,$errstr,$timeout);
 			if($handle!==false)
 			{
 				fclose($handle);
@@ -191,7 +200,17 @@ if(".($this->allowEmpty ? "jQuery.trim(value)!='' && " : '').$condition.") {
 		if(preg_match_all('/^(.*)@(.*)$/',$value,$matches))
 		{
 			if(function_exists('idn_to_ascii'))
-				$value=$matches[1][0].'@'.idn_to_ascii($matches[2][0]);
+			{
+				$value=$matches[1][0].'@';
+				if (defined('IDNA_NONTRANSITIONAL_TO_ASCII') && defined('INTL_IDNA_VARIANT_UTS46'))
+				{
+					$value.=idn_to_ascii($matches[2][0],IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46);
+				}
+				else
+				{
+					$value.=idn_to_ascii($matches[2][0]);
+				}
+			}
 			else
 			{
 				require_once(Yii::getPathOfAlias('system.vendors.Net_IDNA2.Net').DIRECTORY_SEPARATOR.'IDNA2.php');

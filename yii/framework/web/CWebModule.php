@@ -3,9 +3,9 @@
  * CWebModule class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -95,7 +95,7 @@ class CWebModule extends CModule
 
 	/**
 	 * @return string the directory that contains the controller classes. Defaults to 'moduleDir/controllers' where
-     * moduleDir is the directory containing the module class.
+	 * moduleDir is the directory containing the module class.
 	 */
 	public function getControllerPath()
 	{

@@ -3,9 +3,9 @@
  * CDbCommandBuilder class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -137,11 +137,11 @@ class CDbCommandBuilder extends CComponent
 				{
 					$pk=array();
 					foreach($table->primaryKey as $key)
-						$pk[]=$alias.'.'.$key;
+						$pk[]=$alias.'.'.$this->_schema->quoteColumnName($key);
 					$pk=implode(', ',$pk);
 				}
 				else
-					$pk=$alias.'.'.$table->primaryKey;
+					$pk=$alias.'.'.$this->_schema->quoteColumnName($table->primaryKey);
 				$sql="SELECT COUNT(DISTINCT $pk)";
 			}
 			else

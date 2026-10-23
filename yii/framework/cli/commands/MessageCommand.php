@@ -3,9 +3,9 @@
  * MessageCommand class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -147,7 +147,15 @@ EOD;
 				else
 					$category=substr($matches[$i][1],1,-1);
 				$message=$matches[$i][2];
-				$messages[$category][]=eval("return $message;");  // use eval to eliminate quote escape
+				try
+				{
+					$evalResult = eval("return $message;");  // use eval to eliminate quote escape
+				}
+				catch (ParseError $e)
+				{
+					$evalResult = false;
+				}
+				$messages[$category][] = $evalResult;
 			}
 		}
 		return $messages;

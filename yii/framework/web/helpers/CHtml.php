@@ -3,9 +3,9 @@
  * CHtml class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 
@@ -75,7 +75,7 @@ class CHtml
 	 * You can override this setting for a particular element by setting the htmlOptions delegate attribute
 	 * (see {@link clientChange}).
 	 *
-	 * For more information about attaching jQuery event handler see {@link http://api.jquery.com/on/}
+	 * For more information about attaching jQuery event handler see {@link https://api.jquery.com/on/}
 	 * @since 1.1.9
 	 * @see clientChange
 	 */
@@ -86,12 +86,22 @@ class CHtml
 	 */
 	public static $closeSingleTags=true;
 	/**
+	 * @var boolean whether to add <code>type="javascript"</code> to <code>&lt;script&gt;</code> tags. Defaults to true. Can be set to false for HTML5.
+	 * @since 1.1.24
+	 */
+	public static $setScriptType=true;
+	/**
+	 * @var boolean whether to add a CDATA wrapper around <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> contents. Defaults to true. Can be set to false for HTML5.
+	 * @since 1.1.24
+	 */
+	public static $cdataScriptAndStyleContents=true;
+	/**
 	 * @var boolean whether to render special attributes value. Defaults to true. Can be set to false for HTML5.
 	 * @since 1.1.13
 	 */
 	public static $renderSpecialAttributesValue=true;
 	/**
-	 * @var callback the generator used in the {@link CHtml::modelName()} method.
+	 * @var callable the generator used in the {@link CHtml::modelName()} method.
 	 * @since 1.1.14
 	 */
 	private static $_modelNameConverter;
@@ -101,11 +111,11 @@ class CHtml
 	 * The {@link CApplication::charset application charset} will be used for encoding.
 	 * @param string $text data to be encoded
 	 * @return string the encoded data
-	 * @see http://www.php.net/manual/en/function.htmlspecialchars.php
+	 * @see https://www.php.net/manual/en/function.htmlspecialchars.php
 	 */
 	public static function encode($text)
 	{
-		return htmlspecialchars($text,ENT_QUOTES,Yii::app()->charset);
+		return htmlspecialchars((string)$text,ENT_QUOTES,Yii::app()->charset);
 	}
 
 	/**
@@ -113,7 +123,7 @@ class CHtml
 	 * This is the opposite of {@link encode()}.
 	 * @param string $text data to be decoded
 	 * @return string the decoded data
-	 * @see http://www.php.net/manual/en/function.htmlspecialchars-decode.php
+	 * @see https://www.php.net/manual/en/function.htmlspecialchars-decode.php
 	 * @since 1.1.8
 	 */
 	public static function decode($text)
@@ -128,7 +138,7 @@ class CHtml
 	 * The {@link CApplication::charset application charset} will be used for encoding.
 	 * @param array $data data to be encoded
 	 * @return array the encoded data
-	 * @see http://www.php.net/manual/en/function.htmlspecialchars.php
+	 * @see https://www.php.net/manual/en/function.htmlspecialchars.php
 	 */
 	public static function encodeArray($data)
 	{
@@ -252,7 +262,9 @@ class CHtml
 	{
 		if($media!=='')
 			$media=' media="'.$media.'"';
-		return "<style type=\"text/css\"{$media}>\n/*<![CDATA[*/\n{$text}\n/*]]>*/\n</style>";
+		if(self::$cdataScriptAndStyleContents)
+			$text="/*<![CDATA[*/\n{$text}\n/*]]>*/";
+		return "<style type=\"text/css\"{$media}>\n{$text}\n</style>";
 	}
 
 	/**
@@ -291,11 +303,13 @@ class CHtml
 	 */
 	public static function script($text,array $htmlOptions=array())
 	{
-		$defaultHtmlOptions=array(
-			'type'=>'text/javascript',
-		);
+		$defaultHtmlOptions=array();
+		if(self::$setScriptType)
+			$defaultHtmlOptions['type']='text/javascript';
 		$htmlOptions=array_merge($defaultHtmlOptions,$htmlOptions);
-		return self::tag('script',$htmlOptions,"\n/*<![CDATA[*/\n{$text}\n/*]]>*/\n");
+		if(self::$cdataScriptAndStyleContents)
+			$text="/*<![CDATA[*/\n{$text}\n/*]]>*/";
+		return self::tag('script',$htmlOptions,"\n{$text}\n");
 	}
 
 	/**
@@ -306,10 +320,10 @@ class CHtml
 	 */
 	public static function scriptFile($url,array $htmlOptions=array())
 	{
-		$defaultHtmlOptions=array(
-			'type'=>'text/javascript',
-			'src'=>$url
-		);
+		$defaultHtmlOptions=array();
+		if(self::$setScriptType)
+			$defaultHtmlOptions['type']='text/javascript';
+		$defaultHtmlOptions['src']=$url;
 		$htmlOptions=array_merge($defaultHtmlOptions,$htmlOptions);
 		return self::tag('script',$htmlOptions,'');
 	}
@@ -353,7 +367,7 @@ class CHtml
 		$hiddens=array();
 		if(!strcasecmp($method,'get') && ($pos=strpos($url,'?'))!==false)
 		{
-			foreach(explode('&',substr($url,$pos+1)) as $pair)
+			foreach(explode('&',substr(preg_replace('/#.+$/','',$url),$pos+1)) as $pair)
 			{
 				if(($pos=strpos($pair,'='))!==false)
 					$hiddens[]=self::hiddenField(urldecode(substr($pair,0,$pos)),urldecode(substr($pair,$pos+1)),array('id'=>false));
@@ -918,6 +932,8 @@ class CHtml
 				$uncheckOptions=array('id'=>self::ID_PREFIX.$htmlOptions['id']);
 			else
 				$uncheckOptions=array('id'=>false);
+			if(!empty($htmlOptions['disabled']))
+				$uncheckOptions['disabled']=$htmlOptions['disabled'];
 			$hidden=self::hiddenField($name,$uncheck,$uncheckOptions);
 		}
 		else
@@ -965,6 +981,8 @@ class CHtml
 				$uncheckOptions=array('id'=>self::ID_PREFIX.$htmlOptions['id']);
 			else
 				$uncheckOptions=array('id'=>false);
+			if(!empty($htmlOptions['disabled']))
+				$uncheckOptions['disabled']=$htmlOptions['disabled'];
 			$hidden=self::hiddenField($name,$uncheck,$uncheckOptions);
 		}
 		else
@@ -992,13 +1010,13 @@ class CHtml
 	 * The 'empty' option can also be an array of value-label pairs.
 	 * Each pair will be used to render a list option at the beginning. Note, the text label will NOT be HTML-encoded.</li>
 	 * <li>options: array, specifies additional attributes for each OPTION tag.
-	 *     The array keys must be the option values, and the array values are the extra
-	 *     OPTION tag attributes in the name-value pairs. For example,
+	 *	 The array keys must be the option values, and the array values are the extra
+	 *	 OPTION tag attributes in the name-value pairs. For example,
 	 * <pre>
-	 *     array(
-	 *         'value1'=>array('disabled'=>true,'label'=>'value 1'),
-	 *         'value2'=>array('label'=>'value 2'),
-	 *     );
+	 *	 array(
+	 *		 'value1'=>array('disabled'=>true,'label'=>'value 1'),
+	 *		 'value2'=>array('label'=>'value 2'),
+	 *	 );
 	 * </pre>
 	 * </li>
 	 * </ul>
@@ -1032,6 +1050,8 @@ class CHtml
 			if(isset($htmlOptions['unselectValue']))
 			{
 				$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+				if(!empty($htmlOptions['disabled']))
+					$hiddenOptions['disabled']=$htmlOptions['disabled'];
 				$hidden=self::hiddenField(substr($htmlOptions['name'],0,-2),$htmlOptions['unselectValue'],$hiddenOptions);
 				unset($htmlOptions['unselectValue']);
 			}
@@ -1058,13 +1078,13 @@ class CHtml
 	 * The 'empty' option can also be an array of value-label pairs.
 	 * Each pair will be used to render a list option at the beginning. Note, the text label will NOT be HTML-encoded.</li>
 	 * <li>options: array, specifies additional attributes for each OPTION tag.
-	 *     The array keys must be the option values, and the array values are the extra
-	 *     OPTION tag attributes in the name-value pairs. For example,
+	 *	 The array keys must be the option values, and the array values are the extra
+	 *	 OPTION tag attributes in the name-value pairs. For example,
 	 * <pre>
-	 *     array(
-	 *         'value1'=>array('disabled'=>true,'label'=>'value 1'),
-	 *         'value2'=>array('label'=>'value 2'),
-	 *     );
+	 *	 array(
+	 *		 'value1'=>array('disabled'=>true,'label'=>'value 1'),
+	 *		 'value2'=>array('label'=>'value 2'),
+	 *	 );
 	 * </pre>
 	 * </li>
 	 * </ul>
@@ -1148,7 +1168,7 @@ class CHtml
 
 		foreach($data as $value=>$labelTitle)
 		{
-			$checked=!is_array($select) && !strcmp($value,$select) || is_array($select) && in_array($value,$select);
+			$checked=!is_array($select) && !strcmp($value,(string)$select) || is_array($select) && in_array($value,$select);
 			$checkAll=$checkAll && $checked;
 			$htmlOptions['value']=$value;
 			$htmlOptions['id']=$baseID.'_'.$id++;
@@ -1260,7 +1280,7 @@ EOD;
 		$id=0;
 		foreach($data as $value=>$labelTitle)
 		{
-			$checked=!strcmp($value,$select);
+			$checked=!strcmp($value,(string)$select);
 			$htmlOptions['value']=$value;
 			$htmlOptions['id']=$baseID.'_'.$id++;
 			$option=self::radioButton($name,$checked,$htmlOptions);
@@ -1347,7 +1367,7 @@ EOD;
 	 * </ul>
 	 * Note, if you specify the 'success' option, the above options will be ignored.
 	 * @return string the generated JavaScript
-	 * @see http://api.jquery.com/jQuery.ajax/#jQuery-ajax-settings
+	 * @see https://api.jquery.com/jQuery.ajax/#jQuery-ajax-settings
 	 */
 	public static function ajax($options)
 	{
@@ -1510,7 +1530,8 @@ EOD;
 	{
 		$realAttribute=$attribute;
 		self::resolveName($model,$attribute); // strip off square brackets if any
-		$htmlOptions['required']=$model->isAttributeRequired($attribute);
+		if (!isset($htmlOptions['required']))
+			$htmlOptions['required']=$model->isAttributeRequired($attribute);
 		return self::activeLabel($model,$realAttribute,$htmlOptions);
 	}
 
@@ -1851,6 +1872,8 @@ EOD;
 		// add a hidden field so that if a model only has a file field, we can
 		// still use isset($_POST[$modelClass]) to detect if the input is submitted
 		$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+		if(!empty($htmlOptions['disabled']))
+			$hiddenOptions['disabled']=$htmlOptions['disabled'];
 		return self::hiddenField($htmlOptions['name'],'',$hiddenOptions)
 			. self::activeInputField('file',$model,$attribute,$htmlOptions);
 	}
@@ -1890,6 +1913,8 @@ EOD;
 			$uncheck='0';
 
 		$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+		if(!empty($htmlOptions['disabled']))
+			$hiddenOptions['disabled']=$htmlOptions['disabled'];
 		$hidden=$uncheck!==null ? self::hiddenField($htmlOptions['name'],$uncheck,$hiddenOptions) : '';
 
 		// add a hidden field so that if the radio button is not selected, it still submits a value
@@ -1932,6 +1957,8 @@ EOD;
 			$uncheck='0';
 
 		$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+		if(!empty($htmlOptions['disabled']))
+			$hiddenOptions['disabled']=$htmlOptions['disabled'];
 		$hidden=$uncheck!==null ? self::hiddenField($htmlOptions['name'],$uncheck,$hiddenOptions) : '';
 
 		return $hidden . self::activeInputField('checkbox',$model,$attribute,$htmlOptions);
@@ -1957,13 +1984,13 @@ EOD;
 	 * The 'empty' option can also be an array of value-label pairs.
 	 * Each pair will be used to render a list option at the beginning. Note, the text label will NOT be HTML-encoded.</li>
 	 * <li>options: array, specifies additional attributes for each OPTION tag.
-	 *     The array keys must be the option values, and the array values are the extra
-	 *     OPTION tag attributes in the name-value pairs. For example,
+	 *	 The array keys must be the option values, and the array values are the extra
+	 *	 OPTION tag attributes in the name-value pairs. For example,
 	 * <pre>
-	 *     array(
-	 *         'value1'=>array('disabled'=>true,'label'=>'value 1'),
-	 *         'value2'=>array('label'=>'value 2'),
-	 *     );
+	 *	 array(
+	 *		 'value1'=>array('disabled'=>true,'label'=>'value 1'),
+	 *		 'value2'=>array('label'=>'value 2'),
+	 *	 );
 	 * </pre>
 	 * </li>
 	 * </ul>
@@ -1994,6 +2021,8 @@ EOD;
 			if(isset($htmlOptions['unselectValue']))
 			{
 				$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+				if(!empty($htmlOptions['disabled']))
+					$hiddenOptions['disabled']=$htmlOptions['disabled'];
 				$hidden=self::hiddenField(substr($htmlOptions['name'],0,-2),$htmlOptions['unselectValue'],$hiddenOptions);
 				unset($htmlOptions['unselectValue']);
 			}
@@ -2022,13 +2051,13 @@ EOD;
 	 * The 'empty' option can also be an array of value-label pairs.
 	 * Each pair will be used to render a list option at the beginning. Note, the text label will NOT be HTML-encoded.</li>
 	 * <li>options: array, specifies additional attributes for each OPTION tag.
-	 *     The array keys must be the option values, and the array values are the extra
-	 *     OPTION tag attributes in the name-value pairs. For example,
+	 *	 The array keys must be the option values, and the array values are the extra
+	 *	 OPTION tag attributes in the name-value pairs. For example,
 	 * <pre>
-	 *     array(
-	 *         'value1'=>array('disabled'=>true,'label'=>'value 1'),
-	 *         'value2'=>array('label'=>'value 2'),
-	 *     );
+	 *	 array(
+	 *		 'value1'=>array('disabled'=>true,'label'=>'value 1'),
+	 *		 'value2'=>array('label'=>'value 2'),
+	 *	 );
 	 * </pre>
 	 * </li>
 	 * </ul>
@@ -2102,6 +2131,8 @@ EOD;
 			$uncheck='';
 
 		$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+		if(!empty($htmlOptions['disabled']))
+			$hiddenOptions['disabled']=$htmlOptions['disabled'];
 		$hidden=$uncheck!==null ? self::hiddenField($name,$uncheck,$hiddenOptions) : '';
 
 		return $hidden . self::checkBoxList($name,$selection,$data,$htmlOptions);
@@ -2162,6 +2193,8 @@ EOD;
 			$uncheck='';
 
 		$hiddenOptions=isset($htmlOptions['id']) ? array('id'=>self::ID_PREFIX.$htmlOptions['id']) : array('id'=>false);
+		if(!empty($htmlOptions['disabled']))
+			$hiddenOptions['disabled']=$htmlOptions['disabled'];
 		$hidden=$uncheck!==null ? self::hiddenField($name,$uncheck,$hiddenOptions) : '';
 
 		return $hidden . self::radioButtonList($name,$selection,$data,$htmlOptions);
@@ -2178,6 +2211,10 @@ EOD;
 	 * make the error summary to show only the first error message of each attribute.
 	 * If this is not set or is false, all error messages will be displayed.
 	 * This option has been available since version 1.1.3.
+	 * Another special option named 'encode' is recognized, which when set false, will
+	 * disable the CHtml::encode encoding of all error messages.
+	 * If this is not set or is true, all error messages will be encoded by CHtml::encode.
+	 * This option has been available since version 1.1.23.
 	 * @return string the error summary. Empty if no errors are found.
 	 * @see CModel::getErrors
 	 * @see errorSummaryCss
@@ -2201,7 +2238,11 @@ EOD;
 				foreach($errors as $error)
 				{
 					if($error!='')
-						$content.="<li>$error</li>\n";
+					{
+						if (!isset($htmlOptions['encode']) || $htmlOptions['encode'])
+							$error=self::encode($error);
+						$content.= '<li>'.$error."</li>\n";
+					}
 					if($firstError)
 						break;
 				}
@@ -2233,6 +2274,8 @@ EOD;
 	{
 		self::resolveName($model,$attribute); // turn [a][b]attr into attr
 		$error=$model->getError($attribute);
+		if (!isset($htmlOptions['encode']) || $htmlOptions['encode'])
+			$error=self::encode($error);
 		if($error!='')
 		{
 			if(!isset($htmlOptions['class']))
@@ -2327,10 +2370,23 @@ EOD;
 	public static function value($model,$attribute,$defaultValue=null)
 	{
 		if(is_scalar($attribute) || $attribute===null)
-			foreach(explode('.',$attribute) as $name)
+			foreach(explode('.',(string)$attribute) as $name)
 			{
-				if(is_object($model) && isset($model->$name))
-					$model=$model->$name;
+				if(is_object($model))
+				{
+					if ((version_compare(PHP_VERSION, '7.2.0', '>=')
+						&& is_numeric($name))
+						|| !isset($model->$name)
+					)
+					{
+						return $defaultValue;
+					}
+					else
+					{
+						$model=$model->$name;
+					}
+				}
+
 				elseif(is_array($model) && isset($model[$name]))
 					$model=$model[$name];
 				else
@@ -2354,7 +2410,7 @@ EOD;
 
 	/**
 	 * Generates input field ID for a model attribute.
-	 * @param CModel $model the data model
+	 * @param CModel|string $model the data model
 	 * @param string $attribute the attribute
 	 * @return string the generated input field ID
 	 */
@@ -2383,7 +2439,7 @@ EOD;
 	 * Set generator used in the {@link CHtml::modelName()} method. You can use the `null` value to restore default
 	 * generator.
 	 *
-	 * @param callback|null $converter the new generator, the model or class name will be passed to the this callback
+	 * @param callable|null $converter the new generator, the model or class name will be passed to this callback
 	 * and result must be a valid value for HTML name attribute.
 	 * @throws CException if $converter isn't a valid callback
 	 * @since 1.1.14
@@ -2401,7 +2457,7 @@ EOD;
 	/**
 	 * Generates input field name for a model attribute.
 	 * Unlike {@link resolveName}, this method does NOT modify the attribute name.
-	 * @param CModel $model the data model
+	 * @param CModel|string $model the data model
 	 * @param string $attribute the attribute
 	 * @return string the generated input field name
 	 */
@@ -2466,13 +2522,13 @@ EOD;
 	 * The 'empty' option can also be an array of value-label pairs.
 	 * Each pair will be used to render a list option at the beginning. Note, the text label will NOT be HTML-encoded.</li>
 	 * <li>options: array, specifies additional attributes for each OPTION tag.
-	 *     The array keys must be the option values, and the array values are the extra
-	 *     OPTION tag attributes in the name-value pairs. For example,
+	 *	 The array keys must be the option values, and the array values are the extra
+	 *	 OPTION tag attributes in the name-value pairs. For example,
 	 * <pre>
-	 *     array(
-	 *         'value1'=>array('disabled'=>true,'label'=>'value 1'),
-	 *         'value2'=>array('label'=>'value 2'),
-	 *     );
+	 *	 array(
+	 *		 'value1'=>array('disabled'=>true,'label'=>'value 1'),
+	 *		 'value2'=>array('label'=>'value 2'),
+	 *	 );
 	 * </pre>
 	 * </li>
 	 * <li>key: string, specifies the name of key attribute of the selection object(s).
@@ -2535,7 +2591,7 @@ EOD;
 			else
 			{
 				$attributes=array('value'=>(string)$key,'encode'=>!$raw);
-				if(!is_array($selection) && !strcmp($key,$selection) || is_array($selection) && in_array($key,$selection))
+				if(!is_array($selection) && !strcmp($key,(string)$selection) || is_array($selection) && in_array($key,$selection))
 					$attributes['selected']='selected';
 				if(isset($options[$key]))
 					$attributes=array_merge($attributes,$options[$key]);
@@ -2647,7 +2703,7 @@ EOD;
 	 * This method will update the HTML options by setting appropriate 'name' and 'id' attributes.
 	 * This method may also modify the attribute name if the name
 	 * contains square brackets (mainly used in tabular input).
-	 * @param CModel $model the data model
+	 * @param CModel|string $model the data model
 	 * @param string $attribute the attribute
 	 * @param array $htmlOptions the HTML options
 	 */
@@ -2665,7 +2721,7 @@ EOD;
 	 * Generates input name for a model attribute.
 	 * Note, the attribute name may be modified after calling this method if the name
 	 * contains square brackets (mainly used in tabular input) before the real attribute name.
-	 * @param CModel $model the data model
+	 * @param CModel|string $model the data model
 	 * @param string $attribute the attribute
 	 * @return string the input name
 	 */
@@ -2673,7 +2729,7 @@ EOD;
 	{
 		$modelName=self::modelName($model);
 
-		if(($pos=strpos($attribute,'['))!==false)
+		if(($pos=strpos((string)$attribute,'['))!==false)
 		{
 			if($pos!==0)  // e.g. name[a][b]
 				return $modelName.'['.substr($attribute,0,$pos).']'.substr($attribute,$pos);

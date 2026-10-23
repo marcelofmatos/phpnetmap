@@ -3,9 +3,9 @@
  * CWsdlGenerator class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -106,7 +106,7 @@
  *     ...
  * }
  * </pre>
- * For more on soap indicators, see See {@link http://www.w3schools.com/schema/schema_complex_indicators.asp}.
+ * For more on soap indicators, see See {@link https://www.w3schools.com/schema/schema_complex_indicators.asp}.
  *
  * Since the variability of WSDL definitions is virtually unlimited, a special doc comment tag '@soap-wsdl' can be used in order to inject any custom XML string into generated WSDL file.
  * If such a block of the code is found in class's comment block, then it will be used instead of parsing and generating standard attributes within the class.
@@ -361,6 +361,8 @@ class CWsdlGenerator extends CComponent
 
 	/**
 	 * @param string $type PHP variable type
+	 * @return mixed|string
+	 * @throws CException
 	 */
 	protected function processType($type)
 	{
@@ -385,7 +387,7 @@ class CWsdlGenerator extends CComponent
 			$comment=preg_replace('/^\s*\**(\s*?$|\s*)/m','',$comment);
 
 			// extract soap indicator flag, if defined, e.g. @soap-indicator sequence
-			// see http://www.w3schools.com/schema/schema_complex_indicators.asp
+			// see https://www.w3schools.com/schema/schema_complex_indicators.asp
 			if(preg_match('/^@soap-indicator\s+(\w+)\s*?(.*)$/im', $comment, $matches))
 			{
 				$indicator=$matches[1];
@@ -441,9 +443,10 @@ class CWsdlGenerator extends CComponent
 	}
 
 	/**
-	* Parse attributes nillable, minOccurs, maxOccurs
-	* @param string $comment Extracted PHPDoc comment
-	*/
+	 * Parse attributes nillable, minOccurs, maxOccurs
+	 * @param string $comment Extracted PHPDoc comment
+	 * @return array array of [nillable, minOccurs, maxOccurs]
+	 */
 	protected function getWsdlElementAttributes($comment) {
 		$nillable=$minOccurs=$maxOccurs=null;
 		if(preg_match('/{(.+)}/',$comment,$attr))
@@ -498,6 +501,7 @@ class CWsdlGenerator extends CComponent
 	/**
 	 * @param string $serviceUrl Web service URL
 	 * @param string $encoding encoding of the WSDL. Defaults to 'UTF-8'.
+	 * @return DOMDocument
 	 */
 	protected function buildDOM($serviceUrl,$encoding)
 	{
@@ -554,7 +558,7 @@ class CWsdlGenerator extends CComponent
 					$restriction->setAttribute('base','soap-enc:Array');
 					$attribute=$dom->createElement('xsd:attribute');
 					$attribute->setAttribute('ref','soap-enc:arrayType');
-					$attribute->setAttribute('arrayType',(isset(self::$typeMap[$arrayType]) ? 'xsd:' : 'tns:') .$arrayType.'[]');
+					$attribute->setAttribute('wsdl:arrayType',(isset(self::$typeMap[$arrayType]) ? 'xsd:' : 'tns:') .$arrayType.'[]');
 					
 					$restriction->appendChild($attribute);
 					$complexContent->appendChild($restriction);
@@ -683,6 +687,7 @@ class CWsdlGenerator extends CComponent
 	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 * @param string $name method name
 	 * @param string $doc doc
+	 * @return DOMElement a new instance of wsdl:operation element filled by tns In/Out data
 	 */
 	protected function createPortElement($dom,$name,$doc)
 	{
@@ -725,6 +730,7 @@ class CWsdlGenerator extends CComponent
 	 * @param DOMDocument $dom Represents an entire HTML or XML document; serves as the root of the document tree
 	 * @param string $name method name
 	 * @param array $headers array like array('input'=>array(MESSAGE,PART),'output=>array(MESSAGE,PART))
+	 * @return DOMElement a new instance of wsdl:operation element
 	 */
 	protected function createOperationElement($dom,$name,$headers=null)
 	{

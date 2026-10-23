@@ -3,9 +3,9 @@
  * CDbCriteria class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -124,19 +124,19 @@ class CDbCriteria extends CComponent
 	 */
 	public $index;
 	/**
-     * @var mixed scopes to apply
+	 * @var mixed scopes to apply
 	 *
-     * This property is effective only when passing criteria to
+	 * This property is effective only when passing criteria to
 	 * the one of the following methods:
-     * <ul>
-     * <li>{@link CActiveRecord::find()}</li>
-     * <li>{@link CActiveRecord::findAll()}</li>
-     * <li>{@link CActiveRecord::findByPk()}</li>
-     * <li>{@link CActiveRecord::findAllByPk()}</li>
-     * <li>{@link CActiveRecord::findByAttributes()}</li>
-     * <li>{@link CActiveRecord::findAllByAttributes()}</li>
-     * <li>{@link CActiveRecord::count()}</li>
-     * </ul>
+	 * <ul>
+	 * <li>{@link CActiveRecord::find()}</li>
+	 * <li>{@link CActiveRecord::findAll()}</li>
+	 * <li>{@link CActiveRecord::findByPk()}</li>
+	 * <li>{@link CActiveRecord::findAllByPk()}</li>
+	 * <li>{@link CActiveRecord::findByAttributes()}</li>
+	 * <li>{@link CActiveRecord::findAllByAttributes()}</li>
+	 * <li>{@link CActiveRecord::count()}</li>
+	 * </ul>
 	 *
 	 * Can be set to one of the following:
 	 * <ul>
@@ -168,18 +168,21 @@ class CDbCriteria extends CComponent
 	{
 		$map=array();
 		$params=array();
-		foreach($this->params as $name=>$value)
+		if(is_array($this->params))
 		{
-			if(strpos($name,self::PARAM_PREFIX)===0)
+			foreach($this->params as $name=>$value)
 			{
-				$newName=self::PARAM_PREFIX.self::$paramCount++;
-				$map[$name]=$newName;
+				if(strpos($name,self::PARAM_PREFIX)===0)
+				{
+					$newName=self::PARAM_PREFIX.self::$paramCount++;
+					$map[$name]=$newName;
+				}
+				else
+				{
+					$newName=$name;
+				}
+				$params[$newName]=$value;
 			}
-			else
-			{
-				$newName=$name;
-			}
-			$params[$newName]=$value;
 		}
 		if (!empty($map))
 		{
@@ -194,10 +197,17 @@ class CDbCriteria extends CComponent
 			foreach($sqlContentFieldNames as $field)
 			{
 				if(is_array($this->$field))
+				{
 					foreach($this->$field as $k=>$v)
-						$this->{$field}[$k]=strtr($v,$map);
-				else
+					{
+						if (is_scalar($v))
+							$this->{$field}[$k]=strtr($v,$map);
+					}
+				}
+				elseif(is_scalar($this->$field))
+				{
 					$this->$field=strtr($this->$field,$map);
+				}
 			}
 		}
 		$this->params=$params;
@@ -499,8 +509,10 @@ class CDbCriteria extends CComponent
 			$criteria=new self($criteria);
 		if($this->select!==$criteria->select)
 		{
-			if($this->select==='*')
+			if($this->select==='*'||$this->select===false)
 				$this->select=$criteria->select;
+			elseif($criteria->select===false)
+				$this->select=false;
 			elseif($criteria->select!=='*')
 			{
 				$select1=is_string($this->select)?preg_split('/\s*,\s*/',trim($this->select),-1,PREG_SPLIT_NO_EMPTY):$this->select;

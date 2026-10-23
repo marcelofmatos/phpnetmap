@@ -3,9 +3,9 @@
  * CPhpAuthManager class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -70,7 +70,7 @@ class CPhpAuthManager extends CAuthManager
 		$item=$this->_items[$itemName];
 		Yii::trace('Checking permission "'.$item->getName().'"','system.web.auth.CPhpAuthManager');
 		if(!isset($params['userId']))
-		    $params['userId'] = $userId;
+			$params['userId'] = $userId;
 		if($this->executeBizRule($item->getBizRule(),$params,$item->getData()))
 		{
 			if(in_array($itemName,$this->defaultRoles))
@@ -324,6 +324,7 @@ class CPhpAuthManager extends CAuthManager
 	 * Saves an authorization item to persistent storage.
 	 * @param CAuthItem $item the item to be saved.
 	 * @param string $oldName the old item name. If null, it means the item name is not changed.
+	 * @throws CException
 	 */
 	public function saveAuthItem($item,$oldName=null)
 	{

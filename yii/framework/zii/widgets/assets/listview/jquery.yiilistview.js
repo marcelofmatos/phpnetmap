@@ -2,9 +2,9 @@
  * jQuery Yii ListView plugin file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2010 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 ;(function($) {
@@ -43,7 +43,7 @@
 							delete params[settings.ajaxVar];
 
 							var updateUrl = $.param.querystring(url[0], params);
-							window.History.pushState({url: updateUrl}, document.title, decodeURIComponent(updateUrl));
+							window.History.pushState({url: updateUrl}, document.title, updateUrl);
 						}
 					} else {
 						$.fn.yiiListView.update(id, {url: $(this).attr('href')});

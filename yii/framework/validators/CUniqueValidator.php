@@ -3,9 +3,9 @@
  * CUniqueValidator class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -131,7 +131,7 @@ class CUniqueValidator extends CValidator
 		if($exists)
 		{
 			$message=$this->message!==null?$this->message:Yii::t('yii','{attribute} "{value}" has already been taken.');
-			$this->addError($object,$attribute,$message,array('{value}'=>CHtml::encode($value)));
+			$this->addError($object,$attribute,$message,array('{value}'=>$value));
 		}
 	}
 	

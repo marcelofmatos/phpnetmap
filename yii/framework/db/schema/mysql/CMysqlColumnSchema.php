@@ -3,9 +3,9 @@
  * CMysqlColumnSchema class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -44,7 +44,7 @@ class CMysqlColumnSchema extends CDbColumnSchema
 	{
 		if(strncmp($this->dbType,'bit',3)===0)
 			$this->defaultValue=bindec(trim($defaultValue,'b\''));
-		elseif($this->dbType==='timestamp' && $defaultValue==='CURRENT_TIMESTAMP')
+		elseif(($this->dbType==='timestamp' || $this->dbType==='datetime')  && ($defaultValue==='CURRENT_TIMESTAMP' || $defaultValue==='current_timestamp()'))
 			$this->defaultValue=null;
 		else
 			parent::extractDefault($defaultValue);

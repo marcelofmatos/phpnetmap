@@ -3,9 +3,9 @@
  * CListIterator class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -27,10 +27,6 @@ class CListIterator implements Iterator
 	 * @var integer index of the current item
 	 */
 	private $_i;
-	/**
-	 * @var integer count of the data items
-	 */
-	private $_c;
 
 	/**
 	 * Constructor.
@@ -40,13 +36,13 @@ class CListIterator implements Iterator
 	{
 		$this->_d=&$data;
 		$this->_i=0;
-		$this->_c=count($this->_d);
 	}
 
 	/**
 	 * Rewinds internal array pointer.
 	 * This method is required by the interface Iterator.
 	 */
+	#[ReturnTypeWillChange]
 	public function rewind()
 	{
 		$this->_i=0;
@@ -57,6 +53,7 @@ class CListIterator implements Iterator
 	 * This method is required by the interface Iterator.
 	 * @return integer the key of the current array item
 	 */
+	#[ReturnTypeWillChange]
 	public function key()
 	{
 		return $this->_i;
@@ -67,6 +64,7 @@ class CListIterator implements Iterator
 	 * This method is required by the interface Iterator.
 	 * @return mixed the current array item
 	 */
+	#[ReturnTypeWillChange]
 	public function current()
 	{
 		return $this->_d[$this->_i];
@@ -76,6 +74,7 @@ class CListIterator implements Iterator
 	 * Moves the internal pointer to the next array item.
 	 * This method is required by the interface Iterator.
 	 */
+	#[ReturnTypeWillChange]
 	public function next()
 	{
 		$this->_i++;
@@ -86,8 +85,9 @@ class CListIterator implements Iterator
 	 * This method is required by the interface Iterator.
 	 * @return boolean
 	 */
+	#[ReturnTypeWillChange]
 	public function valid()
 	{
-		return $this->_i<$this->_c;
+		return $this->_i<count($this->_d);
 	}
 }

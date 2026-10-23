@@ -3,9 +3,9 @@
  * CLocale class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -330,7 +330,7 @@ class CLocale extends CComponent
 	public function getLanguageID($id)
 	{
 		// normalize id
-		$id = $this->getCanonicalID($id);
+		$id = self::getCanonicalID($id);
 		// remove sub tags
 		if(($underscorePosition=strpos($id, '_'))!== false)
 		{
@@ -349,7 +349,7 @@ class CLocale extends CComponent
 	public function getScriptID($id)
 	{
 		// normalize id
-		$id = $this->getCanonicalID($id);
+		$id = self::getCanonicalID($id);
 		// find sub tags
 		if(($underscorePosition=strpos($id, '_'))!==false)
 		{
@@ -381,7 +381,7 @@ class CLocale extends CComponent
 	public function getTerritoryID($id)
 	{
 		// normalize id
-		$id = $this->getCanonicalID($id);
+		$id = self::getCanonicalID($id);
 		// find sub tags
 		if (($underscorePosition=strpos($id, '_'))!== false)
 		{
@@ -417,7 +417,7 @@ class CLocale extends CComponent
 	 */
 	public function getLocaleDisplayName($id=null, $category='languages')
 	{
-		$id = $this->getCanonicalID($id);
+		$id = self::getCanonicalID((string)$id);
 		if (($category == 'languages') && (isset($this->_data[$category][$id])))
 		{
 			return $this->_data[$category][$id];

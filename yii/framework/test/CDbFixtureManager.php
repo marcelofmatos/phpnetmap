@@ -3,9 +3,9 @@
  * This file contains the CDbFixtureManager class.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -161,7 +161,7 @@ class CDbFixtureManager extends CApplicationComponent
 	{
 		$fileName=$this->basePath.DIRECTORY_SEPARATOR.$tableName.'.php';
 		if(!is_file($fileName))
-			return false;
+			throw new CException('Could not load fixture file ' . $fileName);
 
 		$rows=array();
 		$schema=$this->getDbConnection()->getSchema();
@@ -170,7 +170,11 @@ class CDbFixtureManager extends CApplicationComponent
 
 		foreach(require($fileName) as $alias=>$row)
 		{
-			$builder->createInsertCommand($table,$row)->execute();
+			try {
+				$builder->createInsertCommand($table,$row)->execute();
+			} catch (CException $e) {
+				throw new CException('Exception loading row ' . $alias . ' in fixture ' . $fileName . ', Error: ' . $e->getMessage(), $e->getCode(), $e);
+			}
 			$primaryKey=$table->primaryKey;
 			if($table->sequenceName!==null)
 			{

@@ -362,13 +362,14 @@ class ModelCode extends CCodeModel
 	/**
 	 * Checks if the given table is a "many to many" pivot table.
 	 * Their PK has 2 fields, and both of those fields are also FK to other separate tables.
-	 * @param CDbTableSchema table to inspect
+	 * @param CDbTableSchema $table table to inspect
 	 * @return boolean true if table matches description of helper table.
 	 */
 	protected function isRelationTable($table)
 	{
 		$pk=$table->primaryKey;
-		return (count($pk) === 2 // we want 2 columns
+        $count=is_array($pk) ? count($pk) : 1;
+        return ($count === 2 // we want 2 columns
 			&& isset($table->foreignKeys[$pk[0]]) // pk column 1 is also a foreign key
 			&& isset($table->foreignKeys[$pk[1]]) // pk column 2 is also a foriegn key
 			&& $table->foreignKeys[$pk[0]][0] !== $table->foreignKeys[$pk[1]][0]); // and the foreign keys point different tables
@@ -393,9 +394,9 @@ class ModelCode extends CCodeModel
 
 	/**
 	 * Generate a name for use as a relation name (inside relations() function in a model).
-	 * @param string the name of the table to hold the relation
-	 * @param string the foreign key name
-	 * @param boolean whether the relation would contain multiple objects
+	 * @param string $tableName the name of the table to hold the relation
+	 * @param string $fkName the foreign key name
+	 * @param boolean $multiple whether the relation would contain multiple objects
 	 * @return string the relation name
 	 */
 	protected function generateRelationName($tableName, $fkName, $multiple)
@@ -404,7 +405,7 @@ class ModelCode extends CCodeModel
 			$relationName=rtrim(substr($fkName, 0, -2),'_');
 		else
 			$relationName=$fkName;
-		$relationName[0]=strtolower($relationName);
+		$relationName[0]=strtolower($relationName[0]);
 
 		if($multiple)
 			$relationName=$this->pluralize($relationName);

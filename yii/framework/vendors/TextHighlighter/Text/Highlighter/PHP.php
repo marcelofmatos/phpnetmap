@@ -6,13 +6,13 @@
  *
  * LICENSE: This source file is subject to version 3.0 of the PHP license
  * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * https://www.php.net/license/3_0.txt.  If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @license    https://www.php.net/license/3_0.txt  PHP License
+ * @link       https://pear.php.net/package/Text_Highlighter
  * @category   Text
  * @package    Text_Highlighter
  * @version    generated from: : php.xml,v 1.1 2007/06/03 02:35:28 ssttoo Exp 
@@ -27,9 +27,9 @@
  * @category   Text
  * @package    Text_Highlighter
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    Release: 0.7.1
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 class  Text_Highlighter_PHP extends Text_Highlighter
 {
@@ -46,7 +46,7 @@ class  Text_Highlighter_PHP extends Text_Highlighter
 
         $this->_options = $options;
         $this->_regs = array (
-            -1 => '/((?i)(\\<\\?(php|=)?)?)/',
+            -1 => '/((?i)\\<\\?(php|=)?)/',
             0 => '/((?i)\\{)|((?i)\\()|((?i)\\[)|((?i)\\/\\*)|((?i)")|((?i)`)|((?mi)\\<\\<\\<[\\x20\\x09]*(\\w+)$)|((?i)\')|((?i)(#|\\/\\/))|((?i)[a-z_]\\w*)|((?i)\\((array|int|integer|string|bool|boolean|object|float|double)\\))|((?i)0[xX][\\da-f]+)|((?i)\\$[a-z_]\\w*)|((?i)\\d\\d*|\\b0\\b)|((?i)0[0-7]+)|((?i)(\\d*\\.\\d+)|(\\d+\\.\\d*))|((?i)((\\d+|((\\d*\\.\\d+)|(\\d+\\.\\d*)))[eE][+-]?\\d+))/',
             1 => '/((?i)\\{)|((?i)\\()|((?i)\\[)|((?i)\\/\\*)|((?i)")|((?i)`)|((?mi)\\<\\<\\<[\\x20\\x09]*(\\w+)$)|((?i)\')|((?i)(#|\\/\\/))|((?i)[a-z_]\\w*)|((?i)\\((array|int|integer|string|bool|boolean|object|float|double)\\))|((?i)\\?\\>)|((?i)0[xX][\\da-f]+)|((?i)\\$[a-z_]\\w*)|((?i)\\d\\d*|\\b0\\b)|((?i)0[0-7]+)|((?i)(\\d*\\.\\d+)|(\\d+\\.\\d*))|((?i)((\\d+|((\\d*\\.\\d+)|(\\d+\\.\\d*)))[eE][+-]?\\d+))/',
             2 => '/((?i)\\{)|((?i)\\()|((?i)\\[)|((?i)\\/\\*)|((?i)")|((?i)`)|((?mi)\\<\\<\\<[\\x20\\x09]*(\\w+)$)|((?i)\')|((?i)(#|\\/\\/))|((?i)[a-z_]\\w*)|((?i)\\((array|int|integer|string|bool|boolean|object|float|double)\\))|((?i)0[xX][\\da-f]+)|((?i)\\$[a-z_]\\w*)|((?i)\\d\\d*|\\b0\\b)|((?i)0[0-7]+)|((?i)(\\d*\\.\\d+)|(\\d+\\.\\d*))|((?i)((\\d+|((\\d*\\.\\d+)|(\\d+\\.\\d*)))[eE][+-]?\\d+))/',
@@ -62,7 +62,7 @@ class  Text_Highlighter_PHP extends Text_Highlighter
         $this->_counts = array (
             -1 => 
             array (
-                0 => 2,
+                0 => 1,
             ),
             0 => 
             array (

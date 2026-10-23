@@ -3,9 +3,9 @@
  * YiiBase class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 
@@ -71,6 +71,13 @@ class CChoiceFormat
 	 */
 	protected static function evaluate($expression,$n)
 	{
-		return @eval("return $expression;");
+		try
+		{
+			return @eval("return $expression;");
+		}
+		catch (ParseError $e)
+		{
+			return false;
+		}
 	}
 }

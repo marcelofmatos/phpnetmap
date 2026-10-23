@@ -6,13 +6,13 @@
  * The original PHP version of this code was written by Geoffrey T. Dairiki
  * <dairiki@dairiki.org>, and is used/adapted with his permission.
  *
- * $Horde: framework/Text_Diff/Diff.php,v 1.11.2.11 2008/02/24 10:57:46 jan Exp $
+ * $Horde: framework/Text_Diff/Diff.php,v 1.11.2.12 2009/01/06 15:23:41 jan Exp $
  *
  * Copyright 2004 Geoffrey T. Dairiki <dairiki@dairiki.org>
- * Copyright 2004-2008 The Horde Project (http://www.horde.org/)
+ * Copyright 2004-2009 The Horde Project (https://www.horde.org/)
  *
  * See the enclosed file COPYING for license information (LGPL). If you did
- * not receive this file, see http://opensource.org/licenses/lgpl-license.php.
+ * not receive this file, see https://opensource.org/licenses/lgpl-license.php.
  *
  * @package Text_Diff
  * @author  Geoffrey T. Dairiki <dairiki@dairiki.org>
@@ -35,7 +35,7 @@ class Text_Diff {
      *                           Normally an array of two arrays, each
      *                           containing the lines from a file.
      */
-    function Text_Diff($engine, $params)
+    function __construct($engine, $params)
     {
         // Backward compatibility workaround.
         if (!is_string($engine)) {
@@ -216,14 +216,12 @@ class Text_Diff {
     /**
      * Determines the location of the system temporary directory.
      *
-     * @static
-     *
      * @access protected
      *
      * @return string  A directory name which can be used for temp files.
      *                 Returns false if one could not be found.
      */
-    function _getTempDir()
+    static function _getTempDir()
     {
         $tmp_locations = array('/tmp', '/var/tmp', 'c:\WUTemp', 'c:\temp',
                                'c:\windows\temp', 'c:\winnt\temp');
@@ -307,13 +305,13 @@ class Text_MappedDiff extends Text_Diff {
      * @param array $mapped_to_lines    This array should have the same number
      *                                  of elements as $to_lines.
      */
-    function Text_MappedDiff($from_lines, $to_lines,
+    function __construct($from_lines, $to_lines,
                              $mapped_from_lines, $mapped_to_lines)
     {
         assert(count($from_lines) == count($mapped_from_lines));
         assert(count($to_lines) == count($mapped_to_lines));
 
-        parent::Text_Diff($mapped_from_lines, $mapped_to_lines);
+        parent::__construct($mapped_from_lines, $mapped_to_lines);
 
         $xi = $yi = 0;
         for ($i = 0; $i < count($this->_edits); $i++) {
@@ -369,7 +367,7 @@ class Text_Diff_Op {
  */
 class Text_Diff_Op_copy extends Text_Diff_Op {
 
-    function Text_Diff_Op_copy($orig, $final = false)
+    function __construct($orig, $final = false)
     {
         if (!is_array($final)) {
             $final = $orig;
@@ -394,7 +392,7 @@ class Text_Diff_Op_copy extends Text_Diff_Op {
  */
 class Text_Diff_Op_delete extends Text_Diff_Op {
 
-    function Text_Diff_Op_delete($lines)
+    function __construct($lines)
     {
         $this->orig = $lines;
         $this->final = false;
@@ -416,7 +414,7 @@ class Text_Diff_Op_delete extends Text_Diff_Op {
  */
 class Text_Diff_Op_add extends Text_Diff_Op {
 
-    function Text_Diff_Op_add($lines)
+    function __construct($lines)
     {
         $this->final = $lines;
         $this->orig = false;
@@ -438,7 +436,7 @@ class Text_Diff_Op_add extends Text_Diff_Op {
  */
 class Text_Diff_Op_change extends Text_Diff_Op {
 
-    function Text_Diff_Op_change($orig, $final)
+    function __construct($orig, $final)
     {
         $this->orig = $orig;
         $this->final = $final;

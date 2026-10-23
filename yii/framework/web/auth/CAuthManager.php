@@ -3,9 +3,9 @@
  * CAuthManager class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -146,7 +146,21 @@ abstract class CAuthManager extends CApplicationComponent implements IAuthManage
 	 */
 	public function executeBizRule($bizRule,$params,$data)
 	{
-		return $bizRule==='' || $bizRule===null || ($this->showErrors ? eval($bizRule)!=0 : @eval($bizRule)!=0);
+		if($bizRule==='' || $bizRule===null)
+			return true;
+		if ($this->showErrors)
+			return eval($bizRule)!=0;
+		else
+		{
+			try
+			{
+				return @eval($bizRule)!=0;
+			}
+			catch (ParseError $e)
+			{
+				return false;
+			}
+		}
 	}
 
 	/**

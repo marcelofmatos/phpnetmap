@@ -7,7 +7,7 @@
  *
  * LICENSE: This source file is subject to version 3.0 of the PHP license
  * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * https://www.php.net/license/3_0.txt.  If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
@@ -15,9 +15,9 @@
  * @package    Text_Highlighter
  * @author     Andrey Demenev <demenev@gmail.com>
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    CVS: $Id: Html.php,v 1.2 2007/06/29 06:56:34 ssttoo Exp $
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 
 /**
@@ -52,11 +52,15 @@ if (!defined('HL_NUMBERS_LI')) {
 /**
  * Use numbered list
  */
-define ('HL_NUMBERS_OL',    1);
+if (!defined('HL_NUMBERS_OL')) {
+    define('HL_NUMBERS_OL', 1);
+}
 /**
  * Use non-numbered list
  */
-define ('HL_NUMBERS_UL',    3);
+if (!defined('HL_NUMBERS_UL')) {
+    define('HL_NUMBERS_UL', 3);
+}
 /**#@-*/
 
 
@@ -77,7 +81,7 @@ define ('HL_NUMBERS_UL',    3);
  *
  * Example of setting documentation links:
  * $options['doclinks'] = array(
- *   'url' => 'http://php.net/%s',
+ *   'url' => 'https://php.net/%s',
  *   'target' => '_blank',
  *   'elements' => array('reserved', 'identifier')
  * );
@@ -122,9 +126,9 @@ define ('HL_NUMBERS_UL',    3);
  * @category   Text
  * @package    Text_Highlighter
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    Release: 0.7.1
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 
 class Text_Highlighter_Renderer_Html extends Text_Highlighter_Renderer_Array
@@ -188,10 +192,12 @@ class Text_Highlighter_Renderer_Html extends Text_Highlighter_Renderer_Array
         'inlinetags' => 'hl-inlinetags',
         'mlcomment'  => 'hl-mlcomment',
         'number'     => 'hl-number',
+        'prepro'     => 'hl-prepro',
         'quotes'     => 'hl-quotes',
         'reserved'   => 'hl-reserved',
         'special'    => 'hl-special',
         'string'     => 'hl-string',
+        'types'      => 'hl-types',
         'url'        => 'hl-url',
         'var'        => 'hl-var',
     );
@@ -200,7 +206,7 @@ class Text_Highlighter_Renderer_Html extends Text_Highlighter_Renderer_Array
      * Setup for links to online documentation
      *
      * This is an array with keys:
-     * - url, ex. http://php.net/%s
+     * - url, ex. https://php.net/%s
      * - target, ex. _blank, default - no target
      * - elements, default is <code>array('reserved', 'identifier')</code>
      *
@@ -289,8 +295,6 @@ class Text_Highlighter_Renderer_Html extends Text_Highlighter_Renderer_Array
         // get parent's output
         parent::finalize();
         $output = parent::getOutput();
-        if(empty($output))
-        	return;
 
         $html_output = '';
 
@@ -320,18 +324,28 @@ class Text_Highlighter_Renderer_Html extends Text_Highlighter_Renderer_Array
 
             $span = $this->_getStyling($the_class);
             $decorated_output = $this->_decorate($content, $key);
-			//print "<pre> token = ".var_export($token, true)." -- span = " . htmlentities($span). "-- deco = ".$decorated_output."</pre>\n";
-			$html_output .= sprintf($span, $decorated_output);
+
+
+            if ($numbers_li == true) {
+                // end span tags before end of li, and re-open on next line
+                $lastSpanTag = str_replace("%s</span>", "", $span);
+                $span = sprintf($span, $decorated_output);
+                $span = str_replace("\n", "</span></li>\n<li>$lastSpanTag&nbsp;", $span);
+                $html_output .= $span;
+            } else {
+                $html_output .= sprintf($span, $decorated_output);
+            }
+
+
         }
 
         // format lists
         if (!empty($this->_numbers) && $numbers_li == true) {
 
-            //$html_output = "<pre>".$html_output."</pre>";
+
             // additional whitespace for browsers that do not display
             // empty list items correctly
-            $this->_output = '<li><pre>&nbsp;' . str_replace("\n", "</pre></li>\n<li><pre>&nbsp;", $html_output) . '</pre></li>';
-
+            $this->_output = '<li>&nbsp;' . $html_output . '</li>';
 
             $start = '';
             if ($this->_numbers == HL_NUMBERS_OL && intval($this->_numbers_start) > 0)  {

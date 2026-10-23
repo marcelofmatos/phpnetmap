@@ -4,16 +4,16 @@
  * CCaptchaAction class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
  * CCaptchaAction renders a CAPTCHA image.
  *
  * CCaptchaAction is used together with {@link CCaptcha} and {@link CCaptchaValidator}
- * to provide the {@link http://en.wikipedia.org/wiki/Captcha CAPTCHA} feature.
+ * to provide the {@link https://en.wikipedia.org/wiki/Captcha CAPTCHA} feature.
  *
  * You must configure properties of CCaptchaAction to customize the appearance of
  * the generated image.
@@ -173,6 +173,8 @@ class CCaptchaAction extends CAction
 	 */
 	public function validate($input,$caseSensitive)
 	{
+		if(!is_string($input))
+			return false;
 		$code = $this->getVerifyCode();
 		$valid = $caseSensitive ? ($input === $code) : strcasecmp($input,$code)===0;
 		$session = Yii::app()->session;

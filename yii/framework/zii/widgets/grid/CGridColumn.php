@@ -3,9 +3,9 @@
  * CGridColumn class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -55,14 +55,20 @@ abstract class CGridColumn extends CComponent
 	 * @var string a PHP expression that is evaluated for every data cell and whose result
 	 * is used as the CSS class name for the data cell. In this expression, you can use the following variables:
 	 * <ul>
-	 *   <li><code>$row</code> the row number (zero-based)</li>
-	 *   <li><code>$data</code> the data model for the row</li>
-	 *   <li><code>$this</code> the column object</li>
+	 *   <li><code>$row</code> the row number (zero-based).</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
+	 *   <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 * 
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
-	 * please refer to the {@link http://www.php.net/manual/en/language.expressions.php php manual}.
+	 * please refer to the {@link https://www.php.net/manual/en/language.expressions.php php manual}.
 	 */
 	public $cssClassExpression;
 	/**
@@ -174,7 +180,7 @@ abstract class CGridColumn extends CComponent
 	 */
 	public function getHeaderCellContent()
 	{
-		return trim($this->header)!=='' ? $this->header : $this->grid->blankDisplay;
+		return $this->header!==null && trim($this->header)!=='' ? $this->header : $this->grid->blankDisplay;
 	}
 
 	/**
@@ -195,7 +201,7 @@ abstract class CGridColumn extends CComponent
 	 */
 	public function getFooterCellContent()
 	{
-		return trim($this->footer)!=='' ? $this->footer : $this->grid->blankDisplay;
+		return $this->footer!==null && trim($this->footer)!=='' ? $this->footer : $this->grid->blankDisplay;
 	}
 
 	/**

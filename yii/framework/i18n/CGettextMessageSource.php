@@ -3,9 +3,9 @@
  * CGettextMessageSource class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -53,7 +53,7 @@ class CGettextMessageSource extends CMessageSource
 	 */
 	public $useMoFile=true;
 	/**
-	 * @var boolean whether to use Big Endian to read and write MO files.
+	 * @var boolean whether to use Big Endian to read MO files.
 	 * Defaults to false. This property is only used when {@link useMoFile} is true.
 	 */
 	public $useBigEndian=false;

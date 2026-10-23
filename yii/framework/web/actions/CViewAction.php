@@ -3,9 +3,9 @@
  * CViewAction class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -92,7 +92,6 @@ class CViewAction extends CAction
 	/**
 	 * Resolves the user-specified view into a valid view name.
 	 * @param string $viewPath user-specified view in the format of 'path.to.view'.
-	 * @return string fully resolved view in the format of 'path/to/view'.
 	 * @throws CHttpException if the user-specified view is invalid
 	 */
 	protected function resolveView($viewPath)

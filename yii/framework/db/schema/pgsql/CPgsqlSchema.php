@@ -3,9 +3,9 @@
  * CPgsqlSchema class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -166,7 +166,12 @@ class CPgsqlSchema extends CDbSchema
 	protected function findColumns($table)
 	{
 		$sql=<<<EOD
-SELECT a.attname, LOWER(format_type(a.atttypid, a.atttypmod)) AS type, d.adsrc, a.attnotnull, a.atthasdef,
+SELECT
+	a.attname,
+	LOWER(format_type(a.atttypid, a.atttypmod)) AS type,
+	pg_get_expr(adbin, adrelid) AS adsrc,
+	a.attnotnull,
+	a.atthasdef,
 	pg_catalog.col_description(a.attrelid, a.attnum) AS comment
 FROM pg_attribute a LEFT JOIN pg_attrdef d ON a.attrelid = d.adrelid AND a.attnum = d.adnum
 WHERE a.attnum > 0 AND NOT a.attisdropped
@@ -186,7 +191,7 @@ EOD;
 			$c=$this->createColumn($column);
 			$table->columns[$c->name]=$c;
 
-			if(stripos($column['adsrc'],'nextval')===0 && preg_match('/nextval\([^\']*\'([^\']+)\'[^\)]*\)/i',$column['adsrc'],$matches))
+			if(isset($column['adsrc']) && stripos($column['adsrc'],'nextval')===0 && preg_match('/nextval\([^\']*\'([^\']+)\'[^\)]*\)/i',$column['adsrc'],$matches))
 			{
 				if(strpos($matches[1],'.')!==false || $table->schemaName===self::DEFAULT_SCHEMA)
 					$this->_sequences[$table->rawName.'.'.$c->name]=$matches[1];
@@ -225,15 +230,16 @@ EOD;
 	protected function findConstraints($table)
 	{
 		$sql=<<<EOD
-SELECT conname, consrc, contype, indkey FROM (
+SELECT
+	conname,
+	consrc,
+	contype,
+	indkey
+FROM (
 	SELECT
 		conname,
-		CASE WHEN contype='f' THEN
-			pg_catalog.pg_get_constraintdef(oid)
-		ELSE
-			'CHECK (' || consrc || ')'
-		END AS consrc,
-		contype,
+		pg_catalog.pg_get_constraintdef(oid) AS consrc,
+		contype::char,
 		conrelid AS relid,
 		NULL AS indkey
 	FROM
@@ -413,42 +419,6 @@ EOD;
 		$sql='ALTER TABLE ' . $this->quoteTableName($table) . ' ALTER COLUMN '
 			. $this->quoteColumnName($column) . ' TYPE ' . $this->getColumnType($type);
 		return $sql;
-	}
-
-	/**
-	 * Builds a SQL statement for creating a new index.
-	 * @param string $name the name of the index. The name will be properly quoted by the method.
-	 * @param string $table the table that the new index will be created for. The table name will be properly quoted by the method.
-	 * @param string $columns the column(s) that should be included in the index. If there are multiple columns, please separate them
-	 * by commas. Each column name will be properly quoted by the method, unless a parenthesis is found in the name.
-	 * @param boolean $unique whether to add UNIQUE constraint on the created index.
-	 * @return string the SQL statement for creating a new index.
-	 * @since 1.1.6
-	 */
-	public function createIndex($name, $table, $columns, $unique=false)
-	{
-		$cols=array();
-		if (is_string($columns))
-			$columns=preg_split('/\s*,\s*/',$columns,-1,PREG_SPLIT_NO_EMPTY);
-		foreach($columns as $col)
-		{
-			if(strpos($col,'(')!==false)
-				$cols[]=$col;
-			else
-				$cols[]=$this->quoteColumnName($col);
-		}
-		if ($unique)
-		{
-			return 'ALTER TABLE ONLY '
-				. $this->quoteTableName($table).' ADD CONSTRAINT '
-				. $this->quoteTableName($name).' UNIQUE ('.implode(', ',$cols).')';
-		}
-		else
-		{
-			return 'CREATE INDEX '
-				. $this->quoteTableName($name).' ON '
-				. $this->quoteTableName($table).' ('.implode(', ',$cols).')';
-		}
 	}
 
 	/**

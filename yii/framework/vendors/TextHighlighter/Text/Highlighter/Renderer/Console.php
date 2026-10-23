@@ -7,7 +7,7 @@
  *
  * LICENSE: This source file is subject to version 3.0 of the PHP license
  * that is available through the world-wide-web at the following URI:
- * http://www.php.net/license/3_0.txt.  If you did not receive a copy of
+ * https://www.php.net/license/3_0.txt.  If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
@@ -15,9 +15,9 @@
  * @package    Text_Highlighter
  * @author     Andrey Demenev <demenev@gmail.com>
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    CVS: $Id: Console.php,v 1.1 2007/06/03 02:37:08 ssttoo Exp $
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 
 /**
@@ -44,9 +44,9 @@ define ('HL_CONSOLE_DEFCOLOR', "\033[0m");
  * @category   Text
  * @package    Text_Highlighter
  * @copyright  2004-2006 Andrey Demenev
- * @license    http://www.php.net/license/3_0.txt  PHP License
+ * @license    https://www.php.net/license/3_0.txt  PHP License
  * @version    Release: 0.7.1
- * @link       http://pear.php.net/package/Text_Highlighter
+ * @link       https://pear.php.net/package/Text_Highlighter
  */
 
 class Text_Highlighter_Renderer_Console extends Text_Highlighter_Renderer
@@ -176,12 +176,17 @@ class Text_Highlighter_Renderer_Console extends Text_Highlighter_Renderer
     function finalize()
     {
         if ($this->_numbers) {
-            $nlines = substr_count($this->_output, "\n") + 1;
-            $len = strlen($nlines);
-            $i = 1;
-            $this->_output = preg_replace('~^~em', '" " . str_pad($i++, $len, " ", STR_PAD_LEFT) . ": "', $this->_output);
+            $this->_output = preg_replace_callback('~^~m', array($this, 'replaceCallback'), $this->_output);
         }
         $this->_output .= HL_CONSOLE_DEFCOLOR . "\n";
+    }
+
+    function replaceCallback()
+    {
+        $nlines = substr_count($this->_output, "\n") + 1;
+        $len = strlen($nlines);
+        $i = 1;
+        return " " . str_pad($i++, $len, " ", STR_PAD_LEFT) . ": ";
     }
 
     /**

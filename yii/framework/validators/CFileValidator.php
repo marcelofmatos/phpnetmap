@@ -3,9 +3,9 @@
  * CFileValidator class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -195,7 +195,7 @@ class CFileValidator extends CValidator
 		if($error==UPLOAD_ERR_INI_SIZE || $error==UPLOAD_ERR_FORM_SIZE || $this->maxSize!==null && $file->getSize()>$this->maxSize)
 		{
 			$message=$this->tooLarge!==null?$this->tooLarge : Yii::t('yii','The file "{file}" is too large. Its size cannot exceed {limit} bytes.');
-			$this->addError($object,$attribute,$message,array('{file}'=>CHtml::encode($file->getName()), '{limit}'=>$this->getSizeLimit()));
+			$this->addError($object,$attribute,$message,array('{file}'=>$file->getName(), '{limit}'=>$this->getSizeLimit()));
 			if($error!==UPLOAD_ERR_OK)
 				return;
 		}
@@ -204,21 +204,21 @@ class CFileValidator extends CValidator
 			if($error==UPLOAD_ERR_NO_FILE)
 				return $this->emptyAttribute($object, $attribute);
 			elseif($error==UPLOAD_ERR_PARTIAL)
-				throw new CException(Yii::t('yii','The file "{file}" was only partially uploaded.',array('{file}'=>CHtml::encode($file->getName()))));
+				throw new CException(Yii::t('yii','The file "{file}" was only partially uploaded.',array('{file}'=>$file->getName())));
 			elseif($error==UPLOAD_ERR_NO_TMP_DIR)
-				throw new CException(Yii::t('yii','Missing the temporary folder to store the uploaded file "{file}".',array('{file}'=>CHtml::encode($file->getName()))));
+				throw new CException(Yii::t('yii','Missing the temporary folder to store the uploaded file "{file}".',array('{file}'=>$file->getName())));
 			elseif($error==UPLOAD_ERR_CANT_WRITE)
-				throw new CException(Yii::t('yii','Failed to write the uploaded file "{file}" to disk.',array('{file}'=>CHtml::encode($file->getName()))));
+				throw new CException(Yii::t('yii','Failed to write the uploaded file "{file}" to disk.',array('{file}'=>$file->getName())));
 			elseif(defined('UPLOAD_ERR_EXTENSION') && $error==UPLOAD_ERR_EXTENSION)  // available for PHP 5.2.0 or above
 				throw new CException(Yii::t('yii','A PHP extension stopped the file upload.'));
 			else
-				throw new CException(Yii::t('yii','Unable to upload the file "{file}" because of an unrecognized error.',array('{file}'=>CHtml::encode($file->getName()))));
+				throw new CException(Yii::t('yii','Unable to upload the file "{file}" because of an unrecognized error.',array('{file}'=>$file->getName())));
 		}
 
 		if($this->minSize!==null && $file->getSize()<$this->minSize)
 		{
 			$message=$this->tooSmall!==null?$this->tooSmall : Yii::t('yii','The file "{file}" is too small. Its size cannot be smaller than {limit} bytes.');
-			$this->addError($object,$attribute,$message,array('{file}'=>CHtml::encode($file->getName()), '{limit}'=>$this->minSize));
+			$this->addError($object,$attribute,$message,array('{file}'=>$file->getName(), '{limit}'=>$this->minSize));
 		}
 
 		if($this->types!==null)
@@ -230,7 +230,7 @@ class CFileValidator extends CValidator
 			if(!in_array(strtolower($file->getExtensionName()),$types))
 			{
 				$message=$this->wrongType!==null?$this->wrongType : Yii::t('yii','The file "{file}" cannot be uploaded. Only files with these extensions are allowed: {extensions}.');
-				$this->addError($object,$attribute,$message,array('{file}'=>CHtml::encode($file->getName()), '{extensions}'=>implode(', ',$types)));
+				$this->addError($object,$attribute,$message,array('{file}'=>$file->getName(), '{extensions}'=>implode(', ',$types)));
 			}
 		}
 
@@ -255,7 +255,7 @@ class CFileValidator extends CValidator
 			if($mimeType===false || !in_array(strtolower($mimeType),$mimeTypes))
 			{
 				$message=$this->wrongMimeType!==null?$this->wrongMimeType : Yii::t('yii','The file "{file}" cannot be uploaded. Only files of these MIME-types are allowed: {mimeTypes}.');
-				$this->addError($object,$attribute,$message,array('{file}'=>CHtml::encode($file->getName()), '{mimeTypes}'=>implode(', ',$mimeTypes)));
+				$this->addError($object,$attribute,$message,array('{file}'=>$file->getName(), '{mimeTypes}'=>implode(', ',$mimeTypes)));
 			}
 		}
 	}
@@ -301,7 +301,9 @@ class CFileValidator extends CValidator
 	}
 
 	/**
-	 * Converts php.ini style size to bytes. Examples of size strings are: 150, 1g, 500k, 5M (size suffix
+	 * Converts php.ini style size to bytes.
+	 *
+	 * Examples of size strings are: 150, 1g, 500k, 5M (size suffix
 	 * is case insensitive). If you pass here the number with a fractional part, then everything after
 	 * the decimal point will be ignored (php.ini values common behavior). For example 1.5G value would be
 	 * treated as 1G and 1073741824 number will be returned as a result. This method is public

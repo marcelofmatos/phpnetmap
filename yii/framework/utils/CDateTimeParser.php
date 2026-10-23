@@ -5,9 +5,9 @@
  * @author Wei Zhuo <weizhuo[at]gamil[dot]com>
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Tomasz Suchanek <tomasz[dot]suchanek[at]gmail[dot]com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -26,8 +26,8 @@
  * y       | 4 year digit, e.g., 2005 (available since 1.1.16)
  * yy      | 2 year digit, e.g., 96, 05
  * yyyy    | 4 year digit, e.g., 2005
- * h       | Hour in 0 to 23, no padding
- * hh      | Hour in 00 to 23, zero leading
+ * h       | Hour in 0 to 12, no padding
+ * hh      | Hour in 00 to 12, zero leading
  * H       | Hour in 0 to 23, no padding
  * HH      | Hour in 00 to 23, zero leading
  * m       | Minutes in 0 to 59, no padding
@@ -195,22 +195,22 @@ class CDateTimeParser
 				}
 				case 'a':
 				{
-				    if(($ampm=self::parseAmPm($value,$i))===false)
-				        return false;
-				    if(isset($hour))
-				    {
-				    	if($hour==12 && $ampm==='am')
-				    		$hour=0;
-				    	elseif($hour<12 && $ampm==='pm')
-				    		$hour+=12;
-				    }
+					if(($ampm=self::parseAmPm($value,$i))===false)
+						return false;
+					if(isset($hour))
+					{
+						if($hour==12 && $ampm==='am')
+							$hour=0;
+						elseif($hour<12 && $ampm==='pm')
+							$hour+=12;
+					}
 					$i+=2;
 					break;
 				}
 				default:
 				{
 					$tn=self::$_mbstringAvailable ? mb_strlen($token,Yii::app()->charset) : strlen($token);
-					if($i>=$n || ($token{0}!='?' && (self::$_mbstringAvailable ? mb_substr($value,$i,$tn,Yii::app()->charset) : substr($value,$i,$tn))!==$token))
+					if($i>=$n || ($token[0]!='?' && (self::$_mbstringAvailable ? mb_substr($value,$i,$tn,Yii::app()->charset) : substr($value,$i,$tn))!==$token))
 						return false;
 					$i+=$tn;
 					break;

@@ -3,9 +3,9 @@
  * CFilterChain class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 
@@ -52,6 +52,7 @@ class CFilterChain extends CList
 	 * @param CAction $action the action being filtered by this chain.
 	 * @param array $filters list of filters to be applied to the action.
 	 * @return CFilterChain
+	 * @throws CException
 	 */
 	public static function create($controller,$action,$filters)
 	{

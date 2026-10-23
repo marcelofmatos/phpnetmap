@@ -3,9 +3,9 @@
  * CUserIdentity class file
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -51,6 +51,7 @@ class CUserIdentity extends CBaseUserIdentity
 	 * Derived classes should override this method, or an exception will be thrown.
 	 * This method is required by {@link IUserIdentity}.
 	 * @return boolean whether authentication succeeds.
+	 * @throws CException
 	 */
 	public function authenticate()
 	{

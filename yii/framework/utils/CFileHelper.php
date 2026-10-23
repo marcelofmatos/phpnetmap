@@ -3,9 +3,9 @@
  * CFileHelper class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -79,7 +79,10 @@ class CFileHelper
 	{
 		if(!isset($options['traverseSymlinks']))
 			$options['traverseSymlinks']=false;
-		$items=glob($directory.DIRECTORY_SEPARATOR.'{,.}*',GLOB_MARK | GLOB_BRACE);
+		$items=array_merge(
+			glob($directory.DIRECTORY_SEPARATOR.'*',GLOB_MARK),
+			glob($directory.DIRECTORY_SEPARATOR.'.*',GLOB_MARK)
+		);
 		foreach($items as $item)
 		{
 			if(basename($item)=='.' || basename($item)=='..')
@@ -153,6 +156,7 @@ class CFileHelper
 	 * @param array $options additional options. The following options are supported:
 	 * newDirMode - the permission to be set for newly copied directories (defaults to 0777);
 	 * newFileMode - the permission to be set for newly copied files (defaults to the current environment setting).
+	 * @throws Exception
 	 */
 	protected static function copyDirectoryRecursive($src,$dst,$base,$fileTypes,$exclude,$level,$options)
 	{
@@ -199,6 +203,7 @@ class CFileHelper
 	 * level N means searching for those directories that are within N levels.
 	 * @param boolean $absolutePaths whether to return absolute paths or relative ones
 	 * @return array files found under the directory.
+	 * @throws Exception
 	 */
 	protected static function findFilesRecursive($dir,$base,$fileTypes,$exclude,$level,$absolutePaths)
 	{
@@ -218,7 +223,7 @@ class CFileHelper
 				if($isFile)
 					$list[]=$absolutePaths?$fullPath:$path;
 				elseif($level)
-					$list=array_merge($list,self::findFilesRecursive($dir,$base.'/'.$file,$fileTypes,$exclude,$level-1,$absolutePaths));
+					$list=array_merge($list,self::findFilesRecursive($dir,$base.DIRECTORY_SEPARATOR.$file,$fileTypes,$exclude,$level-1,$absolutePaths));
 			}
 		}
 		closedir($handle);
@@ -262,8 +267,8 @@ class CFileHelper
 	 * </ol>
 	 * @param string $file the file name.
 	 * @param string $magicFile name of a magic database file, usually something like /path/to/magic.mime.
-	 * This will be passed as the second parameter to {@link http://php.net/manual/en/function.finfo-open.php finfo_open}.
-	 * Magic file format described in {@link http://linux.die.net/man/5/magic man 5 magic}, note that this file does not
+	 * This will be passed as the second parameter to {@link https://php.net/manual/en/function.finfo-open.php finfo_open}.
+	 * Magic file format described in {@link https://linux.die.net/man/5/magic man 5 magic}, note that this file does not
 	 * contain a standard PHP array as you might suppose. Specified magic file will be used only when fileinfo
 	 * PHP extension is available. This parameter has been available since version 1.1.3.
 	 * @param boolean $checkExtension whether to check the file extension in case the MIME type cannot be determined

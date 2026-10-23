@@ -3,9 +3,9 @@
  * CTextHighlighter class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 require_once(Yii::getPathOfAlias('system.vendors.TextHighlighter.Text.Highlighter').'.php');
@@ -67,7 +67,7 @@ class CTextHighlighter extends COutputProcessor
 
 	/**
 	 * Processes the captured output.
-     * This method highlights the output according to the syntax of the specified {@link language}.
+	 * This method highlights the output according to the syntax of the specified {@link language}.
 	 * @param string $output the captured output to be processed
 	 */
 	public function processOutput($output)

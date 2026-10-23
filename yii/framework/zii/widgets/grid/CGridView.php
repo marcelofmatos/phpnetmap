@@ -3,9 +3,9 @@
  * CGridView class file.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 Yii::import('zii.widgets.CBaseListView');
@@ -69,7 +69,11 @@ Yii::import('zii.widgets.grid.CCheckBoxColumn');
  *     ),
  * ));
  * </pre>
- *
+ *  
+ * Note: the above example assumes that CGridView is used with {@link CActiveDataProvider}. When used with 
+ * {@link CArrayDataProvider} or {@link CSqlDataProvider}, attribute values must be accessed as array item like 
+ * <code>$data['create_time']</code>, not as object property.
+ * 
  * Please refer to {@link columns} for more details about how to configure this property.
  *
  * @property boolean $hasFooter Whether the table should render a footer.
@@ -113,14 +117,20 @@ class CGridView extends CBaseListView
 	 * @var string a PHP expression that is evaluated for every table body row and whose result
 	 * is used as the CSS class name for the row. In this expression, you can use the following variables:
 	 * <ul>
-	 *   <li><code>$row</code> the row number (zero-based)</li>
-	 *   <li><code>$data</code> the data model for the row</li>
-	 *   <li><code>$this</code> the grid view object</li>
+	 *   <li><code>$row</code> the row number (zero-based).</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
+	 *   <li><code>$this</code> the grid view object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 * 
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
-	 * please refer to the {@link http://www.php.net/manual/en/language.expressions.php php manual}.
+	 * please refer to the {@link https://www.php.net/manual/en/language.expressions.php php manual}.
 	 * @see rowCssClass
 	 * @deprecated in 1.1.13 in favor of {@link rowHtmlOptionsExpression}
 	 */
@@ -131,14 +141,20 @@ class CGridView extends CBaseListView
 	 * array whose key value pairs correspond to html attribute and value.
 	 * In this expression, you can use the following variables:
 	 * <ul>
-	 *   <li><code>$row</code> the row number (zero-based)</li>
-	 *   <li><code>$data</code> the data model for the row</li>
-	 *   <li><code>$this</code> the grid view object</li>
+	 *   <li><code>$row</code> the row number (zero-based).</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
+	 *   <li><code>$this</code> the grid view object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 * 
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
-	 * please refer to the {@link http://www.php.net/manual/en/language.expressions.php php manual}.
+	 * please refer to the {@link https://www.php.net/manual/en/language.expressions.php php manual}.
 	 * @since 1.1.13
 	 */
 	public $rowHtmlOptionsExpression;
@@ -405,6 +421,7 @@ class CGridView extends CBaseListView
 	 * Creates a {@link CDataColumn} based on a shortcut column specification string.
 	 * @param string $text the column specification string
 	 * @return CDataColumn the column instance
+	 * @throws CException
 	 */
 	protected function createDataColumn($text)
 	{
@@ -631,7 +648,7 @@ class CGridView extends CBaseListView
 	 * 
 	 * @param CGridColumn $column The Column instance to 
 	 * @param integer $row
-	 * @since 1.1.17
+	 * @since 1.1.16
 	 */
 	protected function renderDataCell($column, $row)
 	{

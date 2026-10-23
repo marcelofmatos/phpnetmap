@@ -2,11 +2,11 @@
 /**
  * CPradoViewRenderer class file.
  *
- * @author Steve Heyns http://customgothic.com/
+ * @author Steve Heyns https://customgothic.com/
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright 2008-2013 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @license https://www.yiiframework.com/license/
  */
 
 /**
@@ -60,7 +60,7 @@
  * // the whole tag will be stripped off
  * </pre>
  *
- * @author Steve Heyns http://customgothic.com/
+ * @author Steve Heyns https://customgothic.com/
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @package system.web.renderers
  * @since 1.0
@@ -88,7 +88,7 @@ class CPradoViewRenderer extends CViewRenderer
 		$this->_input=file_get_contents($sourceFile);
 		$n=preg_match_all('/'.implode('|',$regexRules).'/msS',$this->_input,$matches,PREG_SET_ORDER|PREG_OFFSET_CAPTURE);
 		$textStart=0;
-        $this->_output="<?php /* source file: $sourceFile */ ?>\n";
+		$this->_output="<?php /* source file: $sourceFile */ ?>\n";
 		for($i=0;$i<$n;++$i)
 		{
 			$match=&$matches[$i];
