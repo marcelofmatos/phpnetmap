@@ -1,6 +1,10 @@
 # PHPNetMap — imagem self-contained equivalente ao tutum/php-apache.
 # Base oficial multi-arch (linux/amd64 + linux/arm64) com Apache + mod_php.
-FROM php:7.4-apache
+FROM php:8.4-apache
+
+# CVE-2026-109618 / CVE-2026-109619 (RCE no core do PHP) só estão corrigidos
+# a partir do 8.4.27 — falha o build se a tag 8.4-apache vier mais antiga.
+RUN php -r 'exit(version_compare(PHP_VERSION, "8.4.27", ">=") ? 0 : 1);'
 
 # Preenchido pelo workflow de release (--build-arg VERSION=x.y.z) com a
 # mesma tag git criada pro release — não vem do .git (excluído do build
