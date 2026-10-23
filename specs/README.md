@@ -10,3 +10,4 @@ deve satisfazer a spec, e a verificação se dá via testes automatizados.
 |------|-------|------|--------|
 | [005-search-undefined-result.md](005-search-undefined-result.md) | [#5](https://github.com/marcelofmatos/phpnetmap/issues/5) | Bug | Proposta |
 | [006-docker-arm64.md](006-docker-arm64.md) | [#6](https://github.com/marcelofmatos/phpnetmap/issues/6) | Feature | Proposta (decisões em aberto) |
+| [007-php84-cve-2026-109618.md](007-php84-cve-2026-109618.md) | — | Segurança | Implementada |

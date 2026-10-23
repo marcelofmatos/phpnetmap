@@ -90,7 +90,7 @@ See more in https://docs.docker.com/engine/getstarted/
 ## Building the image (multi-arch)
 
 The image is built from the `Dockerfile` in this repository on top of the
-official `php:7.4-apache` base, so it runs on both **linux/amd64** and
+official `php:8.4-apache` base, so it runs on both **linux/amd64** and
 **linux/arm64** (Raspberry Pi, Apple Silicon, ARM servers).
 
 To build it locally for both platforms and push to a registry:

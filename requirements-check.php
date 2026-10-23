@@ -41,22 +41,28 @@ function pnm_color($text, $code, $useColor) {
 }
 
 // ---------------------------------------------------------------------
-// 1. PHP version — the Docker image (and the only combination this app
-//    has actually been run against) is php:7.4-apache.
+// 1. PHP version — the Docker image is php:8.4-apache (>= 8.4.27, the first
+//    8.4 release fixed for CVE-2026-109618 / CVE-2026-109619).
 // ---------------------------------------------------------------------
 $phpVersion = PHP_VERSION;
-if (version_compare($phpVersion, '7.1.0', '<')) {
+if (version_compare($phpVersion, '8.4.0', '<')) {
     pnm_check(
         'PHP version',
         'fail',
-        "$phpVersion — needs at least PHP 7.1; PHP 7.4 is what the Docker image (and this checklist) targets."
+        "$phpVersion — unsupported: PHP 8.4 (>= 8.4.27) is what the Docker image (and this checklist) targets. "
+        . "Older versions are vulnerable to CVE-2026-109618 / CVE-2026-109619."
     );
-} elseif (version_compare($phpVersion, '8.0.0', '>=')) {
+} elseif (version_compare($phpVersion, '8.4.27', '<')) {
+    pnm_check(
+        'PHP version',
+        'fail',
+        "$phpVersion — PHP 8.4 is supported, but versions below 8.4.27 are vulnerable to CVE-2026-109618 / CVE-2026-109619. Update PHP."
+    );
+} elseif (version_compare($phpVersion, '8.5.0', '>=')) {
     pnm_check(
         'PHP version',
         'warn',
-        "$phpVersion — this app (Yii 1.1) targets PHP 7.x, and PHP 7.4 is the exact version the Docker image "
-        . "and CI use. PHP 8+ is untested here: it may run with extra deprecation notices, or not run at all."
+        "$phpVersion — this app (Yii 1.1.32) supports up to PHP 8.4; PHP 8.5+ is untested here."
     );
 } else {
     pnm_check('PHP version', 'pass', $phpVersion);

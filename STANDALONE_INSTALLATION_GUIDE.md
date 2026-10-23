@@ -10,9 +10,9 @@ If Docker is available on your server, prefer it — see the main
 [README.md](README.md). Use this guide when Docker isn't an option (locked-down
 host, existing bare-metal LAMP server, etc.).
 
-Tested target: **Debian/Ubuntu with PHP 7.4** (the exact version the Docker
-image and CI use). Other Linux distributions and PHP 7.x versions will
-likely work but aren't verified here.
+Tested target: **Debian/Ubuntu with PHP 8.4** (the version the Docker
+image and CI use). Other Linux distributions will likely work but aren't
+verified here. PHP 7.4 is no longer supported.
 
 ## Contents
 
@@ -32,21 +32,21 @@ likely work but aren't verified here.
 
 ## 1. Prerequisites
 
-- A Linux server (Debian 11 "bullseye" or Ubuntu 20.04/22.04 recommended —
+- A Linux server (Debian 13 "trixie" recommended, or Ubuntu 22.04/24.04 —
   see the PHP version note below) with root/sudo access.
 - Network line of sight from this server to the switches/routers you want
   to monitor via SNMP (UDP/161).
 - A domain name or IP address to reach the web UI.
 
-**About the PHP version.** This app targets **PHP 7.4**. Debian 11 and
-Ubuntu 20.04 ship PHP 7.4 in their default repositories. Newer releases
-(Debian 12+, Ubuntu 22.04+) default to PHP 8.x, which is **untested** with
-this app (Yii 1.1, a framework from the PHP 5/7 era). On a newer OS, either:
-
-- provision an older base image (Debian 11 container/VM), or
-- add the [Ondřej Surý PPA](https://launchpad.net/~ondrej/+archive/ubuntu/php)
-  (Ubuntu) or [Sury's Debian repo](https://packages.sury.org/php/) to install
-  PHP 7.4 alongside/instead of the distro default:
+**About the PHP version.** This app targets **PHP 8.4** (the highest version
+supported by the bundled Yii 1.1.32). The minimum safe version is **8.4.27**:
+earlier releases are vulnerable to CVE-2026-109618 / CVE-2026-109619
+(unauthenticated RCE in PHP core, affects Apache mod_php). **PHP 7.4 is no
+longer supported** — it never received an official fix. Debian 13 ("trixie")
+ships PHP 8.4 in its default repositories. On other distributions (e.g.
+Ubuntu), add the [Ondřej Surý PPA](https://launchpad.net/~ondrej/+archive/ubuntu/php)
+(Ubuntu) or [Sury's Debian repo](https://packages.sury.org/php/) (Debian) to
+get PHP 8.4:
 
   ```bash
   # Ubuntu
@@ -67,11 +67,10 @@ this app (Yii 1.1, a framework from the PHP 5/7 era). On a newer OS, either:
 sudo apt-get update
 sudo apt-get install -y \
     apache2 \
-    php7.4 libapache2-mod-php7.4 \
-    php7.4-sqlite3 \
-    php7.4-snmp \
-    php7.4-apcu \
-    php7.4-json \
+    php8.4 libapache2-mod-php8.4 \
+    php8.4-sqlite3 \
+    php8.4-snmp \
+    php8.4-apcu \
     snmpd \
     sqlite3 \
     apache2-utils \
@@ -83,11 +82,10 @@ What each piece is for (mirrors [`requirements-check.php`](requirements-check.ph
 | Package | Why |
 |---|---|
 | `apache2` | web server |
-| `php7.4`, `libapache2-mod-php7.4` | runs the app under Apache |
-| `php7.4-sqlite3` (provides `pdo_sqlite`) | the app's database — a single SQLite file, no separate DB server needed |
-| `php7.4-snmp` | queries network devices via SNMP v1/v2c/v3 — the app's core feature |
-| `php7.4-apcu` | caches SNMP results (CAM/ARP tables, GET responses); enabled by default in the app's Configuration page |
-| `php7.4-json` | usually built in; listed for completeness (AJAX endpoints) |
+| `php8.4`, `libapache2-mod-php8.4` | runs the app under Apache |
+| `php8.4-sqlite3` (provides `pdo_sqlite`) | the app's database — a single SQLite file, no separate DB server needed |
+| `php8.4-snmp` | queries network devices via SNMP v1/v2c/v3 — the app's core feature |
+| `php8.4-apcu` | caches SNMP results (CAM/ARP tables, GET responses); enabled by default in the app's Configuration page |
 | `snmpd` | an SNMP daemon *on this server itself* — the app doesn't require this to query *other* devices, but the original reference image ran it, so it's included for parity. Safe to skip if you don't need this host itself pollable. |
 | `apache2-utils` | provides the `htpasswd` command (step 6) |
 | `git` | to fetch the code (step 3) |
@@ -230,7 +228,7 @@ gate unless you explicitly switch back.
 
 The app never calls `ini_set()` for any of this (see `index.php`), so it's
 entirely at the mercy of your server's `php.ini`
-(`/etc/php/7.4/apache2/php.ini` on Debian/Ubuntu). None of these will stop
+(`/etc/php/8.4/apache2/php.ini` on Debian/Ubuntu). None of these will stop
 the app from *loading*, but each has a concrete, observable failure mode:
 
 | Setting | Recommended | Why |
@@ -244,7 +242,7 @@ the app from *loading*, but each has a concrete, observable failure mode:
 Edit the file, then reload Apache:
 
 ```bash
-sudo nano /etc/php/7.4/apache2/php.ini
+sudo nano /etc/php/8.4/apache2/php.ini
 sudo systemctl reload apache2
 ```
 
@@ -370,7 +368,7 @@ sudo tail -f /var/log/apache2/error.log
 **"APC disabled or not installed" exception.**
 `protected/components/CacheAPC.php` throws this the moment the app tries
 to cache anything, if `apcu.enabled` is off — check `php -i | grep apc`,
-and make sure `php7.4-apcu` is installed. If you can't install it, turn
+and make sure `php8.4-apcu` is installed. If you can't install it, turn
 "Cache" off on the Configuration page instead.
 
 **Clean URLs 404, or `.htpasswd` seems to be ignored.**
