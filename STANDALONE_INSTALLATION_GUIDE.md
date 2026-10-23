@@ -43,7 +43,10 @@ supported by the bundled Yii 1.1.32). The minimum safe version is **8.4.27**:
 earlier releases are vulnerable to CVE-2026-109618 / CVE-2026-109619
 (unauthenticated RCE in PHP core, affects Apache mod_php). **PHP 7.4 is no
 longer supported** — it never received an official fix. Debian 13 ("trixie")
-ships PHP 8.4 in its default repositories. On other distributions (e.g.
+ships PHP 8.4 in its default repositories; distro packages backport the fix
+without changing the version number, so on a stock Debian `php -v` may show
+an older 8.4.x — keep the system updated and confirm the fix in the package
+changelog (`requirements-check.php` warns about this). On other distributions (e.g.
 Ubuntu), add the [Ondřej Surý PPA](https://launchpad.net/~ondrej/+archive/ubuntu/php)
 (Ubuntu) or [Sury's Debian repo](https://packages.sury.org/php/) (Debian) to
 get PHP 8.4:

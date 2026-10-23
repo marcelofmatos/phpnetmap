@@ -53,10 +53,13 @@ if (version_compare($phpVersion, '8.4.0', '<')) {
         . "Older versions are vulnerable to CVE-2026-109618 / CVE-2026-109619."
     );
 } elseif (version_compare($phpVersion, '8.4.27', '<')) {
+    // Distro packages (Debian/Ubuntu) backport security fixes without
+    // bumping PHP_VERSION, so a lower version is not proof of being vulnerable.
     pnm_check(
         'PHP version',
-        'fail',
-        "$phpVersion — PHP 8.4 is supported, but versions below 8.4.27 are vulnerable to CVE-2026-109618 / CVE-2026-109619. Update PHP."
+        'warn',
+        "$phpVersion — upstream PHP below 8.4.27 is vulnerable to CVE-2026-109618 / CVE-2026-109619. "
+        . "If this is a distro package, check its changelog for the backported fix; otherwise update PHP."
     );
 } elseif (version_compare($phpVersion, '8.5.0', '>=')) {
     pnm_check(
