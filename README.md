@@ -111,6 +111,21 @@ docker buildx imagetools inspect ghcr.io/marcelofmatos/phpnetmap:latest
 ```
 
 
+## Security: PHP 8.4 (CVE-2026-109618 / CVE-2026-109619)
+
+CVE-2026-109618 and CVE-2026-109619 (disclosed 2026-10-21) are critical
+unauthenticated remote code execution flaws in the PHP core that affect any
+installation serving web requests, Apache mod_php included. The old
+`php:7.4-apache` base never got a fix, so the image now uses **PHP 8.4**
+(the build fails below **8.4.27**, the first fixed 8.4 release) and the
+bundled framework is **Yii 1.1.32** (Yii 1.1.16 does not run on PHP 8).
+
+Upgrade by pulling an image released after this change. For a standalone
+install, see [STANDALONE_INSTALLATION_GUIDE.md](STANDALONE_INSTALLATION_GUIDE.md).
+Details and the list of PHP 8 fixes are in
+[specs/007-php84-cve-2026-109618.md](specs/007-php84-cve-2026-109618.md).
+
+
 ## Using with docker-compose
 
 Use these comands to install docker-compose
