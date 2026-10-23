@@ -5,37 +5,57 @@ use PHPUnit\Framework\TestCase;
 class SearchViewTest extends TestCase
 {
     private $hostId;
+    private $savedWebState;
+    private $assetDir;
 
     protected function setUp(): void
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
         }, E_ALL);
-        self::useTempAssetDir();
-        // Grid sort links and forms build URLs from the current request.
-        $_SERVER['REQUEST_URI'] = '/search/index';
+        $this->useTempWebState('/search/index');
     }
 
     protected function tearDown(): void
     {
         restore_error_handler();
-        unset($_SERVER['REQUEST_URI']);
-        Yii::app()->setController(null);
+        $this->restoreWebState();
         if ($this->hostId) {
             Yii::app()->db->createCommand("DELETE FROM host WHERE id = {$this->hostId}")->execute();
         }
     }
 
-    // Grid widgets publish assets next to the entry script (vendor/bin
-    // under PHPUnit) — point the asset manager at a writable temp dir.
-    private static function useTempAssetDir()
+    // Grid widgets publish assets next to the entry script (vendor/bin under
+    // PHPUnit) and build sort links from the request URI — point both at
+    // test values, keeping the previous state to put back afterwards.
+    private function useTempWebState($requestUri)
     {
-        $dir = sys_get_temp_dir() . '/pnm-test-assets';
-        if (!is_dir($dir)) {
-            mkdir($dir);
+        $am = Yii::app()->assetManager;
+        $request = Yii::app()->request;
+        $this->savedWebState = array(
+            'server' => array_key_exists('REQUEST_URI', $_SERVER) ? $_SERVER['REQUEST_URI'] : null,
+            'assets' => Closure::bind(function () { return array($this->_basePath, $this->_baseUrl, $this->_published); }, $am, 'CAssetManager')(),
+            'request' => Closure::bind(function () { return $this->_requestUri; }, $request, 'CHttpRequest')(),
+        );
+        $this->assetDir = sys_get_temp_dir() . '/pnm-test-assets-' . uniqid();
+        mkdir($this->assetDir);
+        $am->basePath = $this->assetDir;
+        $am->baseUrl = '/assets';
+        $_SERVER['REQUEST_URI'] = $requestUri;
+    }
+
+    private function restoreWebState()
+    {
+        $state = $this->savedWebState;
+        Closure::bind(function ($s) { list($this->_basePath, $this->_baseUrl, $this->_published) = $s; }, Yii::app()->assetManager, 'CAssetManager')($state['assets']);
+        Closure::bind(function ($s) { $this->_requestUri = $s; }, Yii::app()->request, 'CHttpRequest')($state['request']);
+        if ($state['server'] === null) {
+            unset($_SERVER['REQUEST_URI']);
+        } else {
+            $_SERVER['REQUEST_URI'] = $state['server'];
         }
-        Yii::app()->assetManager->basePath = $dir;
-        Yii::app()->assetManager->baseUrl = '/assets';
+        Yii::app()->setController(null);
+        CFileHelper::removeDirectory($this->assetDir);
     }
 
     private function render($type, $result)
