@@ -69,6 +69,8 @@ class PNMSnmp {
     static function walk($host, $object_id, $cache_ttl = null) {
 
         $skipCache = ($cache_ttl === 0);
+        $cache = null;
+        $result = null;
 
         if(!$skipCache && Yii::app()->params['cache']) {
             $cache_var = str_replace('.','_',$host->ip.$object_id);
@@ -112,6 +114,9 @@ class PNMSnmp {
 
     static function get($host, $object_id, $cache_ttl = null) {
         
+        $cache = null;
+        $result = null;
+
         if(Yii::app()->params['cache']) {
             $cache_var = str_replace('.','_',$host->ip.$object_id);
             $cache = new CacheAPC();
@@ -181,6 +186,8 @@ class PNMSnmp {
         
         if(is_null($type)) throw new Exception('type not set');
 
+        $result = null;
+
         if ($snmp instanceof SnmpTemplate) {
             switch ($snmp->version) {
                 case "1":
@@ -201,8 +208,7 @@ class PNMSnmp {
     }
     
     public static function getOid($key) {
-        $oid = self::$oids[$key];
-        return $oid ? $oid : $key;
+        return isset(self::$oids[$key]) ? self::$oids[$key] : $key;
     }
 
     public static function getKey($oid) {

@@ -211,7 +211,7 @@ class Host extends CActiveRecord {
             
             
 
-            while (list($key, $data) = each($res)) {
+            foreach ($res as $key => $data) {
                 #$ip = preg_replace('/IP-MIB::ipNetToMediaPhysAddress\.[0-9]+\./', '', $key);
                 $ip = preg_replace('/.1.3.6.1.2.1.4.22.1.2\.[0-9]+\./', '', $key);
                 #$mac_snmp = strtolower(str_replace('STRING: ', '', $data));
@@ -709,11 +709,11 @@ class Host extends CActiveRecord {
     
     public function save($runValidation = true, $attributes = null) {
         
-        if(preg_match('/([0-9A-F]{2})([0-9A-F]{2})-([0-9A-F]{2})([0-9A-F]{2})-([0-9A-F]{2})([0-9A-F]{2})/', $this->mac, $m)) {
+        if(preg_match('/([0-9A-F]{2})([0-9A-F]{2})-([0-9A-F]{2})([0-9A-F]{2})-([0-9A-F]{2})([0-9A-F]{2})/', (string) $this->mac, $m)) {
             $this->mac = "{$m[1]}:{$m[2]}:{$m[3]}:{$m[4]}:{$m[5]}:{$m[6]}";
         }
         
-        $this->mac = strtolower($this->mac);
+        $this->mac = strtolower((string) $this->mac);
         
         return parent::save($runValidation, $attributes);
     }
